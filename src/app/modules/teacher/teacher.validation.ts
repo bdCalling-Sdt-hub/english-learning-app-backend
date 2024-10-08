@@ -36,33 +36,46 @@ const createTeacherZodSchema = z.object({
   }),
 });
 const createStripeAccountZodSchema = z.object({
-  dateOfBirth: z.object({
-    day: z.number().int().min(1).max(31),
-    month: z.number().int().min(1).max(12),
-    year: z.number().int().min(1900).max(9999),
-  }),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().min(1),
-  city: z.string().min(1),
-  country: z.string().min(1),
-  addressLine1: z.string().min(1),
-  address: z.object({
-    postCode: z.string().min(1),
-  }),
-  frontFilePart: z.object({
-    id: z.string().min(1),
-  }),
-  backFilePart: z.object({
-    id: z.string().min(1),
-  }),
-  bank_info: z.object({
-    account_holder_name: z.string().min(1),
-    account_holder_type: z.string().min(1),
-    account_number: z.string().min(1),
-    country: z.string().min(1),
-    currency: z.string().min(1),
+  body: z.object({
+    dateOfBirth: z
+      .object({
+        day: z.number().int().min(1).max(31).optional(),
+        month: z.number().int().min(1).max(12).optional(),
+        year: z.number().int().min(1900).max(9999).optional(),
+      })
+      .required(),
+    id: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    email: z.string().email().optional(),
+    phone: z.string().optional(),
+    city: z.string().optional(),
+    country: z.string().optional(),
+    addressLine1: z.string().optional(),
+    address: z
+      .object({
+        postCode: z.string().optional(),
+      })
+      .optional(),
+    frontFilePart: z
+      .object({
+        id: z.string().optional(),
+      })
+      .optional(),
+    backFilePart: z
+      .object({
+        id: z.string().optional(),
+      })
+      .optional(),
+    bank_info: z
+      .object({
+        account_holder_name: z.string().optional(),
+        account_holder_type: z.string().optional(),
+        account_number: z.string().optional(),
+        country: z.string().optional(),
+        currency: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 const updateTeacherZodSchema = z.object({

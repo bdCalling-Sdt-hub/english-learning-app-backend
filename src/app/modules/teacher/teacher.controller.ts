@@ -3,8 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { TeacherService } from './teacher.service';
-import ApiError from '../../../errors/ApiError';
-import { logger } from '../../../shared/logger';
 
 const createTeacher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -89,8 +87,7 @@ const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
 });
 
 const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const result = await TeacherService.createTeacherStripeAccount(id);
+  const result = await TeacherService.createTeacherStripeAccount(req.body);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

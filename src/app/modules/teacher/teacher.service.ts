@@ -10,7 +10,6 @@ import { ITeacher } from './teacher.interface';
 import { Teacher } from './teacher.model';
 import Stripe from 'stripe';
 import config from '../../../config';
-import fs from 'fs';
 
 const stripeSecretKey = config.stripe_secret_key;
 
