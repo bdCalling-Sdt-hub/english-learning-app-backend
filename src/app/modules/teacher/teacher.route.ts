@@ -14,6 +14,11 @@ router
   )
   .get('/all', TeacherController.getAllTeachers)
   .get('/:id', TeacherController.getTeacherById)
+  .post(
+    '/payment-account-setup',
+    validateRequest(TeacherValidation.createStripeAccountZodSchema),
+    TeacherController.setUpTeacherPayment
+  )
   .patch(
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),

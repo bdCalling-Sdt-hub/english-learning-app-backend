@@ -55,7 +55,6 @@ const createTeacherToDB = async (req: any) => {
 };
 
 const createTeacherStripeAccount = async (data: any) => {
-  //create token
   const token = await stripe.tokens.create({
     account: {
       individual: {
@@ -129,7 +128,6 @@ const createTeacherStripeAccount = async (data: any) => {
 
   return accountLink;
 };
-
 const getTeacherProfileFromDB = async (
   teacher: JwtPayload
 ): Promise<Partial<ITeacher>> => {
@@ -188,5 +186,6 @@ export const TeacherService = {
   updateProfileToDB,
   getAllTeachersFromDB,
   getTeacherByIdFromDB,
+  createTeacherStripeAccount,
   deleteTeacherFromDB,
 };

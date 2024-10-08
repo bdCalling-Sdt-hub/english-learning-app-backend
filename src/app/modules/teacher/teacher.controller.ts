@@ -88,6 +88,17 @@ const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await TeacherService.createTeacherStripeAccount(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Teacher payment setup successfully',
+    data: result,
+  });
+});
+
 export const TeacherController = {
   createTeacher,
   getTeacherProfile,
@@ -95,4 +106,5 @@ export const TeacherController = {
   getTeacherById,
   getAllTeachers,
   deleteTeacher,
+  setUpTeacherPayment,
 };

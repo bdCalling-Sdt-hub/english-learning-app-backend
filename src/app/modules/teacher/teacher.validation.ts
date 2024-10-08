@@ -35,6 +35,36 @@ const createTeacherZodSchema = z.object({
     profile: z.string().optional(),
   }),
 });
+const createStripeAccountZodSchema = z.object({
+  dateOfBirth: z.object({
+    day: z.number().int().min(1).max(31),
+    month: z.number().int().min(1).max(12),
+    year: z.number().int().min(1900).max(9999),
+  }),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  email: z.string().email(),
+  phone: z.string().min(1),
+  city: z.string().min(1),
+  country: z.string().min(1),
+  addressLine1: z.string().min(1),
+  address: z.object({
+    postCode: z.string().min(1),
+  }),
+  frontFilePart: z.object({
+    id: z.string().min(1),
+  }),
+  backFilePart: z.object({
+    id: z.string().min(1),
+  }),
+  bank_info: z.object({
+    account_holder_name: z.string().min(1),
+    account_holder_type: z.string().min(1),
+    account_number: z.string().min(1),
+    country: z.string().min(1),
+    currency: z.string().min(1),
+  }),
+});
 const updateTeacherZodSchema = z.object({
   body: z.object({
     firstName: z.string().optional(),
@@ -63,4 +93,5 @@ const updateTeacherZodSchema = z.object({
 export const TeacherValidation = {
   createTeacherZodSchema,
   updateTeacherZodSchema,
+  createStripeAccountZodSchema,
 };
