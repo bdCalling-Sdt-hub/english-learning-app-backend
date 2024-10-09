@@ -27,6 +27,11 @@ export type ITeacher = {
     month: number;
     year: number;
   };
+  accountInformation: {
+    stripeAccountId?: string;
+    externalAccountId?: string;
+    status?: string;
+  };
   ssnLast4?: string;
   designation?: string;
   experience?: number;
@@ -51,6 +56,36 @@ export type ITeacher = {
     expireAt?: Date;
   };
 };
+
+export interface TeacherStripeAccountData {
+  dateOfBirth: {
+    day: number;
+    month: number;
+    year: number;
+  };
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  city: string;
+  country: string;
+  addressLine1: string;
+  postCode: string;
+  frontFilePart: { id: string };
+  backFilePart: { id: string };
+  bank_info: {
+    account_holder_name: string;
+    account_holder_type: string;
+    account_number: string;
+    country: string;
+    currency: string;
+  };
+  accountInformation: {
+    stripeAccountId?: string;
+    externalAccountId?: string;
+    status?: boolean;
+  };
+}
 
 export type TeacherModel = {
   isExistTeacherById(id: string): Promise<ITeacher | null>;

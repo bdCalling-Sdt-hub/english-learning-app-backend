@@ -123,6 +123,20 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       default: null,
       index: true, // Index for faster lookups
     },
+    accountInformation: {
+      stripeAccountId: {
+        type: String,
+        default: null,
+      },
+      externalAccountId: {
+        type: String,
+        default: null,
+      },
+      status: {
+        type: String,
+        default: 'active',
+      },
+    },
     education: [
       {
         degree: {

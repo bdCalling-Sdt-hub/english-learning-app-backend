@@ -10,7 +10,9 @@ import { ITeacher } from './teacher.interface';
 import { Teacher } from './teacher.model';
 import Stripe from 'stripe';
 import config from '../../../config';
-
+import fs from 'fs';
+import path from 'path';
+import { createLogger } from 'winston';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -52,30 +54,102 @@ const createTeacherToDB = async (req: any) => {
 
   return createdTeacher;
 };
+const uploadFileToStripe = async (filePath: string): Promise<string> => {
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const fileName = path.basename(filePath);
+    const fileExtension = path.extname(filePath).toLowerCase();
 
-const createTeacherStripeAccount = async (data: any) => {
+    let mimeType: string;
+    switch (fileExtension) {
+      case '.jpg':
+      case '.jpeg':
+        mimeType = 'image/jpeg';
+        break;
+      case '.png':
+        mimeType = 'image/png';
+        break;
+      case '.pdf':
+        mimeType = 'application/pdf';
+        break;
+      default:
+        throw new Error(`Unsupported file type: ${fileExtension}`);
+    }
+
+    const file = await stripe.files.create({
+      purpose: 'identity_document',
+      file: {
+        data: fileBuffer,
+        name: fileName,
+        type: mimeType,
+      },
+    });
+    return file.id;
+  } catch (error) {
+    console.error('Error uploading file to Stripe:', error);
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Failed to upload file to Stripe'
+    );
+  }
+};
+
+const createTeacherStripeAccount = async (
+  data: any,
+  files: any,
+  paths: any
+): Promise<string> => {
+  const values = await JSON.parse(data);
+  console.log(values);
+  const isExistUser = await Teacher.findById(values.teacherID);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const dob = new Date(values.dateOfBirth);
+
+  // Process KYC
+  const KYCFiles = files;
+  if (!KYCFiles || KYCFiles.length < 2) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Two KYC files are required!');
+  }
+  const uploadsPath = path.join(__dirname, '../../../..');
+
+  // File upload to Stripe
+  const frontFileId = await uploadFileToStripe(
+    `${uploadsPath}/uploads/${paths[0]}`
+  );
+  const backFileId = await uploadFileToStripe(
+    `${uploadsPath}/uploads/${paths[1]}`
+  );
+
+  // Create token
   const token = await stripe.tokens.create({
     account: {
       individual: {
         dob: {
-          day: data.dateOfBirth.day,
-          month: data.dateOfBirth.month,
-          year: data.dateOfBirth.year,
+          day: dob.getDate(),
+          month: dob.getMonth() + 1,
+          year: dob.getFullYear(),
         },
-        first_name: data?.firstName,
-        last_name: data?.lastName,
-        email: data?.email,
-        phone: data.phone,
+        id_number: values.idNumber,
+        first_name: isExistUser.firstName,
+        last_name: isExistUser.lastName,
+        email: isExistUser.email,
+        phone: values.phoneNumber,
         address: {
-          city: data.city,
-          country: data.country,
-          line1: data.addressLine1,
-          postal_code: data.address.postCode,
+          city: values.address.city,
+          country: values.address.country,
+          line1: values.address.line1,
+          state: values.address.state,
+          postal_code: values.address.postal_code,
         },
+        ssn_last_4: values.ssn_last_4,
+
         verification: {
           document: {
-            front: data.frontFilePart.id,
-            back: data.backFilePart.id,
+            front: frontFileId,
+            back: backFileId,
           },
         },
       },
@@ -83,37 +157,47 @@ const createTeacherStripeAccount = async (data: any) => {
       tos_shown_and_accepted: true,
     },
   });
-
-  //account created
+  // Create account
   const account = await stripe.accounts.create({
     type: 'custom',
-    account_token: token.id,
+    country: values.address.country,
+    email: isExistUser.email,
     capabilities: {
       card_payments: { requested: true },
       transfers: { requested: true },
     },
     business_profile: {
-      mcc: '5970',
-      name: data.firstName,
-      url: 'www.example.com',
+      mcc: '5734',
+      name: values.business_profile.business_name || isExistUser.firstName,
+      url: values.business_profile.website || 'https://example.com',
     },
     external_account: {
       object: 'bank_account',
-      account_holder_name: data.bank_info.account_holder_name,
-      account_holder_type: data.bank_info.account_holder_type,
-      account_number: data.bank_info.account_number,
-      country: data.bank_info.country,
-      currency: data.bank_info.currency,
+      account_number: values.bank_info.account_number,
+      country: values.bank_info.country,
+      currency: values.bank_info.currency,
+      account_holder_name: values.bank_info.account_holder_name,
+      account_holder_type: values.bank_info.account_holder_type,
+      routing_number: values.bank_info.routing_number,
+    },
+    tos_acceptance: {
+      date: Math.floor(Date.now() / 1000),
+      ip: '0.0.0.0', // Replace with the user's actual IP address
     },
   });
 
-  //save to the DB
+  // Update account with additional information
+  await stripe.accounts.update(account.id, {
+    account_token: token.id,
+  });
+
+  // Save to the DB
   if (account.id && account?.external_accounts?.data.length) {
-    data.accountInformation.stripeAccountId = account.id;
-    data.accountInformation.externalAccountId =
-      account.external_accounts?.data[0].id;
-    data.accountInformation.status = true;
-    await data.save();
+    isExistUser.accountInformation.stripeAccountId = account.id;
+    isExistUser.accountInformation.externalAccountId =
+      account.external_accounts.data[0].id;
+    isExistUser.accountInformation.status = 'active';
+    await Teacher.findByIdAndUpdate(values.teacherID, isExistUser);
   }
 
   // Create account link for onboarding
@@ -125,8 +209,9 @@ const createTeacherStripeAccount = async (data: any) => {
     collect: 'eventually_due',
   });
 
-  return accountLink;
+  return accountLink.url;
 };
+
 const getTeacherProfileFromDB = async (
   teacher: JwtPayload
 ): Promise<Partial<ITeacher>> => {
@@ -172,9 +257,13 @@ const getTeacherByIdFromDB = async (
 };
 
 const deleteTeacherFromDB = async (id: string): Promise<Partial<any>> => {
+  const isExistTeacher = await Teacher.findById(id);
+  if (!isExistTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
+  }
   const result = await Teacher.findOneAndDelete({ _id: id });
   if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Couldn't delete teacher!");
   }
   return { message: 'Teacher deleted successfully' };
 };
@@ -187,4 +276,5 @@ export const TeacherService = {
   getTeacherByIdFromDB,
   createTeacherStripeAccount,
   deleteTeacherFromDB,
+  uploadFileToStripe,
 };

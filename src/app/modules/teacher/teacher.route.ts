@@ -16,7 +16,7 @@ router
   .get('/:id', TeacherController.getTeacherById)
   .post(
     '/payment-account-setup',
-    validateRequest(TeacherValidation.createStripeAccountZodSchema),
+    fileUploadHandler(),
     TeacherController.setUpTeacherPayment
   )
   .patch(

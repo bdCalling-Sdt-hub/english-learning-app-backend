@@ -3,6 +3,24 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { TeacherService } from './teacher.service';
+import ApiError from '../../../errors/ApiError';
+import { logger } from '../../../shared/logger';
+import config from '../../../config';
+import Stripe from 'stripe';
+import { Teacher } from './teacher.model';
+import fs from 'fs';
+import path from 'path';
+import { createLogger } from 'winston';
+
+const stripeSecretKey = config.stripe_secret_key;
+
+if (!stripeSecretKey) {
+  throw new Error('Stripe secret key is not defined.');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2024-09-30.acacia',
+});
 
 const createTeacher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -87,11 +105,25 @@ const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
 });
 
 const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
-  const result = await TeacherService.createTeacherStripeAccount(req.body);
+  const data = req.body.data;
+  let paths: any[] = [];
+
+  if (req.files && 'KYC' in req.files && req.files.KYC) {
+    for (const file of req.files.KYC) {
+      paths.push(`/KYCs/${file.filename}`);
+    }
+  }
+  console.log(paths);
+  const result = await TeacherService.createTeacherStripeAccount(
+    data,
+    req.files,
+    paths
+  );
+
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Teacher payment setup successfully',
+    message: 'Connected account created successfully',
     data: result,
   });
 });

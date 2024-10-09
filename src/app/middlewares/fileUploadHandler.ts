@@ -38,6 +38,9 @@ const fileUploadHandler = () => {
         case 'doc':
           uploadDir = path.join(baseUploadDir, 'docs');
           break;
+        case 'KYC':
+          uploadDir = path.join(baseUploadDir, 'KYCs');
+          break;
         default:
           throw new ApiError(StatusCodes.BAD_REQUEST, 'File is not supported');
       }
@@ -63,7 +66,8 @@ const fileUploadHandler = () => {
     if (
       file.fieldname === 'image' ||
       file.fieldname === 'profile' ||
-      file.fieldname === 'banner'
+      file.fieldname === 'banner' ||
+      file.fieldname === 'KYC'
     ) {
       if (
         file.mimetype === 'image/jpeg' ||
@@ -106,6 +110,7 @@ const fileUploadHandler = () => {
     { name: 'image', maxCount: 3 },
     { name: 'media', maxCount: 3 },
     { name: 'doc', maxCount: 3 },
+    { name: 'KYC', maxCount: 3 },
   ]);
   return upload;
 };
