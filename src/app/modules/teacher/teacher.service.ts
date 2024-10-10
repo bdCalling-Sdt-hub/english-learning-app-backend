@@ -97,7 +97,8 @@ const uploadFileToStripe = async (filePath: string): Promise<string> => {
 const createTeacherStripeAccount = async (
   data: any,
   files: any,
-  paths: any
+  paths: any,
+  ip: string
 ): Promise<string> => {
   const values = await JSON.parse(data);
   console.log(values);
@@ -144,7 +145,7 @@ const createTeacherStripeAccount = async (
           state: values.address.state,
           postal_code: values.address.postal_code,
         },
-        ssn_last_4: values.ssn_last_4,
+        ssn_last_4: values.idNumber.slice(-4),
 
         verification: {
           document: {
@@ -182,7 +183,7 @@ const createTeacherStripeAccount = async (
     },
     tos_acceptance: {
       date: Math.floor(Date.now() / 1000),
-      ip: '0.0.0.0', // Replace with the user's actual IP address
+      ip: ip, // Replace with the user's actual IP address
     },
   });
 
@@ -203,8 +204,8 @@ const createTeacherStripeAccount = async (
   // Create account link for onboarding
   const accountLink = await stripe.accountLinks.create({
     account: account.id,
-    refresh_url: 'https://example.com/reauth',
-    return_url: 'https://example.com/return',
+    refresh_url: config.stripe_refresh_url || 'https://example.com/reauth',
+    return_url: config.stripe_return_url || 'https://example.com/return',
     type: 'account_onboarding',
     collect: 'eventually_due',
   });

@@ -108,6 +108,8 @@ const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
   const data = req.body.data;
   let paths: any[] = [];
 
+  // const paths: any[] = [];
+  const ip = req.ip || '0.0.0.0';
   if (req.files && 'KYC' in req.files && req.files.KYC) {
     for (const file of req.files.KYC) {
       paths.push(`/KYCs/${file.filename}`);
@@ -117,7 +119,8 @@ const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
   const result = await TeacherService.createTeacherStripeAccount(
     data,
     req.files,
-    paths
+    paths,
+    ip
   );
 
   sendResponse(res, {

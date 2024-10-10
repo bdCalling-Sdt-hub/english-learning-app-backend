@@ -10,6 +10,8 @@ export default {
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
   stripe_secret_key: process.env.STRIPE_SECRET_KEY,
   domain_stripe: process.env.DOMAIN_STRIPE,
+  stripe_refresh_url: process.env.STRIPE_REFRESH_URL,
+  stripe_return_url: process.env.STRIPE_RETURN_URL,
   jwt: {
     jwt_secret: process.env.JWT_SECRET,
     jwt_expire_in: process.env.JWT_EXPIRE_IN,
