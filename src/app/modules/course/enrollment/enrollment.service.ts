@@ -15,21 +15,31 @@ const createEnrollmentToDB = async (data: any) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found');
   }
 
-  const teacher = await Teacher.findById(data.teacherID);
+  const teacher = await Teacher.findById(isExistCourse.teacherID);
   if (!teacher) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
   }
+
   let paymentIntent;
 
   try {
+    // Step 1: Charge the student to add funds to platform's available balance
+    const platformCharge = await stripe.charges.create({
+      amount: isExistCourse.price * 100, // amount in cents
+      currency: 'usd',
+      source: 'tok_bypassPending', // Use Stripe's test token for bypassing pending state
+      description: `Payment for course ${isExistCourse.name}`,
+    });
+
+    // Step 2: Create payment intent for student (simulating student paying)
     paymentIntent = await stripe.paymentIntents.create({
-      amount: isExistCourse.price * 100,
+      amount: isExistCourse.price * 100, // amount in cents
       currency: 'usd',
       payment_method: data.paymentMethodId,
       confirm: true,
+      return_url: 'https://yourdomain.com/payment-confirmation', // Add your return URL here
       automatic_payment_methods: {
         enabled: true,
-        allow_redirects: 'never',
       },
       metadata: {
         courseID: data.courseID,
@@ -41,6 +51,7 @@ const createEnrollmentToDB = async (data: any) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Payment failed');
   }
 
+  // Step 3: Enroll the student in the course after successful payment
   const enrollmentData = {
     studentID: data.studentID,
     courseID: data.courseID,
@@ -62,15 +73,15 @@ const createEnrollmentToDB = async (data: any) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Enrollment update failed');
   }
 
-  const teacherShare = isExistCourse.price * 0.8 * 100;
+  const teacherShare = isExistCourse.price * 0.8 * 100; // 80% of the course price
 
   try {
-    // Proceed with the transfer
+    // Step 4: Transfer the teacher's share (80% of the course price)
     await stripe.transfers.create({
-      amount: teacherShare,
+      amount: teacherShare, // Teacher's share in cents
       currency: 'usd',
-      destination: teacher?.accountInformation.stripeAccountId!,
-      transfer_group: paymentIntent.id,
+      destination: teacher?.accountInformation.stripeAccountId!, // Teacher's Stripe account
+      transfer_group: paymentIntent.id, // Group transfer with the payment
     });
   } catch (error) {
     console.error('Transfer failed:', error);
