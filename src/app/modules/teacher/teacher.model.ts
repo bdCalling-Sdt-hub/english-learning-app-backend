@@ -21,6 +21,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       default: USER_ROLES.TEACHER,
       required: true,
     },
+    appointedBy: {
+      type: String,
+      required: false,
+    },
     type: {
       type: String,
       enum: ['platform', 'freelancer'],

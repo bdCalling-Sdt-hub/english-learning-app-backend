@@ -3,6 +3,11 @@ import { AdminTypes } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { IAdmin } from './admin.interface';
 import { Admin } from './admin.model';
+import { Teacher } from '../teacher/teacher.model';
+import { emailTemplate } from '../../../shared/emailTemplate';
+import generateOTP from '../../../util/generateOTP';
+import { emailHelper } from '../../../helpers/emailHelper';
+import app from '../../../app';
 
 const createAdminToDB = async (
   userData: IAdmin,
@@ -44,7 +49,7 @@ const getAdminByIdFromDB = async (id: string) => {
   return admin;
 };
 const getAdminsFromDB = async () => {
-  const admins = await Admin.find({});
+  const admins = await Admin.find({ type: { $ne: AdminTypes.SUPERADMIN } });
   if (!admins) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
   }
@@ -68,10 +73,70 @@ const deleteAdminFromDB = async (id: string) => {
   return admin;
 };
 
+const createAppointedTeacherToDB = async (userData: any, adminId: string) => {
+  const isExistAdmin = await Admin.findById(adminId);
+  if (!isExistAdmin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
+  }
+  const isExistTeacher = await Teacher.isExistTeacherByEmail(userData.email);
+  if (isExistTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
+  }
+  const data = {
+    ...userData,
+    appointedBy: adminId,
+    type: 'platform',
+  };
+  const createdTeacher = await Teacher.create(data);
+  if (!createdTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
+  }
+
+  return createdTeacher;
+};
+
+const makeTeacherAppointedToDB = async (id: string, adminId: string) => {
+  const isExistAdmin = await Admin.findById(adminId);
+  if (!isExistAdmin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
+  }
+
+  const isExistTeacher = await Teacher.findById(id);
+  if (!isExistTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
+  }
+  const teacher = await Teacher.findById(id);
+
+  if (!teacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
+  }
+
+  if (teacher.type === 'platform') {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Already appointed as platform teacher!'
+    );
+  }
+
+  const appointedTeacher = await Teacher.findOneAndUpdate(
+    { _id: id },
+    { $set: { type: 'platform', appointedBy: adminId } },
+    { new: true }
+  );
+
+  if (!appointedTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
+  }
+
+  return appointedTeacher;
+};
+
 export const AdminService = {
   createAdminToDB,
   updateAdminToDB,
   getAdminByIdFromDB,
   getAdminsFromDB,
   deleteAdminFromDB,
+  createAppointedTeacherToDB,
+  makeTeacherAppointedToDB,
 };

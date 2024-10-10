@@ -82,6 +82,9 @@ import { isTeacherTransfersActive } from '../../../helpers/isTeacherTransfersAct
 const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
   // Validate the teacher's existence
   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
+  if (isExistTeacher?.type === 'platform') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'You cannot create courses');
+  }
   // @ts-ignore
   const isTeacherDeleted = isExistTeacher?.status === status.delete;
   let lectures;

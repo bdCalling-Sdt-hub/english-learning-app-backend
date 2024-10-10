@@ -16,5 +16,15 @@ router.patch('/:id', auth(USER_ROLES.ADMIN), AdminController.updateAdmin);
 router.get('/', auth(USER_ROLES.ADMIN), AdminController.getAllAdmins);
 router.get('/:id', auth(USER_ROLES.ADMIN), AdminController.getAdminById);
 router.delete('/:id', auth(USER_ROLES.ADMIN), AdminController.deleteAdmin);
+router.post(
+  '/:adminId/create-appointed-teacher',
+  auth(USER_ROLES.ADMIN),
+  AdminController.createAppointedTeacher
+);
+router.post(
+  '/:adminId/make-teacher-appointed/:id',
+  auth(USER_ROLES.ADMIN),
+  AdminController.makeTeacherAppointed
+);
 
 export const AdminRoutes = router;

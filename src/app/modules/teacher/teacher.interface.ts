@@ -7,6 +7,7 @@ export type ITeacher = {
   lastName: string;
   role?: USER_ROLES;
   phoneNumber: string;
+  appointedBy?: string;
   email: string;
   password: string;
   location?: string;

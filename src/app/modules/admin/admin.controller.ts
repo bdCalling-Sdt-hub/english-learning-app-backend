@@ -74,6 +74,37 @@ const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createAppointedTeacher = catchAsync(
+  async (req: Request, res: Response) => {
+    const adminId = req.params.adminId;
+    const { ...userData } = req.body;
+    const result = await AdminService.createAppointedTeacherToDB(
+      userData,
+      adminId
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Appointed teacher created successfully',
+      data: result,
+    });
+  }
+);
+
+const makeTeacherAppointed = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const adminId = req.params.adminId;
+  const result = await AdminService.makeTeacherAppointedToDB(id, adminId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Teacher appointed successfully',
+    data: result,
+  });
+});
+
 export const AdminController = {
   createAdmin,
   createSuperAdmin,
@@ -81,4 +112,6 @@ export const AdminController = {
   getAllAdmins,
   getAdminById,
   deleteAdmin,
+  createAppointedTeacher,
+  makeTeacherAppointed,
 };

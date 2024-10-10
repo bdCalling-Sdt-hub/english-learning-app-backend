@@ -16,6 +16,7 @@ router
   .get('/:id', TeacherController.getTeacherById)
   .post(
     '/payment-account-setup',
+    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
     fileUploadHandler(),
     TeacherController.setUpTeacherPayment
   )

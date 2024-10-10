@@ -18,6 +18,7 @@ const createTeacherZodSchema = z.object({
     city: z.string().optional(),
     addressLine1: z.string().optional(),
     addressLine2: z.string().optional(),
+    appointedBy: z.string().optional(),
     postCode: z.string().optional(),
     state: z.string().optional(),
     idNumber: z.string().optional(),
