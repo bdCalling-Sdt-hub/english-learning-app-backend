@@ -21,6 +21,12 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       default: USER_ROLES.TEACHER,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ['platform', 'freelancer'],
+      default: 'freelancer',
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -75,7 +81,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     status: {
       type: String,
-      enum: ['active', 'deleted'], // Changed 'delete' to 'deleted' for clarity
+      enum: ['active', 'deleted'],
       default: 'active',
     },
     verified: {
@@ -107,10 +113,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
         max: new Date().getFullYear(),
       },
     },
-    ssnLast4: {
-      type: String,
-      required: false,
-    },
+
     designation: {
       type: String,
     },
@@ -118,11 +121,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       type: Number,
       min: 0, // Ensure experience is a positive number
     },
-    stripeAccountId: {
-      type: String,
-      default: null,
-      index: true, // Index for faster lookups
-    },
+
     accountInformation: {
       stripeAccountId: {
         type: String,

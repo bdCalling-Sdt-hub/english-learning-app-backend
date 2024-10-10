@@ -7,7 +7,7 @@ import { AdminService } from './admin.service';
 
 const createSuperAdmin = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
-  const result = await AdminService.createAdminToDB(userData, 'super');
+  const result = await AdminService.createAdminToDB(userData, 'SUPERADMIN');
 
   sendResponse(res, {
     success: true,

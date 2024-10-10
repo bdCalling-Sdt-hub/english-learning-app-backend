@@ -16,6 +16,7 @@ const createAdminToDB = async (
   if (!admin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
   }
+
   return admin;
 };
 

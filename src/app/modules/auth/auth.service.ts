@@ -18,11 +18,12 @@ import { ResetToken } from '../resetToken/resetToken.model';
 import { Student } from '../student/student.model';
 import { Teacher } from '../teacher/teacher.model';
 import { findInStudentAndTeacher } from '../../../util/findInStudentAndTeacher';
-import { USER_ROLES } from '../../../enums/user';
+import { AdminTypes, USER_ROLES } from '../../../enums/user';
 import { getModelAccordingToRole } from '../../../util/getModelAccordingToRole';
 import { logger } from '../../../shared/logger';
+import { Admin } from '../admin/admin.model';
 
-type UserModel = typeof Student | typeof Teacher;
+type UserModel = typeof Student | typeof Teacher | typeof Admin;
 
 // login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -52,13 +53,17 @@ const loginUserFromDB = async (payload: ILoginData) => {
   if (password && !(await User.isMatchPassword(password, existUser.password))) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
   }
-
+  let role: any = existUser.role;
+  // @ts-ignore
+  if (existUser.type === AdminTypes.SUPERADMIN) {
+    role = AdminTypes.SUPERADMIN;
+  }
   const createToken = jwtHelper.createToken(
-    { id: existUser._id, role: existUser.role, email: existUser.email },
+    { id: existUser._id, role: role, email: existUser.email },
     config.jwt.jwt_secret as Secret,
     config.jwt.jwt_expire_in as string
   );
-
+  console.log(role);
   return { createToken };
 };
 
@@ -97,7 +102,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   const isExistUserTeacher = await Teacher.findOne({ email }).select(
     '+authentication'
   );
-
+  const isExistAdmin = await Admin.findOne({ email }).select('+authentication');
   let isExistUser;
   let User;
 
@@ -107,6 +112,9 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   } else if (isExistUserTeacher) {
     isExistUser = isExistUserTeacher;
     User = Teacher;
+  } else if (isExistAdmin) {
+    isExistUser = isExistAdmin;
+    User = Admin;
   } else {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }

@@ -22,11 +22,13 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
     },
     type: {
       type: String,
+      enum: Object.values(AdminTypes),
+      default: AdminTypes.ADMIN,
       required: [true, 'type is required'],
     },
     verified: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     role: {
       type: String,
@@ -54,13 +56,21 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
   },
   { timestamps: true }
 );
-
+adminSchema.statics.isMatchPassword = async (
+  password: string,
+  hashPassword: string
+): Promise<boolean> => {
+  return await bcrypt.compare(password, hashPassword);
+};
 adminSchema.pre('save', async function (next) {
-  const isExistSuperAdmin = await Admin.findOne({
+  const isExistSuperAdmin = await Admin.find({
     type: AdminTypes.SUPERADMIN,
   });
-  if (isExistSuperAdmin) {
+  if (isExistSuperAdmin.length > 1) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Super Admin already exist!');
+  }
+  if (this.type === AdminTypes.SUPERADMIN) {
+    this.verified = true;
   }
 
   this.password = await bcrypt.hash(

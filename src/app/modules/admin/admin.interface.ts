@@ -5,10 +5,10 @@ export type IAdmin = {
   name: string;
   email: string;
   password: string;
-  type: AdminTypes;
-  status: 'active' | 'delete';
-  verified: boolean;
-  role: USER_ROLES.ADMIN;
+  type?: AdminTypes;
+  status?: 'active' | 'delete';
+  verified?: boolean;
+  role?: USER_ROLES.ADMIN;
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode?: number;

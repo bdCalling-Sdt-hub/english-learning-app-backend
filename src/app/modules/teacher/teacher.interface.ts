@@ -17,6 +17,7 @@ export type ITeacher = {
   addressLine2?: string;
   postCode?: string;
   state?: string;
+  type?: 'platform' | 'freelancer';
   idNumber?: string;
   ip?: string;
   gender?: 'male' | 'female' | 'other';
