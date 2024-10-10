@@ -17,8 +17,16 @@ export const findInStudentAndTeacher = async (
     );
     if (isExistTeracher) {
       existUser = isExistTeracher;
-    } else {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+    }
+    if (!isExistTeracher) {
+      const isExistAdmin = await Student.findOne({ email }).select(
+        `+${selectItem}`
+      );
+      if (isExistAdmin) {
+        existUser = isExistAdmin;
+      } else {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+      }
     }
   } else {
     existUser = isExistUser;

@@ -9,3 +9,8 @@ export enum status {
   active = 'active',
   delete = 'delete',
 }
+
+export enum AdminTypes {
+  ADMIN = 'ADMIN',
+  SUPERADMIN = 'SUPERADMIN',
+}
