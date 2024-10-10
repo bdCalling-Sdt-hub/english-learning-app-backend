@@ -19,7 +19,16 @@ const createEnrollmentToDB = async (data: any) => {
   if (!teacher) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
   }
-
+  const isStudentEnrolled = await Enrollment.findOne({
+    studentID: data.studentID,
+    courseID: data.courseID,
+  });
+  if (isStudentEnrolled) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Student is already enrolled in this course'
+    );
+  }
   let paymentIntent;
 
   try {
@@ -37,9 +46,9 @@ const createEnrollmentToDB = async (data: any) => {
       currency: 'usd',
       payment_method: data.paymentMethodId,
       confirm: true,
-      return_url: 'https://yourdomain.com/payment-confirmation', // Add your return URL here
       automatic_payment_methods: {
         enabled: true,
+        allow_redirects: 'never', // Disable redirect-based payments
       },
       metadata: {
         courseID: data.courseID,

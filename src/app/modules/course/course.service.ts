@@ -9,6 +9,7 @@ import { CourseValidation } from './course.validation';
 import { ILecture } from './lecture/lecture.interface';
 import Stripe from 'stripe';
 import config from '../../../config';
+import { isTeacherTransfersActive } from '../../../helpers/isTeacherTransfersActive';
 // without stripe
 // const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
 //   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
@@ -85,7 +86,16 @@ const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
   const isTeacherDeleted = isExistTeacher?.status === status.delete;
   let lectures;
   const stripe = new Stripe(config.stripe_secret_key!);
-
+  const isActive = await isTeacherTransfersActive(
+    isExistTeacher?.accountInformation?.stripeAccountId,
+    'transfers'
+  );
+  if (!isActive) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "Teacher don't have payment account set up"
+    );
+  }
   // Handle lectures if they exist
   if (data.lectures.length > 0) {
     lectures = data.lectures;
