@@ -131,6 +131,30 @@ const makeTeacherAppointedToDB = async (id: string, adminId: string) => {
   return appointedTeacher;
 };
 
+const makeTeacherUnappointedToDB = async (id: string, adminId: string) => {
+  const isExistAdmin = await Admin.findById(adminId);
+  if (!isExistAdmin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
+  }
+
+  const isExistTeacher = await Teacher.findById(id);
+  if (!isExistTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
+  }
+
+  const unappointedTeacher = await Teacher.findOneAndUpdate(
+    { _id: id },
+    { $set: { type: 'freelancer', appointedBy: null } },
+    { new: true }
+  );
+
+  if (!unappointedTeacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
+  }
+
+  return unappointedTeacher;
+};
+
 export const AdminService = {
   createAdminToDB,
   updateAdminToDB,
@@ -139,4 +163,5 @@ export const AdminService = {
   deleteAdminFromDB,
   createAppointedTeacherToDB,
   makeTeacherAppointedToDB,
+  makeTeacherUnappointedToDB,
 };

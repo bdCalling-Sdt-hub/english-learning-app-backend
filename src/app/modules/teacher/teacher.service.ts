@@ -13,6 +13,7 @@ import config from '../../../config';
 import fs from 'fs';
 import path from 'path';
 import { createLogger } from 'winston';
+import bcrypt from 'bcrypt';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -257,10 +258,24 @@ const getTeacherByIdFromDB = async (
   return result;
 };
 
-const deleteTeacherFromDB = async (id: string): Promise<Partial<any>> => {
+const deleteTeacherFromDB = async (
+  id: string,
+  password: string
+): Promise<Partial<any>> => {
   const isExistTeacher = await Teacher.findById(id);
   if (!isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
+  }
+  const isUserAppointed = isExistTeacher.type === 'platform';
+  if (isUserAppointed) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Platform teacher cannot be deleted!'
+    );
+  }
+  const isPasswordMatch = bcrypt.compare(password, isExistTeacher.password);
+  if (!isPasswordMatch) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid password!');
   }
   const result = await Teacher.findOneAndDelete({ _id: id });
   if (!result) {

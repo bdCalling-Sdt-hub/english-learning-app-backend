@@ -105,6 +105,21 @@ const makeTeacherAppointed = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const makeTeacherUnappointed = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const adminId = req.params.adminId;
+    const result = await AdminService.makeTeacherUnappointedToDB(id, adminId);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Teacher unappointed successfully',
+      data: result,
+    });
+  }
+);
+
 export const AdminController = {
   createAdmin,
   createSuperAdmin,
@@ -114,4 +129,5 @@ export const AdminController = {
   deleteAdmin,
   createAppointedTeacher,
   makeTeacherAppointed,
+  makeTeacherUnappointed,
 };

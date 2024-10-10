@@ -109,10 +109,14 @@ const getStudentByIdFromDB = async (
   return result;
 };
 
-const deleteStudentFromDB = async (id: string) => {
+const deleteStudentFromDB = async (id: string, password: string) => {
   const existStudent = await Student.isExistStudentById(id);
   if (!existStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
+  }
+  const isPasswordMatch = await existStudent.isMatchPassword(password);
+  if (!isPasswordMatch) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid password!');
   }
   if (existStudent.status === 'delete') {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');

@@ -26,5 +26,10 @@ router.post(
   auth(USER_ROLES.ADMIN),
   AdminController.makeTeacherAppointed
 );
+router.post(
+  '/:adminId/make-teacher-unappointed/:id',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.makeTeacherUnappointed
+);
 
 export const AdminRoutes = router;
