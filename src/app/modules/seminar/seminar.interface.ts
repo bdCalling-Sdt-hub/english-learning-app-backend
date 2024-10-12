@@ -3,6 +3,7 @@ import { Model, ObjectId } from 'mongoose';
 export type ISeminar = {
   title: string;
   description: string;
+  date: string;
   time: string;
   duration: string;
   teacherID: string;

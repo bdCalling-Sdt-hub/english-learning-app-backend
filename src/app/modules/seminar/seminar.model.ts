@@ -15,6 +15,10 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
       type: String,
       required: [true, 'description is required'],
     },
+    date: {
+      type: String,
+      required: [true, 'date is required'],
+    },
     time: {
       type: String,
       required: [true, 'time is required'],
