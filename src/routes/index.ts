@@ -6,6 +6,7 @@ import { CourseRoutes } from '../app/modules/course/course.route';
 import { ReviewsRoutes } from '../app/modules/reviews/reviews.route';
 import { AdminRoutes } from '../app/modules/admin/admin.routes';
 import { SeminarRoutes } from '../app/modules/seminar/seminar.route';
+import { ComplainRoutes } from '../app/modules/complain/complain.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -32,6 +33,10 @@ const apiRoutes = [
   {
     path: '/seminars',
     route: SeminarRoutes,
+  },
+  {
+    path: '/complains',
+    route: ComplainRoutes,
   },
   {
     path: '/admin',
