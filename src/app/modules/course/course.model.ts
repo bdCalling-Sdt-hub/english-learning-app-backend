@@ -21,11 +21,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       type: String,
       required: true,
     },
-    type: {
-      type: String,
-      enum: ['platform', 'freelancer'],
-      required: true,
-    },
+
     price: {
       type: Number,
       required: true,

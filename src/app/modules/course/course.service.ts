@@ -89,15 +89,10 @@ const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
   const isTeacherDeleted = isExistTeacher?.status === status.delete;
   let lectures;
   const stripe = new Stripe(config.stripe_secret_key!);
-  const isActive = await isTeacherTransfersActive(
-    isExistTeacher?.accountInformation?.stripeAccountId,
-    'transfers'
-  );
-  if (!isActive) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      "Teacher don't have payment account set up"
-    );
+  const isPaymentSetup = await isExistTeacher?.accountInformation
+    .stripeAccountId;
+  if (!isPaymentSetup || isPaymentSetup === null) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Payment not setup');
   }
   // Handle lectures if they exist
   if (data.lectures.length > 0) {
