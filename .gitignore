@@ -5,3 +5,4 @@ uploads/
 testing-frontend-react
 /dist
 .vercel
+test.js
