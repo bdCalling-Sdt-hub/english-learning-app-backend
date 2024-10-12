@@ -14,6 +14,12 @@ router.post(
   fileUploadHandler(),
   SeminarController.createSeminar
 );
+router.post(
+  '/book',
+  auth(USER_ROLES.STUDENT),
+  validateRequest(SeminarValidation.bookSeminarZodSchema),
+  SeminarController.bookSeminar
+);
 router.patch(
   '/:id',
   auth(USER_ROLES.TEACHER),

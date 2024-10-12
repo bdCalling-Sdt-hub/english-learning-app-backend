@@ -80,6 +80,22 @@ const getSeminarByTeacherIdFromDB = async (id: string) => {
   return result;
 };
 
+const bookSeminarToDB = async (data: any) => {
+  const isExistSeminar = await getSeminarByIdFromDB(data.seminarID);
+  if (!isExistSeminar) {
+    throw new Error('Seminar not found');
+  }
+  const result = await Seminar.findOneAndUpdate(
+    { _id: data.seminarID },
+    { $push: { bookings: data.studentID } },
+    { new: true }
+  );
+  if (!result) {
+    throw new Error('Seminar not booked');
+  }
+  return result;
+};
+
 export const seminarService = {
   createSeminarToDB,
   updateSeminarToDB,
@@ -87,4 +103,5 @@ export const seminarService = {
   getAllSeminarFromDB,
   getSeminarByIdFromDB,
   getSeminarByTeacherIdFromDB,
+  bookSeminarToDB,
 };

@@ -26,8 +26,14 @@ const updateSeminarZodSchema = z.object({
     status: z.enum(['draft', 'published', 'deleted']).optional(),
   }),
 });
-
+const bookSeminarZodSchema = z.object({
+  body: z.object({
+    studentID: z.string({ required_error: 'This is required' }),
+    seminarID: z.string({ required_error: 'This is required' }),
+  }),
+});
 export const SeminarValidation = {
   createSeminarValidation,
   updateSeminarZodSchema,
+  bookSeminarZodSchema,
 };
