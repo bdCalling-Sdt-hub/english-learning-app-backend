@@ -48,7 +48,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       select: 0,
       minlength: 8,
     },
-
+    earnings: {
+      type: Number,
+      default: 0,
+    },
     profile: {
       type: String,
       default: 'https://i.ibb.co/z5YHLV9/profile.png',

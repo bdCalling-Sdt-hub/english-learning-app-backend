@@ -14,7 +14,14 @@ const createEnrollmentToDB = async (data: any) => {
   if (!isExistCourse) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found');
   }
-
+  const isClassFilled =
+    isExistCourse.enrollmentsID.length >= isExistCourse.studentRange;
+  if (isClassFilled) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'No More Student can enroll in this course'
+    );
+  }
   const teacher = await Teacher.findById(isExistCourse.teacherID);
   if (!teacher) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
@@ -82,16 +89,26 @@ const createEnrollmentToDB = async (data: any) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Enrollment update failed');
   }
 
-  const teacherShare = isExistCourse.price * 0.8 * 100; // 80% of the course price
+  const teacherShare = isExistCourse.price * 0.8 * 100;
 
   try {
-    // Step 4: Transfer the teacher's share (80% of the course price)
-    await stripe.transfers.create({
-      amount: teacherShare, // Teacher's share in cents
+    const giveTeacherShare = await stripe.transfers.create({
+      amount: teacherShare,
       currency: 'usd',
-      destination: teacher?.accountInformation.stripeAccountId!, // Teacher's Stripe account
-      transfer_group: paymentIntent.id, // Group transfer with the payment
+      destination: teacher?.accountInformation.stripeAccountId!,
+      transfer_group: paymentIntent.id,
     });
+    if (!giveTeacherShare) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to transfer funds to teacher'
+      );
+    }
+    await Teacher.findOneAndUpdate(
+      { _id: isExistCourse.teacherID },
+      { $inc: { earnings: teacherShare / 100 } },
+      { new: true }
+    );
   } catch (error) {
     console.error('Transfer failed:', error);
     throw new ApiError(

@@ -16,6 +16,7 @@ export type ITeacher = {
   gender?: 'male' | 'female' | 'other';
   status?: 'active' | 'deleted';
   verified?: boolean;
+  earnings?: number;
   dateOfBirth?: {
     day: number;
     month: number;
