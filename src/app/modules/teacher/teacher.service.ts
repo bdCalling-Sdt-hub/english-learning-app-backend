@@ -102,7 +102,7 @@ const createTeacherStripeAccount = async (
   ip: string
 ): Promise<string> => {
   const values = await JSON.parse(data);
-  console.log(values);
+
   const isExistUser = await Teacher.findById(values.teacherID);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");

@@ -38,12 +38,12 @@ reviewSchema.pre('save', async function (next) {
   if (!isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student not found!');
   }
-  //   if (isExistCourse.enrollmentsID.includes(this.studentID)) {
-  //     throw new ApiError(
-  //       StatusCodes.BAD_REQUEST,
-  //       "You didn't enroll in this course!"
-  //     );
-  //   }
+  if (isExistCourse.enrollmentsID.includes(this.studentID)) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "You didn't enroll in this course!"
+    );
+  }
 
   next();
 });

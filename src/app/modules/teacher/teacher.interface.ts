@@ -10,17 +10,9 @@ export type ITeacher = {
   appointedBy?: string;
   email: string;
   password: string;
-  location?: string;
   profile?: string;
   country?: string;
-  city?: string;
-  addressLine1?: string;
-  addressLine2?: string;
-  postCode?: string;
-  state?: string;
   type?: 'platform' | 'freelancer';
-  idNumber?: string;
-  ip?: string;
   gender?: 'male' | 'female' | 'other';
   status?: 'active' | 'deleted';
   verified?: boolean;
@@ -34,24 +26,10 @@ export type ITeacher = {
     externalAccountId?: string;
     status?: string;
   };
-  ssnLast4?: string;
   designation?: string;
   experience?: number;
-  stripeAccountId?: string;
-  externalAccountId?: string;
-  accountStatus?: boolean;
   education?: Education[];
-  bank_info?: {
-    account_holder_name: string;
-    account_holder_type: string;
-    account_number: string;
-    country: string;
-    currency: string;
-  };
-  business_profile?: {
-    business_name?: string;
-    website?: string;
-  };
+
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode?: number;

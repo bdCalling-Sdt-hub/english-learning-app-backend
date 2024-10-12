@@ -48,37 +48,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       select: 0,
       minlength: 8,
     },
-    city: {
-      type: String,
-      required: false,
-    },
-    addressLine1: {
-      type: String,
-      required: false,
-    },
-    addressLine2: {
-      type: String,
-      required: false,
-    },
-    postCode: {
-      type: String,
-      required: false,
-    },
-    state: {
-      type: String,
-      required: false,
-    },
-    idNumber: {
-      type: String,
-      required: false,
-    },
-    ip: {
-      type: String,
-      required: false,
-    },
-    location: {
-      type: String,
-    },
+
     profile: {
       type: String,
       default: 'https://i.ibb.co/z5YHLV9/profile.png',
@@ -123,7 +93,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     experience: {
       type: Number,
-      min: 0, // Ensure experience is a positive number
+      min: 0,
     },
 
     accountInformation: {
@@ -150,12 +120,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
           type: String,
           required: true,
         },
-        // You can add more fields here if needed
       },
     ],
     authentication: {
       isResetPassword: {
-        // Flattened structure for clarity
         type: Boolean,
         default: false,
       },

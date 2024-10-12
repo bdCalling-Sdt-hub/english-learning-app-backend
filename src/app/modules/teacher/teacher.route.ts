@@ -23,7 +23,6 @@ router
   .patch(
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
-    validateRequest(TeacherValidation.updateTeacherZodSchema),
     fileUploadHandler(),
     TeacherController.updateProfile
   )
@@ -33,11 +32,9 @@ router
     TeacherController.deleteTeacher
   )
   .route('/')
-  .post(TeacherController.createTeacher)
-  .patch(
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
-    fileUploadHandler(),
-    TeacherController.updateProfile
+  .post(
+    validateRequest(TeacherValidation.createTeacherZodSchema),
+    TeacherController.createTeacher
   );
 
 export const TeacherRoutes = router;

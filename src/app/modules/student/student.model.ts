@@ -62,6 +62,11 @@ const userSchema = new Schema<IStudent, StudentModel>(
       type: Date,
       default: null,
     },
+    language: {
+      type: String,
+      default: 'en',
+      required: false,
+    },
     authentication: {
       type: {
         isResetPassword: {

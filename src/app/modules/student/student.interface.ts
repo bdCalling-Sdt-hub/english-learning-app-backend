@@ -13,6 +13,7 @@ export type IStudent = {
   verified: boolean;
   gender: string;
   dateOfBirth: Date;
+  language: string;
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode: number;
