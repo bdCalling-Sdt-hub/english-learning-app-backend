@@ -93,7 +93,7 @@ const addToWishlist = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Student added to wishlist successfully',
+    message: 'Course added to wishlist successfully',
     data: result,
   });
 });

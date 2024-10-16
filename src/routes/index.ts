@@ -7,7 +7,7 @@ import { ReviewsRoutes } from '../app/modules/reviews/reviews.route';
 import { AdminRoutes } from '../app/modules/admin/admin.routes';
 import { SeminarRoutes } from '../app/modules/seminar/seminar.route';
 import { ComplainRoutes } from '../app/modules/complain/complain.route';
-import { WishlistRoutes } from '../app/modules/course/wishlist/wishlist.route';
+import { FaqRoutes } from '../app/modules/faq/faq.routes';
 
 const router = express.Router();
 
@@ -43,6 +43,10 @@ const apiRoutes = [
   {
     path: '/admin',
     route: AdminRoutes,
+  },
+  {
+    path: '/faq',
+    route: FaqRoutes,
   },
 ];
 
