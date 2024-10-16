@@ -64,6 +64,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
     config.jwt.jwt_expire_in as string
   );
   console.log(role);
+  if (existUser.role === USER_ROLES.TEACHER) {
+    // @ts-ignore
+    return { createToken, role, TeacherType: existUser?.type };
+  }
   return { createToken, role };
 };
 
