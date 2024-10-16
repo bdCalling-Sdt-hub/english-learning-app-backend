@@ -5,7 +5,8 @@ import app from './app';
 import config from './config';
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
-
+import { createInfoToDB } from './app/modules/info/info.service';
+import { Info } from './app/modules/info/info.model';
 //uncaught exception
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandleException Detected', error);
@@ -55,6 +56,21 @@ async function main() {
 }
 
 main();
+// crerating a blank info by default if it doesn't exist
+(async () => {
+  const info = await Info.findOne({});
+  if (!info) {
+    const result = await Info.create({
+      Name: 'INFO',
+      About: ' ',
+      PrivecyPolicy: ' ',
+      TermsAndConditions: ' ',
+    });
+    if (!result) {
+      throw new Error('Info not created');
+    }
+  }
+})();
 
 //SIGTERM
 process.on('SIGTERM', () => {

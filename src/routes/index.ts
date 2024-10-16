@@ -8,6 +8,7 @@ import { AdminRoutes } from '../app/modules/admin/admin.routes';
 import { SeminarRoutes } from '../app/modules/seminar/seminar.route';
 import { ComplainRoutes } from '../app/modules/complain/complain.route';
 import { FaqRoutes } from '../app/modules/faq/faq.routes';
+import { InfoRoutes } from '../app/modules/info/info.routes';
 
 const router = express.Router();
 
@@ -47,6 +48,10 @@ const apiRoutes = [
   {
     path: '/faq',
     route: FaqRoutes,
+  },
+  {
+    path: '/info',
+    route: InfoRoutes,
   },
 ];
 
