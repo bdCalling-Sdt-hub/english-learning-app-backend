@@ -21,7 +21,10 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       type: String,
       required: true,
     },
-
+    language: {
+      type: String,
+      required: true,
+    },
     price: {
       type: Number,
       required: true,

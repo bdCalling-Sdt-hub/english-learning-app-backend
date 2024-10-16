@@ -7,6 +7,7 @@ export type IStudent = {
   phone: string;
   email: string;
   password: string;
+  wishlist?: [string];
   address: string;
   profile?: string;
   status: 'active' | 'delete';

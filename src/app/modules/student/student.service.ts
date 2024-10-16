@@ -12,6 +12,7 @@ import { Teacher } from '../teacher/teacher.model';
 import sendResponse from '../../../shared/sendResponse';
 import { isStudentDeleted } from '../../../util/isDeleted';
 import { Admin } from '../admin/admin.model';
+import { Course } from '../course/course.model';
 
 const createStudentToDB = async (
   payload: Partial<IStudent>
@@ -138,6 +139,56 @@ const deleteStudentFromDB = async (id: string, password: string) => {
   return { message: 'Student deleted successfully' };
 };
 
+const addToWishlistToDB = async (courseID: string, studentId: string) => {
+  const existStudent = await Student.findOne({ _id: studentId });
+  if (!existStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
+  }
+  if (existStudent.status === 'delete') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
+  }
+  const isExistCourse = await Course.findOne({ _id: courseID });
+  if (!isExistCourse) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Course doesn't exist!");
+  }
+  const result = await Student.findOneAndUpdate(
+    { _id: studentId },
+    { $push: { wishlist: courseID } }
+  );
+  if (!result) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Course not added to wishlist!'
+    );
+  }
+  return result;
+};
+
+const removeFromWishlistToDB = async (courseID: string, studentId: string) => {
+  const existStudent = await Student.findOne({ _id: studentId });
+  if (!existStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
+  }
+  if (existStudent.status === 'delete') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
+  }
+  const isExistCourse = await Course.findOne({ _id: courseID });
+  if (!isExistCourse) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Course doesn't exist!");
+  }
+  const result = await Student.findOneAndUpdate(
+    { _id: studentId },
+    { $pull: { wishlist: courseID } }
+  );
+  if (!result) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Course not removed from wishlist!'
+    );
+  }
+  return result;
+};
+
 export const StudentService = {
   createStudentToDB,
   getStudentProfileFromDB,
@@ -145,4 +196,6 @@ export const StudentService = {
   getAllStudentsFromDB,
   getStudentByIdFromDB,
   deleteStudentFromDB,
+  addToWishlistToDB,
+  removeFromWishlistToDB,
 };

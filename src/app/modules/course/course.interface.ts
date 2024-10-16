@@ -5,6 +5,7 @@ export type ICourse = {
   banner: string;
   details: string;
   price: number;
+  language: string;
   studentRange: number;
   teacherID: string;
   enrollmentsID: Array<string>; // id of the enrollment of this course the enrollment is a seperate model

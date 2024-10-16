@@ -19,6 +19,7 @@ router
   .get('/:id', CourseController.getCourseById)
   .get('/teacher/:teacherID', CourseController.getCourseByTeacherId)
   .get('/:id/lectures', CourseController.getLecturesOfCourseByID)
+
   .patch(
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),

@@ -16,6 +16,7 @@ import { createLogger } from 'winston';
 import bcrypt from 'bcrypt';
 import { Student } from '../student/student.model';
 import { Admin } from '../admin/admin.model';
+import { TeacherValidation } from './teacher.validation';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -114,7 +115,7 @@ const createTeacherStripeAccount = async (
 ): Promise<string> => {
   const values = await JSON.parse(data);
 
-  const isExistUser = await Teacher.findById(values.teacherID);
+  const isExistUser = await Teacher.findOne({ email: values.email });
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -146,9 +147,9 @@ const createTeacherStripeAccount = async (
           year: dob.getFullYear(),
         },
         id_number: values.idNumber,
-        first_name: isExistUser.firstName,
-        last_name: isExistUser.lastName,
-        email: isExistUser.email,
+        first_name: values.firstName,
+        last_name: values.lastName,
+        email: values.email,
         phone: values.phoneNumber,
         address: {
           city: values.address.city,

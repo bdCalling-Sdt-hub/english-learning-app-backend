@@ -67,6 +67,11 @@ const userSchema = new Schema<IStudent, StudentModel>(
       default: 'en',
       required: false,
     },
+    wishlist: {
+      type: [String],
+      default: [],
+      required: false,
+    },
     authentication: {
       type: {
         isResetPassword: {

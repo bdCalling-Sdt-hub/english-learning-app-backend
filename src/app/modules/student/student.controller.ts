@@ -85,11 +85,41 @@ const deleteStudent = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const addToWishlist = catchAsync(async (req: Request, res: Response) => {
+  const courseId = req.body.courseId;
+  const studentId = req.body.studentId;
+  const result = await StudentService.addToWishlistToDB(courseId, studentId);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Student added to wishlist successfully',
+    data: result,
+  });
+});
+
+const removeFromWishlist = catchAsync(async (req: Request, res: Response) => {
+  const courseId = req.body.courseId;
+  const studentId = req.body.studentId;
+  const result = await StudentService.removeFromWishlistToDB(
+    courseId,
+    studentId
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Student removed from wishlist successfully',
+    data: result,
+  });
+});
+
 export const StudentController = {
   createStudent,
   getStudentProfile,
   updateProfile,
   getAllStudents,
   getStudentById,
+  removeFromWishlist,
   deleteStudent,
+  addToWishlist,
 };

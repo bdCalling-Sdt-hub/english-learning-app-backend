@@ -36,5 +36,16 @@ router
     fileUploadHandler(),
     StudentController.updateProfile
   );
+router
+  .post(
+    '/wishlist/add',
+    auth(USER_ROLES.STUDENT),
+    StudentController.addToWishlist
+  )
+  .post(
+    '/wishlist/remove',
+    auth(USER_ROLES.STUDENT),
+    StudentController.removeFromWishlist
+  );
 
 export const StudentRoutes = router;
