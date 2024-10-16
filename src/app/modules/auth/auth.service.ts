@@ -66,7 +66,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   console.log(role);
   if (existUser.role === USER_ROLES.TEACHER) {
     // @ts-ignore
-    return { createToken, role, TeacherType: existUser?.type };
+    return { createToken, role: existUser?.type?.toUpperCase() };
   }
   return { createToken, role };
 };
