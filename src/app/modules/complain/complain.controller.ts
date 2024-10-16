@@ -37,8 +37,20 @@ const getAllComplains = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const getEnrolledTeachers = catchAsync(async (req: Request, res: Response) => {
+  const email = req.params.email;
+  const result = await complainService.getEnrolledTeachersFromDB(email);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Teachers retrieved successfully',
+    data: result,
+  });
+});
 export const ComplainController = {
   createComplain,
   getAllComplains,
   getComplainById,
+  getEnrolledTeachers,
 };

@@ -8,11 +8,18 @@ import { emailTemplate } from '../../../shared/emailTemplate';
 import generateOTP from '../../../util/generateOTP';
 import { emailHelper } from '../../../helpers/emailHelper';
 import app from '../../../app';
+import { Student } from '../student/student.model';
 
 const createAdminToDB = async (
   userData: IAdmin,
   type: string | undefined = undefined
 ) => {
+  const isExistAdmin = await Admin.findOne({ email: userData.email });
+  const isExistTeacher = await Teacher.findOne({ email: userData.email });
+  const isExistStudent = await Student.findOne({ email: userData.email });
+  if (isExistAdmin || isExistTeacher || isExistStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+  }
   const admin = await Admin.create({
     ...userData,
     type: type || AdminTypes.ADMIN,
@@ -31,6 +38,12 @@ const updateAdminToDB = async (id: string, userData: IAdmin) => {
       StatusCodes.BAD_REQUEST,
       'You cannot update admin types!'
     );
+  }
+  const isExistAdmin = await Admin.findOne({ email: userData.email });
+  const isExistTeacher = await Teacher.findOne({ email: userData.email });
+  const isExistStudent = await Student.findOne({ email: userData.email });
+  if (isExistAdmin || isExistTeacher || isExistStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
   }
   const admin = await Admin.findByIdAndUpdate(id, userData, {
     new: true,
@@ -81,6 +94,10 @@ const createAppointedTeacherToDB = async (userData: any, adminId: string) => {
   const isExistTeacher = await Teacher.isExistTeacherByEmail(userData.email);
   if (isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
+  }
+  const isExistStudent = await Student.findOne({ email: userData.email });
+  if (isExistTeacher || isExistStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
   }
   const data = {
     ...userData,

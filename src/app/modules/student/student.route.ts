@@ -9,6 +9,11 @@ const router = express.Router();
 
 router
   .get('/', StudentController.getAllStudents)
+  .get(
+    '/profile',
+    auth(USER_ROLES.STUDENT),
+    StudentController.getStudentProfile
+  )
   .get('/:id', StudentController.getStudentById)
   .patch(
     '/:id',

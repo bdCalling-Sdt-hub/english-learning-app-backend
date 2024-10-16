@@ -1,7 +1,35 @@
+import { Course } from '../course/course.model';
+import { Enrollment } from '../course/enrollment/enrollment.model';
+import { Student } from '../student/student.model';
+import { Teacher } from '../teacher/teacher.model';
 import { Complain } from './complain.model';
 
 const createComplainToDB = async (data: any) => {
   const result = await Complain.create(data);
+  const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
+  if (!isExistTeacher) {
+    throw new Error('Teacher not found');
+  }
+  const isExistStudent = await Student.findOne({ _id: data.studentID });
+  if (!isExistStudent) {
+    throw new Error('Student not found');
+  }
+  const isExistEnrollment = await Enrollment.findOne({
+    studentID: data.studentID,
+  });
+  if (!isExistEnrollment) {
+    throw new Error('Enrollment not found');
+  }
+  const course = await Course.findOne({ _id: isExistEnrollment.courseID });
+  if (!course) {
+    throw new Error('Course not found');
+  }
+  const isExistTeacherEnrollment = await Teacher.findOne({
+    _id: course?.teacherID,
+  });
+  if (!isExistTeacherEnrollment) {
+    throw new Error('Teacher not found');
+  }
   if (!result) {
     throw new Error('Complain not created');
   }
@@ -23,9 +51,38 @@ const getAllComplainsFromDB = async () => {
   }
   return result;
 };
+const getEnrolledTeachersFromDB = async (email: string) => {
+  // Find the student by email
+  const isExistStudent = await Student.findOne({ email: email });
+  if (!isExistStudent) {
+    throw new Error('Student not found');
+  }
+
+  // Find all enrollments for the student
+  const enrollments = await Enrollment.find({ studentID: isExistStudent._id });
+  if (!enrollments || enrollments.length === 0) {
+    throw new Error('Enrollment not found');
+  }
+
+  // Fetch all courses based on the enrollments
+  const courseIDs = enrollments.map(enrollment => enrollment.courseID);
+  const courses = await Course.find({ _id: { $in: courseIDs } });
+  if (!courses || courses.length === 0) {
+    throw new Error('Courses not found');
+  }
+
+  // Fetch all teacher IDs from the courses
+  const teacherIDs = courses.map(course => course.teacherID);
+
+  // Fetch teacher details (if needed) or just return the teacher IDs
+  const teachers = await Teacher.find({ _id: { $in: teacherIDs } });
+
+  return teachers; // This will return the array of teacher objects
+};
 
 export const complainService = {
   createComplainToDB,
   getComplainByIdFromDB,
   getAllComplainsFromDB,
+  getEnrolledTeachersFromDB,
 };

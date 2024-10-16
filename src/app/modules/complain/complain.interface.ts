@@ -1,7 +1,8 @@
 import { Model } from 'mongoose';
 
 export type IComplain = {
-  subject: string;
+  studentID: string;
+  teacherID: string;
   message: string;
 };
 

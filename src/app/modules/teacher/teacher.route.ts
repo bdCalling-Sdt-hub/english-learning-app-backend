@@ -9,7 +9,7 @@ const router = express.Router();
 router
   .get(
     '/profile',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
+    auth(USER_ROLES.TEACHER),
     TeacherController.getTeacherProfile
   )
   .get('/all', TeacherController.getAllTeachers)

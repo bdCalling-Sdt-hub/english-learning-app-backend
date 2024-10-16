@@ -12,7 +12,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       type: String,
       required: true,
     },
-    lastName: {
+    address: {
       type: String,
       required: true,
     },

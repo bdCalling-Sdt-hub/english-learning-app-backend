@@ -14,6 +14,8 @@ import fs from 'fs';
 import path from 'path';
 import { createLogger } from 'winston';
 import bcrypt from 'bcrypt';
+import { Student } from '../student/student.model';
+import { Admin } from '../admin/admin.model';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -26,6 +28,15 @@ const stripe = new Stripe(stripeSecretKey, {
 
 const createTeacherToDB = async (req: any) => {
   const { ...user } = req.body;
+  const isExistStudent = await Student.findOne({ email: user.email });
+  const isExistAdmin = await Admin.findOne({ email: user.email });
+
+  if (isExistAdmin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin already exist!');
+  }
+  if (isExistStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already exist!');
+  }
   const isExistTeacher = await Teacher.isExistTeacherByEmail(user.email);
   if (isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');

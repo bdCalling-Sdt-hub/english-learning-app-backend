@@ -11,12 +11,24 @@ import { Student } from './student.model';
 import { Teacher } from '../teacher/teacher.model';
 import sendResponse from '../../../shared/sendResponse';
 import { isStudentDeleted } from '../../../util/isDeleted';
+import { Admin } from '../admin/admin.model';
 
 const createStudentToDB = async (
   payload: Partial<IStudent>
 ): Promise<IStudent> => {
   //set role
   payload.role = USER_ROLES.STUDENT;
+  const isExistTeacher = await Teacher.findOne({ email: payload.email });
+  if (isExistTeacher) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Email already exist in teacher!'
+    );
+  }
+  const isExistAdmin = await Admin.findOne({ email: payload.email });
+  if (isExistAdmin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+  }
   const createUser = await Student.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
