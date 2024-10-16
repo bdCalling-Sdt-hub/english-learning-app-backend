@@ -64,7 +64,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
     config.jwt.jwt_expire_in as string
   );
   console.log(role);
-  return { createToken };
+  return { createToken, role };
 };
 
 // forget password

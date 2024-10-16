@@ -24,7 +24,7 @@ export const findInStudentAndTeacher = async (
 
       if (isExistUser) {
         existUser = isExistUser;
-      } else {
+      } else if (!isExistUser) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
       }
     } else {
