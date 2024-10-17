@@ -49,9 +49,22 @@ const filterCourseByRate = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
+const filterCourseBySearch = catchAsync(async (req: Request, res: Response) => {
+  const search = req.query.search;
+  if (!search) {
+    throw new Error('Please provide search in the URL');
+  }
+  const result = await filterService.filterCourseBySearchFromDB(search);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+});
 export const filterController = {
   filterCourseByGender,
   filterCourseByRate,
+  filterCourseBySearch,
   filterCourseByDate,
 };

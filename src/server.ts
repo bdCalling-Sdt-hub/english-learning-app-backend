@@ -5,7 +5,6 @@ import app from './app';
 import config from './config';
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
-import { createInfoToDB } from './app/modules/info/info.service';
 import { Info } from './app/modules/info/info.model';
 //uncaught exception
 process.on('uncaughtException', error => {

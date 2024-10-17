@@ -51,8 +51,63 @@ const filterCourseByRateFromDB = async (from: number, to: number) => {
   }
 };
 
+const filterCourseBySearchFromDB = async (search: string) => {
+  if (!search) {
+    throw new Error('Please provide search in the URL');
+  }
+
+  const regexSearch = new RegExp(search, 'i'); // Case-insensitive regex for search
+
+  // Query to find any courses that match in `name` or `details`
+  const courses = await Course.find({
+    $or: [
+      { name: { $regex: regexSearch } }, // Match in name
+      { details: { $regex: regexSearch } }, // Match in details
+    ],
+  }).exec();
+
+  if (!courses || courses.length === 0) {
+    throw new Error('Course not found!');
+  }
+
+  // Sorting logic:
+  const sortedCourses = courses.sort((a, b) => {
+    const searchLower = search.toLowerCase();
+
+    const aName = a.name.toLowerCase();
+    const bName = b.name.toLowerCase();
+    const aDetails = a.details.toLowerCase();
+    const bDetails = b.details.toLowerCase();
+
+    // 1. Exact match in `name` comes first
+    if (aName === searchLower) return -1;
+    if (bName === searchLower) return 1;
+
+    // 2. Partial match in `name` comes next
+    if (aName.startsWith(searchLower) && !bName.startsWith(searchLower))
+      return -1;
+    if (bName.startsWith(searchLower) && !aName.startsWith(searchLower))
+      return 1;
+
+    // 3. `name` contains the search term but is not a match at the start
+    if (aName.includes(searchLower) && !bName.includes(searchLower)) return -1;
+    if (bName.includes(searchLower) && !aName.includes(searchLower)) return 1;
+
+    // 4. Match in `details` comes last
+    if (aDetails.includes(searchLower) && !bDetails.includes(searchLower))
+      return -1;
+    if (bDetails.includes(searchLower) && !aDetails.includes(searchLower))
+      return 1;
+
+    return 0; // Otherwise, keep the same order
+  });
+
+  return sortedCourses;
+};
+
 export const filterService = {
   filterCourseByGenderFromDB,
   filterCourseByDateFromDB,
   filterCourseByRateFromDB,
+  filterCourseBySearchFromDB,
 };

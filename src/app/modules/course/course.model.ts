@@ -66,7 +66,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
   },
   { timestamps: true }
 );
-
+courseSchema.index({ name: 'text', details: 'text' });
 courseSchema.pre('save', async function (next) {
   //check user
   const isExistTecher = await Teacher.findOne({ _id: this.teacherID });
