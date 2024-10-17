@@ -10,6 +10,7 @@ import { ComplainRoutes } from '../app/modules/complain/complain.route';
 import { FaqRoutes } from '../app/modules/faq/faq.routes';
 import { InfoRoutes } from '../app/modules/info/info.routes';
 import { BannerRoutes } from '../app/modules/banner/banner.routes';
+import { NotificationRoutes } from '../app/modules/notifications/notification.route';
 
 const router = express.Router();
 
@@ -57,6 +58,10 @@ const apiRoutes = [
   {
     path: '/banners',
     route: BannerRoutes,
+  },
+  {
+    path: '/notifications',
+    route: NotificationRoutes,
   },
 ];
 
