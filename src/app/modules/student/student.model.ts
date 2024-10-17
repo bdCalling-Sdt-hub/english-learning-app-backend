@@ -6,6 +6,7 @@ import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { IStudent, StudentModel } from './student.interface';
 import { object } from 'zod';
+import { LANGUAGE } from '../../../enums/language';
 
 const userSchema = new Schema<IStudent, StudentModel>(
   {
@@ -64,8 +65,8 @@ const userSchema = new Schema<IStudent, StudentModel>(
     },
     language: {
       type: String,
-      default: 'en',
-      required: false,
+      enum: LANGUAGE,
+      default: LANGUAGE.ENGLISH,
     },
     wishlist: {
       type: [String],

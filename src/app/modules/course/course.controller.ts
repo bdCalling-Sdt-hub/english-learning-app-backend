@@ -109,9 +109,22 @@ const deleteCourse = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getCourseByLanguage = catchAsync(async (req: Request, res: Response) => {
+  const language = req.params.language;
+  const result = await CourseService.getCourseByLanguageFromDB(language);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+});
+
 export const CourseController = {
   deleteCourse,
   createCourse,
+  getCourseByLanguage,
   updateCourse,
   getCourseById,
   getCourseByTeacherId,

@@ -1,5 +1,6 @@
 import { Model } from 'mongoose';
 import { USER_ROLES } from '../../../enums/user';
+import { LANGUAGE } from '../../../enums/language';
 
 export type IStudent = {
   name: string;
@@ -14,7 +15,7 @@ export type IStudent = {
   verified: boolean;
   gender: string;
   dateOfBirth: Date;
-  language: string;
+  language: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode: number;

@@ -6,6 +6,7 @@ import { LectureRoutes } from './lecture/lecture.route';
 import { EnrollmentRoutes } from './enrollment/enrollment.route';
 import auth from '../../middlewares/auth';
 import { USER_ROLES } from '../../../enums/user';
+import { filterRoutes } from './filter/filter.route';
 const router = express.Router();
 
 router
@@ -19,7 +20,7 @@ router
   .get('/:id', CourseController.getCourseById)
   .get('/teacher/:teacherID', CourseController.getCourseByTeacherId)
   .get('/:id/lectures', CourseController.getLecturesOfCourseByID)
-
+  .get('/language/:language', CourseController.getCourseByLanguage)
   .patch(
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
@@ -33,4 +34,5 @@ router
   );
 router.use('/lectures', LectureRoutes);
 router.use('/enrollments', EnrollmentRoutes);
+router.use('/filter', filterRoutes);
 export const CourseRoutes = router;

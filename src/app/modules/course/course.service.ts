@@ -10,6 +10,7 @@ import { ILecture } from './lecture/lecture.interface';
 import Stripe from 'stripe';
 import config from '../../../config';
 import { isTeacherTransfersActive } from '../../../helpers/isTeacherTransfersActive';
+import { LANGUAGE } from '../../../enums/language';
 // without stripe
 // const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
 //   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
@@ -280,6 +281,27 @@ const deleteCourseFromDB = async (id: string): Promise<Partial<ICourse>> => {
   return result;
 };
 
+const getCourseByLanguageFromDB = async (
+  language: string
+): Promise<Partial<Array<ICourse> | null>> => {
+  if (
+    language !== LANGUAGE.ENGLISH &&
+    language !== LANGUAGE.HEBREW &&
+    language !== LANGUAGE.SPANISH
+  ) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Language can only be either ENGLISH, HEBREW or SPANISH!'
+    );
+  }
+  language = language.toUpperCase();
+  const result = await Course.find({ language });
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
+  }
+  return result;
+};
+
 export const CourseService = {
   createCourseToDB,
   getCourseByTeacherIdFromDB,
@@ -287,5 +309,6 @@ export const CourseService = {
   getCourseByIdFromDB,
   updateCourseToDB,
   getLecturesOfCourseFromDB,
+  getCourseByLanguageFromDB,
   deleteCourseFromDB,
 };

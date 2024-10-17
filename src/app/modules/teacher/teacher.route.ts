@@ -20,6 +20,7 @@ router
     fileUploadHandler(),
     TeacherController.setUpTeacherPayment
   )
+  .get('/language/:language', TeacherController.getTeachersByLanguage)
   .patch(
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),

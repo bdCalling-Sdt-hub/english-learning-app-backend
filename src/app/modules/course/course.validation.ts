@@ -1,10 +1,14 @@
 import { z } from 'zod';
+import { LANGUAGE } from '../../../enums/language';
 const createCourseZodSchema = z.object({
   body: z.object({
     name: z.string({ required_error: 'Course Name is required' }),
     details: z.string({ required_error: 'Course Description is required' }),
     banner: z.string().optional(),
     price: z.number({ required_error: 'Course Price is required' }),
+    language: z
+      .enum([LANGUAGE.ENGLISH, LANGUAGE.HEBREW, LANGUAGE.SPANISH])
+      .optional(),
     studentRange: z.number({ required_error: 'Student Range is required' }),
     duration: z
       .string({ required_error: 'Course Duration is required' })
@@ -34,6 +38,9 @@ const updateCourseValidation = z.object({
     details: z.string().optional(),
     banner: z.string().optional(),
     price: z.number().optional(),
+    language: z
+      .enum([LANGUAGE.ENGLISH, LANGUAGE.HEBREW, LANGUAGE.SPANISH])
+      .optional(),
     studentRange: z.number().optional(),
     duration: z
       .string({ required_error: 'Course Duration is required' })

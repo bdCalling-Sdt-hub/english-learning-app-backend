@@ -132,12 +132,26 @@ const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getTeachersByLanguage = catchAsync(
+  async (req: Request, res: Response) => {
+    const { language } = req.params;
+    const result = await TeacherService.getTeachersByLanguageFromDB(language);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Teachers retrieved successfully',
+      data: result,
+    });
+  }
+);
+
 export const TeacherController = {
   createTeacher,
   getTeacherProfile,
   updateProfile,
   getTeacherById,
   getAllTeachers,
+  getTeachersByLanguage,
   deleteTeacher,
   setUpTeacherPayment,
 };

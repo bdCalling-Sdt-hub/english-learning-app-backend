@@ -5,6 +5,7 @@ import config from '../../../config';
 import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { ITeacher, TeacherModel } from './teacher.interface';
+import { LANGUAGE } from '../../../enums/language';
 
 const teacherSchema = new Schema<ITeacher, TeacherModel>(
   {
@@ -64,6 +65,12 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     verified: {
       type: Boolean,
       default: false,
+    },
+
+    language: {
+      type: String,
+      enum: LANGUAGE,
+      default: LANGUAGE.ENGLISH,
     },
     country: {
       type: String,

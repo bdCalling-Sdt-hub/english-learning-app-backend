@@ -17,6 +17,7 @@ import bcrypt from 'bcrypt';
 import { Student } from '../student/student.model';
 import { Admin } from '../admin/admin.model';
 import { TeacherValidation } from './teacher.validation';
+import { LANGUAGE } from '../../../enums/language';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -296,9 +297,28 @@ const deleteTeacherFromDB = async (
   return { message: 'Teacher deleted successfully' };
 };
 
+const getTeachersByLanguageFromDB = async (language: string) => {
+  if (
+    language !== LANGUAGE.ENGLISH &&
+    language !== LANGUAGE.HEBREW &&
+    language !== LANGUAGE.SPANISH
+  ) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Language can only be either ENGLISH, HEBREW or SPANISH!'
+    );
+  }
+  const result = await Teacher.find({ language });
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teachers not found!');
+  }
+  return result;
+};
+
 export const TeacherService = {
   createTeacherToDB,
   getTeacherProfileFromDB,
+  getTeachersByLanguageFromDB,
   updateProfileToDB,
   getAllTeachersFromDB,
   getTeacherByIdFromDB,

@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 import { USER_ROLES } from '../../../enums/user';
 import { Education } from '../../../types/teacher';
+import { LANGUAGE } from '../../../enums/language';
 
 export type ITeacher = {
   firstName: string;
@@ -12,6 +13,7 @@ export type ITeacher = {
   email: string;
   password: string;
   profile?: string;
+  language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   country?: string;
   type?: 'platform' | 'freelancer';
   gender?: 'male' | 'female' | 'other';

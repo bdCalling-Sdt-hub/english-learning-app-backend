@@ -6,6 +6,7 @@ import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { CourseModel, ICourse } from './course.interface';
 import { Teacher } from '../teacher/teacher.model';
+import { LANGUAGE } from '../../../enums/language';
 
 const courseSchema = new Schema<ICourse, CourseModel>(
   {
@@ -21,8 +22,16 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       type: String,
       required: true,
     },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      default: 'male',
+      required: false,
+    },
     language: {
       type: String,
+      enum: LANGUAGE,
+      default: LANGUAGE.ENGLISH,
       required: true,
     },
     price: {
@@ -63,6 +72,9 @@ courseSchema.pre('save', async function (next) {
   const isExistTecher = await Teacher.findOne({ _id: this.teacherID });
   if (!isExistTecher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
+  }
+  if (isExistTecher.gender) {
+    this.gender = isExistTecher.gender;
   }
   next();
 });
