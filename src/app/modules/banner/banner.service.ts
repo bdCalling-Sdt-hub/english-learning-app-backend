@@ -1,3 +1,4 @@
+import { BANNER } from '../../../enums/banner';
 import ApiError from '../../../errors/ApiError';
 import unlinkFile from '../../../shared/unlinkFile';
 import { IBanner } from './banner.interface';
@@ -25,7 +26,31 @@ const deleteBannerFromDB = async (id: string) => {
   return result;
 };
 
+const getBannerFromDB = async () => {
+  const result = await Banner.find({ type: { $ne: BANNER.PROFILE } });
+  return result;
+};
+
+const getProfileBannerFromDB = async () => {
+  const result = await Banner.findOne({ type: BANNER.PROFILE });
+  return result;
+};
+
+const getBannerByIdFromDB = async (id: string) => {
+  if (!id) {
+    throw new ApiError(400, 'Banner id is required');
+  }
+  const result = await Banner.findById(id);
+  if (!result) {
+    throw new ApiError(400, 'Banner not found');
+  }
+  return result;
+};
+
 export const BannerService = {
   createBannerToDB,
   deleteBannerFromDB,
+  getBannerByIdFromDB,
+  getProfileBannerFromDB,
+  getBannerFromDB,
 };

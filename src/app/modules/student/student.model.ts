@@ -25,6 +25,10 @@ const userSchema = new Schema<IStudent, StudentModel>(
       unique: true,
       lowercase: true,
     },
+    banner: {
+      type: String,
+      required: false,
+    },
     phone: {
       type: String,
       required: true,

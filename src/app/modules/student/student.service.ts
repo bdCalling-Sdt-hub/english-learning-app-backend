@@ -13,6 +13,8 @@ import sendResponse from '../../../shared/sendResponse';
 import { isStudentDeleted } from '../../../util/isDeleted';
 import { Admin } from '../admin/admin.model';
 import { Course } from '../course/course.model';
+import { Banner } from '../banner/banner.model';
+import { BANNER } from '../../../enums/banner';
 
 const createStudentToDB = async (
   payload: Partial<IStudent>
@@ -189,6 +191,30 @@ const removeFromWishlistToDB = async (courseID: string, studentId: string) => {
   return result;
 };
 
+const selectBannerByIDToDB = async (bannerId: string, studentId: string) => {
+  const existStudent = await Student.findOne({ _id: studentId });
+  if (!existStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
+  }
+  if (existStudent.status === 'delete') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
+  }
+  const isExistBanner = await Banner.findOne({ _id: bannerId });
+  if (!isExistBanner) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Banner doesn't exist!");
+  }
+  if (isExistBanner.type !== BANNER.PROFILE) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Banner type is not profile!');
+  }
+  const result = await Student.findOneAndUpdate(
+    { _id: studentId },
+    { banner: bannerId }
+  );
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Banner not selected!');
+  }
+};
+
 export const StudentService = {
   createStudentToDB,
   getStudentProfileFromDB,
@@ -198,4 +224,5 @@ export const StudentService = {
   deleteStudentFromDB,
   addToWishlistToDB,
   removeFromWishlistToDB,
+  selectBannerByIDToDB,
 };

@@ -35,7 +35,39 @@ const deleteBanner = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await BannerService.getBannerFromDB();
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Banner retrieved successfully',
+    data: result,
+  });
+});
+
+const getProfileBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await BannerService.getProfileBannerFromDB();
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Banner retrieved successfully',
+    data: result,
+  });
+});
+const getBannerById = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await BannerService.getBannerByIdFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Banner retrieved successfully',
+    data: result,
+  });
+});
 export const BannerController = {
   createBanner,
   deleteBanner,
+  getProfileBanner,
+  getBannerById,
+  getBanner,
 };

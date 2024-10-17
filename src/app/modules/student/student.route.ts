@@ -46,6 +46,7 @@ router
     '/wishlist/remove',
     auth(USER_ROLES.STUDENT),
     StudentController.removeFromWishlist
-  );
+  )
+  .post('/banner/select', StudentController.selectBannerByID);
 
 export const StudentRoutes = router;

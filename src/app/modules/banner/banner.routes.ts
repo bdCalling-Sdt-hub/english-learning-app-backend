@@ -16,4 +16,7 @@ router.delete(
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   BannerController.deleteBanner
 );
+router.get('/', BannerController.getBanner);
+router.get('/profile', BannerController.getProfileBanner);
+router.get('/:id', BannerController.getBannerById);
 export const BannerRoutes = router;

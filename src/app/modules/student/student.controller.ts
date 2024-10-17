@@ -113,6 +113,18 @@ const removeFromWishlist = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const selectBannerByID = catchAsync(async (req: Request, res: Response) => {
+  const bannerId = req.body.bannerId;
+  const studentId = req.body.studentId;
+  const result = await StudentService.selectBannerByIDToDB(bannerId, studentId);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Banner selected successfully',
+    data: result,
+  });
+});
+
 export const StudentController = {
   createStudent,
   getStudentProfile,
@@ -122,4 +134,5 @@ export const StudentController = {
   removeFromWishlist,
   deleteStudent,
   addToWishlist,
+  selectBannerByID,
 };

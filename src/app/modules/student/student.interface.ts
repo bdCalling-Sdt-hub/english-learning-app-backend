@@ -7,6 +7,7 @@ export type IStudent = {
   role: USER_ROLES;
   phone: string;
   email: string;
+  banner: string;
   password: string;
   wishlist?: [string];
   address: string;
