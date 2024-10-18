@@ -19,6 +19,10 @@ const enrollmentSchema = new Schema<IEnrollment, EnrollmentModel>(
       ref: 'Course',
       required: true,
     },
+    teacherID: {
+      type: String,
+      required: false,
+    },
     paymentIntentId: {
       type: String,
       required: true,
@@ -32,7 +36,7 @@ enrollmentSchema.pre('save', async function (next) {
   if (!isExistCourse) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
   }
-
+  this.teacherID = isExistCourse.teacherID;
   const isExistStudent = await Student.findOne({ _id: this.studentID });
   if (!isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student not found!');

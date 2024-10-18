@@ -5,6 +5,7 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import validateRequest from '../../middlewares/validateRequest';
 import { TeacherController } from './teacher.controller';
 import { TeacherValidation } from './teacher.validation';
+import { totalsRoutes } from './totals/totals.route';
 const router = express.Router();
 router
   .get(
@@ -37,5 +38,7 @@ router
     validateRequest(TeacherValidation.createTeacherZodSchema),
     TeacherController.createTeacher
   );
+
+router.use('/total', totalsRoutes);
 
 export const TeacherRoutes = router;
