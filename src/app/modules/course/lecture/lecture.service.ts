@@ -42,7 +42,7 @@ const updateLectureLinkToDB = async (
   if (!isExistCourse) {
     throw new Error('Course not found');
   }
-  const isExistLecture = await Lecture.findOne({ _id: id });
+  const isExistLecture: any = await Lecture.findOne({ _id: id });
   if (!isExistLecture) {
     throw new Error('Lecture not found');
   }
@@ -57,25 +57,27 @@ const updateLectureLinkToDB = async (
     throw new Error('Lecture not updated');
   }
   const sendNotificationMessage = `Your teacher share a meeting link for lecture "${isExistLecture.title}".`;
-  isExistCourse.enrollmentsID.forEach(async enrollmentID => {
-    const enrollment = await Enrollment.findOne({ _id: enrollmentID });
-    if (!enrollment) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Enrollment not found');
-    }
-    const studentID = enrollment?.studentID;
-    if (!studentID) {
-      throw new Error('Student ID not found');
-    }
-    await NotificationService.sendNotificationToDB(
-      {
-        sendTo: USER_ROLES.STUDENT,
-        sendUserID: studentID.toString(),
-        message: sendNotificationMessage,
-        status: 'unread' as const,
-      },
-      io
-    );
-  });
+  await Promise.all(
+    isExistCourse.enrollmentsID.map(async enrollmentID => {
+      const enrollment = await Enrollment.findOne({ _id: enrollmentID });
+      if (!enrollment) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Enrollment not found');
+      }
+      const studentID = enrollment?.studentID;
+      if (!studentID) {
+        throw new Error('Student ID not found');
+      }
+      await NotificationService.sendNotificationToDB(
+        {
+          sendTo: USER_ROLES.STUDENT,
+          sendUserID: studentID.toString(),
+          message: sendNotificationMessage,
+          status: 'unread' as const,
+        },
+        io
+      );
+    })
+  );
 
   return result;
 };

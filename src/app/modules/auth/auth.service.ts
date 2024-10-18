@@ -78,7 +78,7 @@ const forgetPasswordToDB = async (email: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
-  const User = getModelAccordingToRole(isExistUser);
+  const User: any = getModelAccordingToRole(isExistUser);
   const otp = generateOTP();
 
   const emailData = { otp, email: isExistUser.email };
@@ -86,6 +86,7 @@ const forgetPasswordToDB = async (email: string) => {
   emailHelper.sendEmail(resetPasswordEmail);
 
   const authentication = {
+    isResetPassword: true,
     oneTimeCode: otp,
     expireAt: new Date(Date.now() + 3 * 60000), // OTP expires in 3 minutes
   };
@@ -148,9 +149,30 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   let message;
   let data;
 
-  if (!isExistUser.verified) {
+  if (isExistUser.authentication?.isResetPassword) {
+    // User is resetting password
+    const resetToken = cryptoToken();
+    await ResetToken.create({
+      user: isExistUser._id,
+      token: resetToken,
+      expireAt: new Date(Date.now() + 15 * 60000), // 15 minutes expiry
+    });
     // @ts-ignore
+    await User.findOneAndUpdate(
+      { _id: isExistUser._id },
+      {
+        $set: {
+          'authentication.oneTimeCode': null,
+          'authentication.expireAt': null,
+        },
+      }
+    );
 
+    message = 'Email verified. Use the provided token to reset your password.';
+    data = { resetToken };
+  } else {
+    // Regular email verification
+    // @ts-ignore
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
@@ -161,33 +183,18 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
         },
       }
     );
-    message = 'Email verified successfully';
-  } else {
-    const createToken = cryptoToken();
-    await ResetToken.create({
-      user: isExistUser._id,
-      token: createToken,
-      expireAt: new Date(Date.now() + 5 * 60000),
-    });
-    // @ts-ignore
 
-    await User.findOneAndUpdate(
-      { _id: isExistUser._id },
-      {
-        $set: {
-          'authentication.isResetPassword': true,
-          'authentication.oneTimeCode': null,
-          'authentication.expireAt': null,
-        },
-      }
+    const token = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
     );
 
-    message =
-      'Verification successful. Please securely store this code to reset your password.';
-    data = createToken;
+    message = 'Email verified successfully';
+    data = { token };
   }
 
-  return { data, message };
+  return { message, data };
 };
 
 // reset password
@@ -208,12 +215,20 @@ const resetPasswordToDB = async (
   const isExistUserTeacher = await Teacher.findById(isExistToken.user).select(
     '+authentication'
   );
-
+  const isExistAdmin = await Admin.findById(isExistToken.user).select(
+    '+authentication'
+  );
+  let User: any;
   let isExistUser;
   if (isExistUserStudent) {
     isExistUser = isExistUserStudent;
+    User = Student;
   } else if (isExistUserTeacher) {
     isExistUser = isExistUserTeacher;
+    User = Teacher;
+  } else if (isExistAdmin) {
+    isExistUser = isExistAdmin;
+    User = Admin;
   } else {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -253,9 +268,19 @@ const resetPasswordToDB = async (
   };
   // @ts-ignore
 
-  await isExistUser.findOneAndUpdate({ _id: isExistUser._id }, updateData, {
-    new: true,
-  });
+  const isUpdated = await User.findOneAndUpdate(
+    { _id: isExistUser._id },
+    updateData,
+    {
+      new: true,
+    }
+  );
+
+  if (!isUpdated) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Password didn't updated");
+  }
+
+  return isUpdated;
 };
 
 const changePasswordToDB = async (
@@ -299,6 +324,8 @@ const changePasswordToDB = async (
   // @ts-ignore
 
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
+
+  return { message: 'Password changed successfully' };
 };
 
 export const AuthService = {

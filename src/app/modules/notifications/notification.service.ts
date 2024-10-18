@@ -16,8 +16,8 @@ const sendNotificationToDB = async (data: INotification, io: Server) => {
         'Failed to send notification'
       );
     }
-    const roomIdentifier = data.sendUserID || data.sendTo;
-    io.to(roomIdentifier).emit('newNotification', notification);
+    const roomIdentifier = data.sendUserID;
+    io.emit(`newNotification::${roomIdentifier}`, notification);
     return notification;
   } catch (error) {
     throw new ApiError(
@@ -139,7 +139,7 @@ const sendNotificationToAllStudents = async (
       const createdNotifications = await Notification.insertMany(notifications);
 
       createdNotifications.forEach(notification => {
-        io.to(notification.sendUserID).emit('newNotification', notification);
+        io.emit('newNotification', notification);
       });
 
       processedStudents += students.length;

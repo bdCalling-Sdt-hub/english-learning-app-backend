@@ -189,7 +189,7 @@ const createCourseToDB = async (
     });
   }
   if (isExistTeacher.type === 'platform') {
-    const notificationMessage = `A new course "${result.name}" has been added by ${isExistTeacher.name}`;
+    const notificationMessage = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
     await NotificationService.sendNotificationToAllStudents(
       notificationMessage,
       io

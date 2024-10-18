@@ -10,21 +10,17 @@ router
   .get('/:id', LectureController.getLectureByID)
   .post(
     '/',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
+    auth(USER_ROLES.TEACHER),
     validateRequest(LectureValidation.createLectureZodSchema),
     LectureController.createLecture
   )
   .patch(
     '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
+    auth(USER_ROLES.TEACHER),
     validateRequest(LectureValidation.updateLectureZodSchema),
     LectureController.updateLecture
   )
-  .delete(
-    '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
-    LectureController.deleteLecture
-  )
+  .delete('/:id', auth(USER_ROLES.TEACHER), LectureController.deleteLecture)
   .patch('/:id/update-link', LectureController.updateLectureLink);
 
 export const LectureRoutes = router;
