@@ -9,13 +9,13 @@ import { LANGUAGE } from '../../../enums/language';
 
 const teacherSchema = new Schema<ITeacher, TeacherModel>(
   {
-    firstName: {
+    name: {
       type: String,
       required: true,
     },
     address: {
       type: String,
-      required: true,
+      required: false,
     },
     role: {
       type: String,
@@ -39,7 +39,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       lowercase: true,
       match: /.+\@.+\..+/, // Regex for basic email validation
     },
-    phoneNumber: {
+    phone: {
       type: String,
       required: true,
     },

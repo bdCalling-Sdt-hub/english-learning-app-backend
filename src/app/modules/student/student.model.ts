@@ -41,7 +41,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     },
     address: {
       type: String,
-      required: true,
+      required: false,
     },
     profile: {
       type: String,

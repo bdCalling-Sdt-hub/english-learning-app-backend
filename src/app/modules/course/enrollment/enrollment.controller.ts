@@ -3,13 +3,15 @@ import catchAsync from '../../../../shared/catchAsync';
 import sendResponse from '../../../../shared/sendResponse';
 import { EnrollmentService } from './enrollment.service';
 import { Response, Request } from 'express';
+import { Server } from 'socket.io';
 
 const createEnrollment = catchAsync(async (req: Request, res: Response) => {
   const { ...enrollmentData } = req.body;
+  const io: Server = req.app.get('io');
   const data = {
     ...enrollmentData,
   };
-  const result = await EnrollmentService.createEnrollmentToDB(data);
+  const result = await EnrollmentService.createEnrollmentToDB(data, io);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

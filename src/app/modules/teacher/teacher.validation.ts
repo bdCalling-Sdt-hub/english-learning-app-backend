@@ -2,11 +2,10 @@ import { z } from 'zod';
 
 const createTeacherZodSchema = z.object({
   body: z.object({
-    firstName: z.string({ required_error: 'Firstname is required' }),
-    address: z.string({ required_error: 'Address is required' }),
+    name: z.string({ required_error: 'Firstname is required' }),
     email: z.string({ required_error: 'Email is required' }),
     password: z.string({ required_error: 'Password is required' }),
-    phoneNumber: z.string({ required_error: 'phoneNumber is required' }),
+    phone: z.string({ required_error: 'phoneNumber is required' }),
   }),
 });
 const createStripeAccountZodSchema = z.object({

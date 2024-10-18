@@ -5,10 +5,13 @@ import { Enrollment } from './enrollment.model';
 import Stripe from 'stripe';
 import ApiError from '../../../../errors/ApiError';
 import { Teacher } from '../../teacher/teacher.model';
+import { Server } from 'socket.io';
+import { NotificationService } from '../../notifications/notification.service';
+import { USER_ROLES } from '../../../../enums/user';
 
 const stripe = new Stripe(config.stripe_secret_key!);
 
-const createEnrollmentToDB = async (data: any) => {
+const createEnrollmentToDB = async (data: any, io: Server) => {
   const isExistCourse = await Course.findOne({ _id: data.courseID });
 
   if (!isExistCourse) {
@@ -108,6 +111,22 @@ const createEnrollmentToDB = async (data: any) => {
       { _id: isExistCourse.teacherID },
       { $inc: { earnings: teacherShare / 100 } },
       { new: true }
+    );
+    const teacherNotificationMessage = `A new student has enrolled in your course "${updatedCourse.name}".`;
+    await NotificationService.sendNotificationToTeacher(
+      teacher._id.toString(),
+      teacherNotificationMessage,
+      io
+    );
+    const studentNotificationMessage = `You have successfully enrolled in the course "${updatedCourse.name}".`;
+    await NotificationService.sendNotificationToDB(
+      {
+        sendTo: USER_ROLES.STUDENT,
+        sendUserID: data.studentID,
+        message: studentNotificationMessage,
+        status: 'unread' as const,
+      },
+      io
     );
   } catch (error) {
     console.error('Transfer failed:', error);

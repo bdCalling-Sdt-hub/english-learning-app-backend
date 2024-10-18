@@ -5,9 +5,12 @@ import sendResponse from '../../../shared/sendResponse';
 import { CourseService } from './course.service';
 import { logger } from '../../../shared/logger';
 import { CourseValidation } from './course.validation';
+import { Server } from 'socket.io';
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const { ...courseData } = req.body;
+  const io: Server = req.app.get('io');
+
   let banner;
   if (req.files && 'banner' in req.files && req.files.banner[0]) {
     banner = `/banners/${req.files.banner[0].filename}`;
@@ -17,7 +20,7 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
     ...courseData,
   };
 
-  const result = await CourseService.createCourseToDB(data);
+  const result = await CourseService.createCourseToDB(data, io);
 
   sendResponse(res, {
     success: true,

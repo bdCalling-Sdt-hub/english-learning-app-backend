@@ -4,10 +4,9 @@ import { Education } from '../../../types/teacher';
 import { LANGUAGE } from '../../../enums/language';
 
 export type ITeacher = {
-  firstName: string;
-  lastName: string;
+  name: string;
   role?: USER_ROLES;
-  phoneNumber: string;
+  phone: string;
   address: string;
   appointedBy?: string;
   email: string;

@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { AdminTypes } from '../../../enums/user';
+import { AdminTypes, USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { IAdmin } from './admin.interface';
 import { Admin } from './admin.model';
@@ -9,6 +9,8 @@ import generateOTP from '../../../util/generateOTP';
 import { emailHelper } from '../../../helpers/emailHelper';
 import app from '../../../app';
 import { Student } from '../student/student.model';
+import { NotificationService } from '../notifications/notification.service';
+import { Server } from 'socket.io';
 
 const createAdminToDB = async (
   userData: IAdmin,
@@ -32,7 +34,7 @@ const createAdminToDB = async (
   return admin;
 };
 
-const updateAdminToDB = async (id: string, userData: IAdmin) => {
+const updateAdminToDB = async (id: string, userData: IAdmin): Promise<any> => {
   if (userData.type && userData.type !== AdminTypes.SUPERADMIN) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
@@ -112,7 +114,11 @@ const createAppointedTeacherToDB = async (userData: any, adminId: string) => {
   return createdTeacher;
 };
 
-const makeTeacherAppointedToDB = async (id: string, adminId: string) => {
+const makeTeacherAppointedToDB = async (
+  id: string,
+  adminId: string,
+  io: Server
+) => {
   const isExistAdmin = await Admin.findById(adminId);
   if (!isExistAdmin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
@@ -122,13 +128,8 @@ const makeTeacherAppointedToDB = async (id: string, adminId: string) => {
   if (!isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
   }
-  const teacher = await Teacher.findById(id);
 
-  if (!teacher) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
-  }
-
-  if (teacher.type === 'platform') {
+  if (isExistTeacher.type === 'platform') {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
       'Already appointed as platform teacher!'
@@ -144,6 +145,16 @@ const makeTeacherAppointedToDB = async (id: string, adminId: string) => {
   if (!appointedTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
   }
+
+  // Send notification to the appointed teacher
+  const notificationData = {
+    sendTo: USER_ROLES.TEACHER,
+    sendUserID: isExistTeacher._id.toString(),
+    message: 'You have been appointed as a platform teacher.',
+    status: 'unread' as const,
+  };
+
+  await NotificationService.sendNotificationToDB(notificationData, io);
 
   return appointedTeacher;
 };

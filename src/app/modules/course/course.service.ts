@@ -11,6 +11,8 @@ import Stripe from 'stripe';
 import config from '../../../config';
 import { isTeacherTransfersActive } from '../../../helpers/isTeacherTransfersActive';
 import { LANGUAGE } from '../../../enums/language';
+import { NotificationService } from '../notifications/notification.service';
+import { Server } from 'socket.io';
 // without stripe
 // const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
 //   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
@@ -80,12 +82,13 @@ import { LANGUAGE } from '../../../enums/language';
 
 // with stripe
 
-const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
+const createCourseToDB = async (
+  data: any,
+  io: Server
+): Promise<Partial<ICourse>> => {
   // Validate the teacher's existence
   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
-  if (isExistTeacher?.type === 'platform') {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'You cannot create courses');
-  }
+
   // @ts-ignore
   const isTeacherDeleted = isExistTeacher?.status === status.delete;
   let lectures;
@@ -117,7 +120,7 @@ const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
   data.studentRange = Number(data.studentRange);
   data.time.start = data.time.start.toString();
   data.time.end = data.time.end.toString();
-
+  data.type = isExistTeacher?.type;
   // Validate the course data
   const validateData = {
     body: {
@@ -184,6 +187,13 @@ const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
         lectures: [],
       },
     });
+  }
+  if (isExistTeacher.type === 'platform') {
+    const notificationMessage = `A new course "${result.name}" has been added by ${isExistTeacher.name}`;
+    await NotificationService.sendNotificationToAllStudents(
+      notificationMessage,
+      io
+    );
   }
   return result;
 };

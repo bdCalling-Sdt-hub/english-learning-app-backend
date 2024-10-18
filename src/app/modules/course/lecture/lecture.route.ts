@@ -24,6 +24,7 @@ router
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
     LectureController.deleteLecture
-  );
+  )
+  .patch('/:id/update-link', LectureController.updateLectureLink);
 
 export const LectureRoutes = router;

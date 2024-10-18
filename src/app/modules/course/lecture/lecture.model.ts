@@ -12,6 +12,10 @@ const lectureSchema = new Schema<ILecture, LectureModel>(
       type: String,
       required: [true, 'Lecture title is required'],
     },
+    link: {
+      type: String,
+      required: false,
+    },
     date: {
       type: Date,
       required: [true, 'Lecture date is required'],

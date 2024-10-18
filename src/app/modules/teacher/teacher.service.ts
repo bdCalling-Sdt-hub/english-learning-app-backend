@@ -50,7 +50,7 @@ const createTeacherToDB = async (req: any) => {
   }
   const otp = generateOTP();
   const values = {
-    name: createdTeacher.firstName,
+    name: createdTeacher.name,
     otp: otp,
     email: createdTeacher.email!,
   };
@@ -183,7 +183,7 @@ const createTeacherStripeAccount = async (
     },
     business_profile: {
       mcc: '5734',
-      name: values.business_profile.business_name || isExistUser.firstName,
+      name: values.business_profile.business_name || isExistUser.name,
       url: values.business_profile.website || 'https://example.com',
     },
     external_account: {

@@ -10,7 +10,7 @@ export type IStudent = {
   banner: string;
   password: string;
   wishlist?: [string];
-  address: string;
+  address?: string;
   profile?: string;
   status: 'active' | 'delete';
   verified: boolean;

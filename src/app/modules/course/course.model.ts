@@ -22,6 +22,12 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ['platform', 'freelancer'],
+      default: 'freelancer',
+      required: false,
+    },
     gender: {
       type: String,
       enum: ['male', 'female', 'other'],
