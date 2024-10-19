@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { seminarService } from './seminar.service';
 import { Server } from 'socket.io';
+import ApiError from '../../../errors/ApiError';
 
 const createSeminar = catchAsync(async (req: Request, res: Response) => {
   const { ...seminarData } = req.body;
@@ -58,7 +59,7 @@ const deleteSeminar = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllSeminar = catchAsync(async (req: Request, res: Response) => {
-  const result = await seminarService.getAllSeminarFromDB();
+  const result: any = await seminarService.getAllSeminarFromDB();
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -114,6 +115,22 @@ const completeSeminar = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const addLinkToSeminar = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const { link } = req.body;
+  if (!link) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Link is required');
+  }
+  const io: Server = req.app.get('io');
+  const result = await seminarService.addLinkToSeminar(id, link, io);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Link added to seminar successfully',
+    data: result,
+  });
+});
+
 export const SeminarController = {
   createSeminar,
   updateSeminar,
@@ -123,4 +140,5 @@ export const SeminarController = {
   getSeminarByTeacherId,
   bookSeminar,
   completeSeminar,
+  addLinkToSeminar,
 };

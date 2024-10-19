@@ -40,5 +40,10 @@ router.post(
   auth(USER_ROLES.TEACHER),
   SeminarController.completeSeminar
 );
+router.patch(
+  '/:id/link',
+  auth(USER_ROLES.TEACHER),
+  SeminarController.addLinkToSeminar
+);
 
 export const SeminarRoutes = router;

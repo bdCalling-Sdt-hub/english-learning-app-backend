@@ -7,7 +7,7 @@ export type ISeminar = {
   time: string;
   duration: string;
   teacherID: string;
-  link: string;
+  link?: string;
   banner: string;
   bookings: [string];
   status: 'draft' | 'published' | 'completed' | 'deleted';

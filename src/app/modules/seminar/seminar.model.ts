@@ -33,7 +33,7 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
     },
     link: {
       type: String,
-      required: [true, 'link is required'],
+      required: false,
     },
     banner: {
       type: String,

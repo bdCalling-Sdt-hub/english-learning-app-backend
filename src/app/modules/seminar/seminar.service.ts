@@ -101,11 +101,11 @@ const getSeminarByTeacherIdFromDB = async (id: string) => {
 };
 
 const bookSeminarToDB = async (Data: any, io: Server) => {
-  const isExistStudent = await Student.findOne({ _id: Data.studentID });
+  const isExistStudent: any = await Student.findOne({ _id: Data.studentID });
   if (!isExistStudent) {
     throw new Error('Student not found');
   }
-  const isExistSeminar = await getSeminarByIdFromDB(Data.seminarID);
+  const isExistSeminar: any = await getSeminarByIdFromDB(Data.seminarID);
   if (!isExistSeminar) {
     throw new Error('Seminar not found');
   }
@@ -150,6 +150,28 @@ const completeSeminarFromDB = async (id: string): Promise<any> => {
   return result;
 };
 
+const addLinkToSeminar = async (id: string, link: string, io: Server) => {
+  const isExistSeminar: any = await getSeminarByIdFromDB(id);
+  if (!isExistSeminar) {
+    throw new Error('Seminar not found');
+  }
+  const result = await Seminar.findByIdAndUpdate(id, { link }, { new: true });
+  if (!result) {
+    throw new Error('Seminar not updated');
+  }
+  isExistSeminar.bookings.forEach(async (studentID: string) => {
+    await NotificationService.sendNotificationToDB(
+      {
+        sendTo: USER_ROLES.STUDENT,
+        sendUserID: studentID,
+        message: 'Link added to seminar click to join the seminar',
+        data: { seminarID: id, link: link },
+      },
+      io
+    );
+  });
+  return result;
+};
 export const seminarService = {
   createSeminarToDB,
   updateSeminarToDB,
@@ -159,4 +181,5 @@ export const seminarService = {
   getSeminarByTeacherIdFromDB,
   bookSeminarToDB,
   completeSeminarFromDB,
+  addLinkToSeminar,
 };
