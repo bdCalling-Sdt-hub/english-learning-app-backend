@@ -103,6 +103,17 @@ const bookSeminar = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const completeSeminar = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await seminarService.completeSeminarFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Seminar completed successfully',
+    data: result,
+  });
+});
+
 export const SeminarController = {
   createSeminar,
   updateSeminar,
@@ -111,4 +122,5 @@ export const SeminarController = {
   getSeminarById,
   getSeminarByTeacherId,
   bookSeminar,
+  completeSeminar,
 };

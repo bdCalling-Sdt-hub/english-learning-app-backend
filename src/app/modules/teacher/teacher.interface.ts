@@ -35,7 +35,7 @@ export type ITeacher = {
 
   authentication?: {
     isResetPassword: boolean;
-    oneTimeCode?: number;
+    oneTimeCode?: string;
     expireAt?: Date;
   };
 };

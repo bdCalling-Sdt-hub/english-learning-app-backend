@@ -84,7 +84,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
           default: false,
         },
         oneTimeCode: {
-          type: Number,
+          type: String,
           default: null,
         },
         expireAt: {

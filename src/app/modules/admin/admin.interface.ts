@@ -11,7 +11,7 @@ export type IAdmin = {
   role?: USER_ROLES.ADMIN;
   authentication?: {
     isResetPassword: boolean;
-    oneTimeCode?: number;
+    oneTimeCode?: string;
     expireAt?: Date;
   };
 };

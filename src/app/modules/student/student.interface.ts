@@ -19,7 +19,7 @@ export type IStudent = {
   language: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   authentication?: {
     isResetPassword: boolean;
-    oneTimeCode: number;
+    oneTimeCode: string;
     expireAt: Date;
   };
 };

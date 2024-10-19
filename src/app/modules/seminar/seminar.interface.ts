@@ -10,7 +10,7 @@ export type ISeminar = {
   link: string;
   banner: string;
   bookings: [string];
-  status: 'draft' | 'published' | 'deleted';
+  status: 'draft' | 'published' | 'completed' | 'deleted';
 };
 
 export type SeminarModel = Model<ISeminar>;

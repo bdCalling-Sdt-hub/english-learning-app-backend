@@ -35,5 +35,10 @@ router.delete(
 router.get('/', SeminarController.getAllSeminar);
 router.get('/:id', SeminarController.getSeminarById);
 router.get('/teacher/:teacherID', SeminarController.getSeminarByTeacherId);
+router.post(
+  '/:id/complete',
+  auth(USER_ROLES.TEACHER),
+  SeminarController.completeSeminar
+);
 
 export const SeminarRoutes = router;

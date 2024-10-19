@@ -41,7 +41,7 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
     },
     status: {
       type: String,
-      enum: ['draft', 'published', 'deleted'],
+      enum: ['draft', 'published', 'completed', 'deleted'],
       default: 'draft',
     },
     bookings: {

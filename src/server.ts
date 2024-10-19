@@ -6,7 +6,7 @@ import config from './config';
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
 import { Info } from './app/modules/info/info.model';
-import { initCronJobs } from './app/cron';
+import { initCronJobs } from './app/modules/cron/cronService.controller';
 //uncaught exception
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandleException Detected', error);
@@ -14,6 +14,7 @@ process.on('uncaughtException', error => {
 });
 
 let server: any;
+let exportIO: Server;
 async function main() {
   try {
     mongoose.connect(config.database_url as string);
@@ -36,6 +37,7 @@ async function main() {
         origin: '*',
       },
     });
+    exportIO = io;
     socketHelper.socket(io, app);
   } catch (error) {
     errorLogger.error(colors.red('🤢 Failed to connect Database'));
@@ -53,7 +55,6 @@ async function main() {
     }
   });
 }
-
 main();
 // crerating a blank info by default if it doesn't exist
 (async () => {
@@ -78,3 +79,4 @@ process.on('SIGTERM', () => {
     server.close();
   }
 });
+export { exportIO };

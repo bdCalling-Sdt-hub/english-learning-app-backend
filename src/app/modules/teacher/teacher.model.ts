@@ -138,7 +138,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
         default: false,
       },
       oneTimeCode: {
-        type: Number,
+        type: String,
         default: null,
       },
       expireAt: {

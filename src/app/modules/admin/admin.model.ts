@@ -45,7 +45,7 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
         default: false,
       },
       oneTimeCode: {
-        type: Number,
+        type: String,
         default: null,
       },
       expireAt: {

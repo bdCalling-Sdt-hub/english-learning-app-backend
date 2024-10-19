@@ -45,6 +45,7 @@ const sendNotificationToDB = async (data: INotification, io: Server) => {
     io.emit(`${eventName}::${roomIdentifier}`, notification);
     return notification;
   } catch (error) {
+    console.log(error);
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
       'Failed to send notification'

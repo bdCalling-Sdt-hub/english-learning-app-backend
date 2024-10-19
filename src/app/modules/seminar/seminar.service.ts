@@ -58,7 +58,7 @@ const updateSeminarToDB = async (id: string, data: any) => {
   return result;
 };
 
-const deleteSeminarFromDB = async (id: string) => {
+const deleteSeminarFromDB = async (id: string): Promise<any> => {
   const isExistSeminar = await Seminar.findById(id);
   if (!isExistSeminar) {
     throw new Error('Seminar not found');
@@ -109,6 +109,10 @@ const bookSeminarToDB = async (Data: any, io: Server) => {
   if (!isExistSeminar) {
     throw new Error('Seminar not found');
   }
+  const bookingsArray = isExistSeminar.bookings as string[];
+  if (bookingsArray.includes(isExistStudent._id.toString())) {
+    throw new Error('Seminar already booked');
+  }
   const result = await Seminar.findOneAndUpdate(
     { _id: Data.seminarID },
     { $push: { bookings: Data.studentID } },
@@ -128,6 +132,21 @@ const bookSeminarToDB = async (Data: any, io: Server) => {
     sendData,
     io
   );
+  if (!notificationSent) {
+    throw new Error('Notification not sent');
+  }
+  return result;
+};
+
+const completeSeminarFromDB = async (id: string): Promise<any> => {
+  const result = await Seminar.findByIdAndUpdate(
+    id,
+    { status: 'completed' },
+    { new: true }
+  );
+  if (!result) {
+    throw new Error('Seminar not completed');
+  }
   return result;
 };
 
@@ -139,4 +158,5 @@ export const seminarService = {
   getSeminarByIdFromDB,
   getSeminarByTeacherIdFromDB,
   bookSeminarToDB,
+  completeSeminarFromDB,
 };
