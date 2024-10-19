@@ -53,9 +53,10 @@ const sendNotificationToDB = async (data: INotification, io: Server) => {
 };
 
 const sendNotificationToAllUserOfARole = async (
-  message: string,
+  message: any,
   io: Server,
   role: string,
+  data: any = null,
   batchSize = 1000
 ) => {
   try {
@@ -95,6 +96,7 @@ const sendNotificationToAllUserOfARole = async (
         sendTo: role.toUpperCase(),
         sendUserID: user._id.toString(),
         message,
+        data,
         status: 'unread' as const,
       }));
 

@@ -9,8 +9,9 @@ export type INotification = {
     | AdminTypes.SUPERADMIN;
   sendUserID: string;
   message: string;
+  data?: object;
   link?: string;
-  status: 'unread' | 'read';
+  status?: 'unread' | 'read';
 };
 
 export type NotificationModel = Model<INotification>;

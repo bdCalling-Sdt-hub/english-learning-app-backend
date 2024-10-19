@@ -29,8 +29,9 @@ const createTeacher = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'User created successfully',
-      data: result,
+      message:
+        'Student Registered successfully please check your email for OTP',
+      data: '',
     });
   }
 );

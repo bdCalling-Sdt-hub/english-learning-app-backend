@@ -5,6 +5,7 @@ import config from '../../../config';
 import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { INotification, NotificationModel } from './notification.interface';
+import { object } from 'zod';
 
 const NotificationSchema = new Schema<INotification, NotificationModel>(
   {
@@ -19,6 +20,10 @@ const NotificationSchema = new Schema<INotification, NotificationModel>(
     message: {
       type: String,
       required: [true, 'message is required'],
+    },
+    data: {
+      type: Object,
+      required: false,
     },
     link: {
       type: String,

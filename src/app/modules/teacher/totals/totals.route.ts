@@ -4,7 +4,7 @@ import auth from '../../../middlewares/auth';
 import { totalController } from './total.controller';
 const router = express.Router();
 router.get(
-  '/rating',
+  '/status',
   auth(USER_ROLES.TEACHER),
   totalController.getOverallRating
 );

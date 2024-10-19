@@ -10,9 +10,7 @@ const getOverallRating = async (id: string) => {
   }
   const courses = await Course.find({
     teacherID: id,
-  })
-    .select('rating')
-    .lean();
+  });
   if (!courses) {
     throw new Error('Course not found');
   }
@@ -33,8 +31,15 @@ const getOverallRating = async (id: string) => {
     totalstar += review.star;
   });
   const avarageRating = totalstar / reviews.length;
-
-  return { avarageRating: avarageRating, totalRarings: reviews.length };
+  let totalEnrollments: number = 0;
+  courses.forEach(course => {
+    totalEnrollments = totalEnrollments + course.enrollmentsID.length;
+  });
+  return {
+    avarageRating: avarageRating,
+    totalRarings: reviews.length,
+    totalCourseTaker: totalEnrollments,
+  };
 };
 
 export const totalService = { getOverallRating };

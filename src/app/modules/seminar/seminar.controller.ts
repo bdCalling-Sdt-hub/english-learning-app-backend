@@ -93,7 +93,8 @@ const getSeminarByTeacherId = catchAsync(
 
 const bookSeminar = catchAsync(async (req: Request, res: Response) => {
   const { ...data } = req.body;
-  const result = await seminarService.bookSeminarToDB(data);
+  const io: Server = req.app.get('io');
+  const result = await seminarService.bookSeminarToDB(data, io);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

@@ -173,7 +173,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   } else {
     // Regular email verification
     // @ts-ignore
-    await User.findOneAndUpdate(
+    const result = await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
         $set: {
@@ -191,7 +191,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
     );
 
     message = 'Email verified successfully';
-    data = { token };
+    data = { token, result };
   }
 
   return { message, data };

@@ -6,6 +6,7 @@ import { SeminarValidation } from './seminar.validation';
 import { Server } from 'socket.io';
 import { NotificationService } from '../notifications/notification.service';
 import { USER_ROLES } from '../../../enums/user';
+import { Student } from '../student/student.model';
 
 const createSeminarToDB = async (data: ISeminar, io: Server) => {
   const validateData = {
@@ -24,11 +25,16 @@ const createSeminarToDB = async (data: ISeminar, io: Server) => {
     throw new Error('Seminar not created');
   }
   const message = `${isExistTeacher.name} has created a new seminar.`;
+  const seminarData = {
+    teacherID: data.teacherID,
+    seminarID: result._id,
+  };
   const notificationSent =
     await NotificationService.sendNotificationToAllUserOfARole(
       message,
       io,
-      USER_ROLES.STUDENT
+      USER_ROLES.STUDENT,
+      seminarData
     );
 
   if (!notificationSent) {
@@ -94,19 +100,34 @@ const getSeminarByTeacherIdFromDB = async (id: string) => {
   return result;
 };
 
-const bookSeminarToDB = async (data: any) => {
-  const isExistSeminar = await getSeminarByIdFromDB(data.seminarID);
+const bookSeminarToDB = async (Data: any, io: Server) => {
+  const isExistStudent = await Student.findOne({ _id: Data.studentID });
+  if (!isExistStudent) {
+    throw new Error('Student not found');
+  }
+  const isExistSeminar = await getSeminarByIdFromDB(Data.seminarID);
   if (!isExistSeminar) {
     throw new Error('Seminar not found');
   }
   const result = await Seminar.findOneAndUpdate(
-    { _id: data.seminarID },
-    { $push: { bookings: data.studentID } },
+    { _id: Data.seminarID },
+    { $push: { bookings: Data.studentID } },
     { new: true }
   );
   if (!result) {
     throw new Error('Seminar not booked');
   }
+  const message = `${isExistStudent.name} has booked a seminar.`;
+  const sendData = {
+    sendTo: USER_ROLES.TEACHER,
+    sendUserID: isExistSeminar.teacherID,
+    message: message,
+    data: { seminarID: Data.seminarID },
+  };
+  const notificationSent = await NotificationService.sendNotificationToDB(
+    sendData,
+    io
+  );
   return result;
 };
 
