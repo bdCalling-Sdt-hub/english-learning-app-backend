@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import ApiError from '../../../errors/ApiError';
 import { AdminService } from './admin.service';
+import { Server } from 'socket.io';
 
 const createSuperAdmin = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
@@ -78,9 +79,11 @@ const createAppointedTeacher = catchAsync(
   async (req: Request, res: Response) => {
     const adminId = req.params.adminId;
     const { ...userData } = req.body;
+    const io: Server = req.app.get('io');
     const result = await AdminService.createAppointedTeacherToDB(
       userData,
-      adminId
+      adminId,
+      io
     );
 
     sendResponse(res, {
@@ -95,7 +98,9 @@ const createAppointedTeacher = catchAsync(
 const makeTeacherAppointed = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const adminId = req.params.adminId;
-  const result = await AdminService.makeTeacherAppointedToDB(id, adminId);
+  const io: Server = req.app.get('io');
+
+  const result = await AdminService.makeTeacherAppointedToDB(id, adminId, io);
 
   sendResponse(res, {
     success: true,

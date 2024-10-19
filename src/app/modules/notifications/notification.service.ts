@@ -1,23 +1,48 @@
 import { Notification } from './notification.model';
 import { INotification } from './notification.interface';
-import { USER_ROLES } from '../../../enums/user';
+import { AdminTypes, USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
 import { Server } from 'socket.io';
 import { Student } from '../student/student.model';
+import { Teacher } from '../teacher/teacher.model';
+import { SOCKET_EVENTS } from '../../../shared/socketEvents';
+import { Admin } from '../admin/admin.model';
 
 const sendNotificationToDB = async (data: INotification, io: Server) => {
   try {
+    if (!data.sendTo || !data.sendUserID || !data.message) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'sendTo, sendUserID and message are required'
+      );
+    }
     const notification = await Notification.create(data);
     if (!notification) {
-      console.log('notification not found');
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
         'Failed to send notification'
       );
     }
     const roomIdentifier = data.sendUserID;
-    io.emit(`newNotification::${roomIdentifier}`, notification);
+    let eventName;
+    switch (data.sendTo) {
+      case USER_ROLES.TEACHER:
+        eventName = SOCKET_EVENTS.TEACHER.SPECIFIC;
+        break;
+      case USER_ROLES.STUDENT:
+        eventName = SOCKET_EVENTS.STUDENT.SPECIFIC;
+        break;
+      case USER_ROLES.ADMIN:
+        eventName = SOCKET_EVENTS.ADMIN.SPECIFIC;
+        break;
+      case AdminTypes.SUPERADMIN:
+        eventName = SOCKET_EVENTS.ADMIN.SPECIFIC;
+        break;
+      default:
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid user role');
+    }
+    io.emit(`${eventName}::${roomIdentifier}`, notification);
     return notification;
   } catch (error) {
     throw new ApiError(
@@ -26,6 +51,73 @@ const sendNotificationToDB = async (data: INotification, io: Server) => {
     );
   }
 };
+
+const sendNotificationToAllUserOfARole = async (
+  message: string,
+  io: Server,
+  role: string,
+  batchSize = 1000
+) => {
+  try {
+    let User;
+    let Event;
+    switch (role) {
+      case USER_ROLES.STUDENT:
+        User = Student;
+        Event = SOCKET_EVENTS.STUDENT.ALL;
+        break;
+      case USER_ROLES.TEACHER:
+        User = Teacher;
+        Event = SOCKET_EVENTS.TEACHER.ALL;
+        break;
+      case USER_ROLES.ADMIN:
+        User = Admin;
+        Event = SOCKET_EVENTS.ADMIN.ALL;
+        break;
+      case AdminTypes.SUPERADMIN:
+        User = Admin;
+        Event = SOCKET_EVENTS.ADMIN.ALL;
+        break;
+      default:
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid user role');
+    }
+
+    const totalUsers = await User.countDocuments();
+    let processedUsers = 0;
+
+    while (processedUsers < totalUsers) {
+      // @ts-ignore
+      const users = await User.find({}, '_id')
+        .skip(processedUsers)
+        .limit(batchSize);
+      // @ts-ignore
+      const notifications = users.map(user => ({
+        sendTo: role.toUpperCase(),
+        sendUserID: user._id.toString(),
+        message,
+        status: 'unread' as const,
+      }));
+
+      const createdNotifications = await Notification.insertMany(notifications);
+
+      createdNotifications.forEach(notification => {
+        io.emit(Event as string, notification);
+      });
+
+      processedUsers += users.length;
+    }
+
+    console.log(`Notifications sent to ${totalUsers} ${role} users`);
+    return { message: `Notifications sent to ${totalUsers} students` };
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      `Failed to send notifications to all ${role} users`
+    );
+  }
+};
+
 const sendNotificationToTeacher = async (
   teacherId: string,
   message: string,
@@ -40,7 +132,7 @@ const sendNotificationToTeacher = async (
     };
 
     const notification = await Notification.create(notificationData);
-    io.to(teacherId).emit('newNotification', notification);
+    io.emit(`newNotification::${teacherId}`, notification);
 
     return notification;
   } catch (error) {
@@ -139,7 +231,7 @@ const sendNotificationToAllStudents = async (
       const createdNotifications = await Notification.insertMany(notifications);
 
       createdNotifications.forEach(notification => {
-        io.emit('newNotification', notification);
+        io.emit('newStudentNotification', notification);
       });
 
       processedStudents += students.length;
@@ -153,6 +245,7 @@ const sendNotificationToAllStudents = async (
     );
   }
 };
+
 const updateNotificationStatus = async (
   notificationId: string,
   status: 'read' | 'unread'
@@ -255,6 +348,7 @@ export const NotificationService = {
   getAdminNotificationsFromDB,
   getStudentNotificationsFromDB,
   getTeacherNotificationsFromDB,
+  sendNotificationToAllUserOfARole,
   sendNotificationToAllStudents,
   sendNotificationToTeacher,
   updateNotificationStatus,

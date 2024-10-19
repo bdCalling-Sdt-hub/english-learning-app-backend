@@ -1,10 +1,18 @@
+import { Server } from 'socket.io';
 import { INFO } from '../../../enums/info';
+import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
+import { NotificationService } from '../notifications/notification.service';
 import { IInfo } from './info.interface';
 import { Info } from './info.model';
 
-const updateInfoToDB = async (data: Partial<IInfo>, type: string) => {
+const updateInfoToDB = async (
+  data: Partial<IInfo>,
+  type: string,
+  io: Server
+) => {
   let result;
+  let whatUpdated;
   if (type === INFO.ABOUT) {
     if (!data.About) throw new ApiError(400, 'About is required');
     data.About = await data.About?.toString();
@@ -22,6 +30,7 @@ const updateInfoToDB = async (data: Partial<IInfo>, type: string) => {
     if (!update) {
       throw new ApiError(400, 'Could not update');
     }
+    whatUpdated = null;
     result = update;
   } else if (type === INFO.PRIVACYPOLICY) {
     if (!data.PrivecyPolicy)
@@ -44,6 +53,7 @@ const updateInfoToDB = async (data: Partial<IInfo>, type: string) => {
       throw new ApiError(400, 'Could not update');
     }
     result = update;
+    whatUpdated = 'Privecy and Policy';
   } else if (type === INFO.TERMSANDCONDITIONS) {
     if (!data.TermsAndConditions)
       throw new ApiError(400, 'TermsAndConditions is required');
@@ -65,8 +75,28 @@ const updateInfoToDB = async (data: Partial<IInfo>, type: string) => {
       throw new ApiError(400, 'Could not update');
     }
     result = update;
+    whatUpdated = 'Terms and Conditions';
   } else {
     throw new ApiError(400, 'Invalid type');
+  }
+  const notificationMessage = `Admin updated the ${whatUpdated}`;
+  if (whatUpdated !== null) {
+    const sendToTeachers =
+      await NotificationService.sendNotificationToAllUserOfARole(
+        notificationMessage,
+        io,
+        USER_ROLES.TEACHER
+      );
+    const sendToStudents =
+      await NotificationService.sendNotificationToAllUserOfARole(
+        notificationMessage,
+        io,
+        USER_ROLES.STUDENT
+      );
+
+    if (!sendToStudents || !sendToTeachers) {
+      throw new ApiError(400, 'Could not send notification');
+    }
   }
   return result;
 };

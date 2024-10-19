@@ -4,13 +4,15 @@ import sendResponse from '../../../shared/sendResponse';
 import catchAsync from '../../../shared/catchAsync';
 import { InfoService } from './info.service';
 import { INFO } from '../../../enums/info';
+import { Server } from 'socket.io';
 
 const updateAbout = catchAsync(async (req: Request, res: Response) => {
   const { ...infoData } = req.body;
+  const io: Server = req.app.get('io');
   const data = {
     ...infoData,
   };
-  const result = await InfoService.updateInfoToDB(data, INFO.ABOUT);
+  const result = await InfoService.updateInfoToDB(data, INFO.ABOUT, io);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -21,10 +23,12 @@ const updateAbout = catchAsync(async (req: Request, res: Response) => {
 
 const updatePrivacy = catchAsync(async (req: Request, res: Response) => {
   const { ...infoData } = req.body;
+  const io: Server = req.app.get('io');
+
   const data = {
     ...infoData,
   };
-  const result = await InfoService.updateInfoToDB(data, INFO.PRIVACYPOLICY);
+  const result = await InfoService.updateInfoToDB(data, INFO.PRIVACYPOLICY, io);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -35,12 +39,15 @@ const updatePrivacy = catchAsync(async (req: Request, res: Response) => {
 
 const updateTerms = catchAsync(async (req: Request, res: Response) => {
   const { ...infoData } = req.body;
+  const io: Server = req.app.get('io');
+
   const data = {
     ...infoData,
   };
   const result = await InfoService.updateInfoToDB(
     data,
-    INFO.TERMSANDCONDITIONS
+    INFO.TERMSANDCONDITIONS,
+    io
   );
   sendResponse(res, {
     success: true,

@@ -88,7 +88,11 @@ const deleteAdminFromDB = async (id: string) => {
   return admin;
 };
 
-const createAppointedTeacherToDB = async (userData: any, adminId: string) => {
+const createAppointedTeacherToDB = async (
+  userData: any,
+  adminId: string,
+  io: Server
+) => {
   const isExistAdmin = await Admin.findById(adminId);
   if (!isExistAdmin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
@@ -110,7 +114,17 @@ const createAppointedTeacherToDB = async (userData: any, adminId: string) => {
   if (!createdTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
   }
+  const studentMessage = `${createdTeacher.name} have became an appointed teacher.`;
+  const notificationSentStudent =
+    await NotificationService.sendNotificationToAllUserOfARole(
+      studentMessage,
+      io,
+      USER_ROLES.STUDENT
+    );
 
+  if (!notificationSentStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
+  }
   return createdTeacher;
 };
 

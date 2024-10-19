@@ -3,10 +3,11 @@ import { NextFunction, Request, Response } from 'express';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { seminarService } from './seminar.service';
+import { Server } from 'socket.io';
 
 const createSeminar = catchAsync(async (req: Request, res: Response) => {
   const { ...seminarData } = req.body;
-
+  const io: Server = req.app.get('io');
   let banner;
   if (req.files && 'banner' in req.files && req.files.banner[0]) {
     banner = `/banners/${req.files.banner[0].filename}`;
@@ -15,7 +16,7 @@ const createSeminar = catchAsync(async (req: Request, res: Response) => {
     banner,
     ...seminarData,
   };
-  const result = await seminarService.createSeminarToDB(data);
+  const result = await seminarService.createSeminarToDB(data, io);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

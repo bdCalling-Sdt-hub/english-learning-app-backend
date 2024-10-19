@@ -3,7 +3,7 @@ import { ICourse } from './course.interface';
 import { Course } from './course.model';
 import ApiError from '../../../errors/ApiError';
 import { Teacher } from '../teacher/teacher.model';
-import { status } from '../../../enums/user';
+import { status, USER_ROLES } from '../../../enums/user';
 import { Lecture } from './lecture/lecture.model';
 import { CourseValidation } from './course.validation';
 import { ILecture } from './lecture/lecture.interface';
@@ -190,9 +190,10 @@ const createCourseToDB = async (
   }
   if (isExistTeacher.type === 'platform') {
     const notificationMessage = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
-    await NotificationService.sendNotificationToAllStudents(
+    await NotificationService.sendNotificationToAllUserOfARole(
       notificationMessage,
-      io
+      io,
+      USER_ROLES.STUDENT
     );
   }
   return result;

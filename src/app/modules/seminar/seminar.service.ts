@@ -3,8 +3,11 @@ import { ISeminar } from './seminar.interface';
 import { Seminar } from './seminar.model';
 import { Teacher } from '../teacher/teacher.model';
 import { SeminarValidation } from './seminar.validation';
+import { Server } from 'socket.io';
+import { NotificationService } from '../notifications/notification.service';
+import { USER_ROLES } from '../../../enums/user';
 
-const createSeminarToDB = async (data: ISeminar) => {
+const createSeminarToDB = async (data: ISeminar, io: Server) => {
   const validateData = {
     body: {
       ...data,
@@ -19,6 +22,17 @@ const createSeminarToDB = async (data: ISeminar) => {
   }
   if (!result) {
     throw new Error('Seminar not created');
+  }
+  const message = `${isExistTeacher.name} has created a new seminar.`;
+  const notificationSent =
+    await NotificationService.sendNotificationToAllUserOfARole(
+      message,
+      io,
+      USER_ROLES.STUDENT
+    );
+
+  if (!notificationSent) {
+    throw new Error('Notification not sent');
   }
 
   return result;
