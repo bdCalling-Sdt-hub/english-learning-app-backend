@@ -6,6 +6,7 @@ import config from './config';
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
 import { Info } from './app/modules/info/info.model';
+import { initCronJobs } from './app/cron';
 //uncaught exception
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandleException Detected', error);
@@ -26,7 +27,8 @@ async function main() {
         colors.yellow(`♻️  Application listening on port:${config.port}`)
       );
     });
-
+    initCronJobs();
+    logger.info(colors.green('🕒 Cron jobs initialized'));
     //socket
     const io = new Server(server, {
       pingTimeout: 60000,

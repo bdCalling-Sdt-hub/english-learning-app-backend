@@ -35,6 +35,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@types/node-cron": "^3.0.11",
     "bcrypt": "^5.1.1",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
