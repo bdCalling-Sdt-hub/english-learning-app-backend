@@ -15,9 +15,12 @@ import { Admin } from '../admin/admin.model';
 import { Course } from '../course/course.model';
 import { Banner } from '../banner/banner.model';
 import { BANNER } from '../../../enums/banner';
+import { NotificationService } from '../notifications/notification.service';
+import { Server } from 'socket.io';
 
 const createStudentToDB = async (
-  payload: Partial<IStudent>
+  payload: Partial<IStudent>,
+  io: Server
 ): Promise<IStudent> => {
   //set role
   payload.role = USER_ROLES.STUDENT;
@@ -62,7 +65,14 @@ const createStudentToDB = async (
     { _id: createUser._id },
     { $set: { authentication } }
   );
-
+  await NotificationService.sendNotificationToAllUserOfARole(
+    'New student registered',
+    io,
+    USER_ROLES.ADMIN,
+    {
+      data: { studentID: createUser._id },
+    }
+  );
   return createUser;
 };
 

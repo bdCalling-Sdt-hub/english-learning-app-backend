@@ -195,6 +195,15 @@ const createCourseToDB = async (
       io,
       USER_ROLES.STUDENT
     );
+    const adminNotificationMessage: string = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
+    await NotificationService.sendNotificationToAllUserOfARole(
+      adminNotificationMessage,
+      io,
+      USER_ROLES.ADMIN,
+      {
+        data: { courseID: result._id, teacherID: isExistTeacher._id },
+      }
+    );
   }
   return result;
 };

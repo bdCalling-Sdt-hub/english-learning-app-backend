@@ -3,11 +3,13 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StudentService } from './student.service';
+import { Server } from 'socket.io';
 
 const createStudent = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { ...userData } = req.body;
-    const result = await StudentService.createStudentToDB(userData);
+    const io: Server = req.app.get('io');
+    const result = await StudentService.createStudentToDB(userData, io);
 
     sendResponse(res, {
       success: true,
