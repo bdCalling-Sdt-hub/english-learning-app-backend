@@ -8,4 +8,5 @@ router.get(
   auth(USER_ROLES.TEACHER),
   totalController.getOverallRating
 );
+router.get('/earnings', auth(USER_ROLES.TEACHER), totalController.getEarnings);
 export const totalsRoutes = router;

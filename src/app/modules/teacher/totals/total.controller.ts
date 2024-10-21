@@ -13,7 +13,18 @@ const getOverallRating = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getEarnings = catchAsync(async (req: Request, res: Response) => {
+  const { teacher } = req.query;
+  const result = await totalService.getEarnings(teacher?.toString()!);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'Earnings',
+    data: result,
+  });
+});
 
 export const totalController = {
   getOverallRating,
+  getEarnings,
 };

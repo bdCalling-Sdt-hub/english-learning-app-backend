@@ -53,6 +53,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       type: Number,
       default: 0,
     },
+    pendingEarnings: {
+      type: Number,
+      default: 0,
+    },
     profile: {
       type: String,
       default: 'https://i.ibb.co/z5YHLV9/profile.png',

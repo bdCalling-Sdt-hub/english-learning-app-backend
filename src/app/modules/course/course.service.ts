@@ -13,6 +13,9 @@ import { isTeacherTransfersActive } from '../../../helpers/isTeacherTransfersAct
 import { LANGUAGE } from '../../../enums/language';
 import { NotificationService } from '../notifications/notification.service';
 import { Server } from 'socket.io';
+import { Enrollment } from './enrollment/enrollment.model';
+import { EnrollmentService } from './enrollment/enrollment.service';
+
 // without stripe
 // const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
 //   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
@@ -81,13 +84,16 @@ import { Server } from 'socket.io';
 // };
 
 // with stripe
+const stripe = new Stripe(config.stripe_secret_key!, {
+  apiVersion: '2024-09-30.acacia',
+});
 
 const createCourseToDB = async (
   data: any,
   io: Server
 ): Promise<Partial<ICourse>> => {
   // Validate the teacher's existence
-  const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
+  const isExistTeacher: any = await Teacher.findOne({ _id: data.teacherID });
 
   // @ts-ignore
   const isTeacherDeleted = isExistTeacher?.status === status.delete;
@@ -189,7 +195,7 @@ const createCourseToDB = async (
     });
   }
   if (isExistTeacher.type === 'platform') {
-    const notificationMessage = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
+    const notificationMessage: string = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
     await NotificationService.sendNotificationToAllUserOfARole(
       notificationMessage,
       io,
@@ -254,7 +260,7 @@ const getCourseByTeacherIdFromDB = async (
   if (isExistTeacher.status === status.delete) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher deleted!');
   }
-  const result = await Course.find({
+  const result: any = await Course.find({
     teacherID: id,
     status: { $ne: status.delete },
   });
@@ -269,7 +275,7 @@ const getCourseByTeacherIdFromDB = async (
 const getLecturesOfCourseFromDB = async (
   id: string
 ): Promise<Partial<Array<ILecture> | null>> => {
-  const existCourse = await Course.findOne({ _id: id });
+  const existCourse: any = await Course.findOne({ _id: id });
   if (existCourse?.status === status.delete) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course deleted!');
   }

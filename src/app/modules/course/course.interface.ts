@@ -17,7 +17,7 @@ export type ICourse = {
     start: Date;
     end: Date;
   };
-  status: 'active' | 'delete';
+  status: 'active' | 'completed' | 'delete';
 };
 
 export type CourseModel = Model<ICourse>;

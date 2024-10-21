@@ -7,6 +7,7 @@ export type ITeacher = {
   name: string;
   role?: USER_ROLES;
   phone: string;
+  pendingEarnings?: number;
   address: string;
   appointedBy?: string;
   email: string;

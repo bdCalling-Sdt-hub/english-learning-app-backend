@@ -29,7 +29,7 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
   if (!teacher) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
   }
-  const isStudentEnrolled = await Enrollment.findOne({
+  const isStudentEnrolled: any = await Enrollment.findOne({
     studentID: data.studentID,
     courseID: data.courseID,
   });
@@ -42,15 +42,7 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
   let paymentIntent;
 
   try {
-    // Step 1: Charge the student to add funds to platform's available balance
-    const platformCharge = await stripe.charges.create({
-      amount: isExistCourse.price * 100, // amount in cents
-      currency: 'usd',
-      source: 'tok_bypassPending', // Use Stripe's test token for bypassing pending state
-      description: `Payment for course ${isExistCourse.name}`,
-    });
-
-    // Step 2: Create payment intent for student (simulating student paying)
+    // Create payment intent for student
     paymentIntent = await stripe.paymentIntents.create({
       amount: isExistCourse.price * 100, // amount in cents
       currency: 'usd',
@@ -64,13 +56,14 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
         courseID: data.courseID,
         studentID: data.studentID,
       },
+      description: `Payment for course ${isExistCourse.name}`,
     });
   } catch (error) {
     console.error(error);
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Payment failed');
   }
 
-  // Step 3: Enroll the student in the course after successful payment
+  // Enroll the student in the course after successful payment
   const enrollmentData = {
     studentID: data.studentID,
     courseID: data.courseID,
@@ -92,42 +85,73 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Enrollment update failed');
   }
 
-  const teacherShare = isExistCourse.price * 0.8 * 100;
+  // Send notifications
+  const teacherNotificationMessage = `A new student has enrolled in your course "${updatedCourse.name}".`;
+  await NotificationService.sendNotificationToTeacher(
+    teacher._id.toString(),
+    teacherNotificationMessage,
+    io
+  );
+  const studentNotificationMessage = `You have successfully enrolled in the course "${updatedCourse.name}".`;
+  await NotificationService.sendNotificationToDB(
+    {
+      sendTo: USER_ROLES.STUDENT,
+      sendUserID: data.studentID,
+      message: studentNotificationMessage,
+      status: 'unread' as const,
+    },
+    io
+  );
+  await Teacher.findOneAndUpdate(
+    { _id: teacher._id },
+    { $inc: { pendingEarnings: isExistCourse.price } },
+    { new: true }
+  );
+  return result;
+};
+
+const payTeacherForEnrollment = async (enrollmentId: string) => {
+  const enrollment = await Enrollment.findById(enrollmentId);
+  if (!enrollment) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Enrollment not found');
+  }
+  const course = await Course.findById(enrollment.courseID);
+  if (!course) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found');
+  }
+  const teacher = await Teacher.findOne({ _id: course?.teacherID });
+  if (!teacher) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
+  }
+
+  const teacherShare = Math.round(course.price * 0.8 * 100); // 80% to teacher, in cents
 
   try {
-    const giveTeacherShare = await stripe.transfers.create({
+    const transfer = await stripe.transfers.create({
       amount: teacherShare,
       currency: 'usd',
-      destination: teacher?.accountInformation.stripeAccountId!,
-      transfer_group: paymentIntent.id,
+      destination: teacher.accountInformation.stripeAccountId!,
+      transfer_group: enrollment.paymentIntentId,
     });
-    if (!giveTeacherShare) {
+
+    if (!transfer) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
         'Failed to transfer funds to teacher'
       );
     }
+
+    // Update teacher's earnings in the database
     await Teacher.findOneAndUpdate(
-      { _id: isExistCourse.teacherID },
-      { $inc: { earnings: teacherShare / 100 } },
+      { _id: course.teacherID },
+      { $inc: { earnings: teacherShare / 100 } }, // Convert back to dollars
       { new: true }
     );
-    const teacherNotificationMessage = `A new student has enrolled in your course "${updatedCourse.name}".`;
-    await NotificationService.sendNotificationToTeacher(
-      teacher._id.toString(),
-      teacherNotificationMessage,
-      io
-    );
-    const studentNotificationMessage = `You have successfully enrolled in the course "${updatedCourse.name}".`;
-    await NotificationService.sendNotificationToDB(
-      {
-        sendTo: USER_ROLES.STUDENT,
-        sendUserID: data.studentID,
-        message: studentNotificationMessage,
-        status: 'unread' as const,
-      },
-      io
-    );
+
+    // Update enrollment to mark that teacher has been paid
+    await Enrollment.findByIdAndUpdate(enrollmentId, { teacherPaid: true });
+
+    return transfer;
   } catch (error) {
     console.error('Transfer failed:', error);
     throw new ApiError(
@@ -135,10 +159,71 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
       'Failed to transfer funds to teacher'
     );
   }
+};
+const payTeacherForCourse = async (courseId: string, io: Server) => {
+  const course = await Course.findById(courseId);
+  if (course?.status === 'completed' || course?.status === 'delete') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course already completed');
+  }
+  if (!course) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found');
+  }
+  const enrollments = await Enrollment.find({ courseID: courseId });
+  if (!enrollments) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Enrollments not found');
+  }
+  const teacher = await Teacher.findById(course.teacherID);
+  if (!teacher) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
+  }
+  const teacherShare = Math.round(course.price * 0.8 * 100);
+  const transfer = await stripe.transfers.create({
+    amount: teacherShare * course.enrollmentsID.length,
+    currency: 'usd',
+    destination: teacher.accountInformation.stripeAccountId!,
+    transfer_group: courseId,
+  });
+  if (!transfer) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Failed to transfer funds to teacher'
+    );
+  }
+  await Teacher.findOneAndUpdate(
+    { _id: course.teacherID },
+    { $inc: { earnings: teacherShare / 100 } }, // Convert back to dollars
+    { new: true }
+  );
 
-  return result;
+  await Course.findByIdAndUpdate(courseId, { status: 'completed' });
+  await Enrollment.updateMany({ courseID: courseId }, { teacherPaid: true });
+  const teacherNotificationMessage = `Your course "${course.name}" has been completed.`;
+  await NotificationService.sendNotificationToDB(
+    {
+      sendTo: USER_ROLES.TEACHER,
+      sendUserID: teacher._id.toString(),
+      message: teacherNotificationMessage,
+    },
+    io
+  );
+  const studentNotificationMessage = `Your course "${course.name}" has been completed. Let us know your feedback`;
+  Promise.all(
+    enrollments.map(async enrollment => {
+      await NotificationService.sendNotificationToDB(
+        {
+          sendTo: USER_ROLES.STUDENT,
+          sendUserID: `${enrollment.studentID}`,
+          message: studentNotificationMessage,
+        },
+        io
+      );
+    })
+  );
+  return transfer;
 };
 
 export const EnrollmentService = {
   createEnrollmentToDB,
+  payTeacherForEnrollment,
+  payTeacherForCourse,
 };

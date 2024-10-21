@@ -5,6 +5,10 @@ export type IEnrollment = {
   courseID: ObjectId;
   paymentIntentId: string;
   teacherID?: string;
+  teacherPaid?: boolean;
+  // courseCompleted?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type EnrollmentModel = Model<IEnrollment>;

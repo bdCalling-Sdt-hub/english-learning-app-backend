@@ -6,6 +6,7 @@ import { CourseService } from './course.service';
 import { logger } from '../../../shared/logger';
 import { CourseValidation } from './course.validation';
 import { Server } from 'socket.io';
+import { EnrollmentService } from './enrollment/enrollment.service';
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const { ...courseData } = req.body;
@@ -123,6 +124,17 @@ const getCourseByLanguage = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const completeCourse = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const io: Server = req.app.get('io');
+  const result = await EnrollmentService.payTeacherForCourse(id, io);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course completed successfully',
+    data: result,
+  });
+});
 
 export const CourseController = {
   deleteCourse,
@@ -133,4 +145,5 @@ export const CourseController = {
   getCourseByTeacherId,
   getAllCourses,
   getLecturesOfCourseByID,
+  completeCourse,
 };

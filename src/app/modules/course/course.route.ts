@@ -23,16 +23,18 @@ router
   .get('/language/:language', CourseController.getCourseByLanguage)
   .patch(
     '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
+    auth(USER_ROLES.TEACHER),
     fileUploadHandler(),
     CourseController.updateCourse
   )
-  .delete(
-    '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
-    CourseController.deleteCourse
+  .delete('/:id', auth(USER_ROLES.TEACHER), CourseController.deleteCourse)
+  .post(
+    '/completed/:id',
+    auth(USER_ROLES.TEACHER),
+    CourseController.completeCourse
   );
 router.use('/lectures', LectureRoutes);
 router.use('/enrollments', EnrollmentRoutes);
 router.use('/filter', filterRoutes);
+
 export const CourseRoutes = router;

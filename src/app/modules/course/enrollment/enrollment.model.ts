@@ -13,7 +13,6 @@ const enrollmentSchema = new Schema<IEnrollment, EnrollmentModel>(
       ref: 'Student',
       required: true,
     },
-
     courseID: {
       type: Schema.Types.ObjectId,
       ref: 'Course',
@@ -23,6 +22,16 @@ const enrollmentSchema = new Schema<IEnrollment, EnrollmentModel>(
       type: String,
       required: false,
     },
+    teacherPaid: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    // courseCompleted: {
+    //   type: Boolean,
+    //   default: false,
+    //   required: false,
+    // },
     paymentIntentId: {
       type: String,
       required: true,
