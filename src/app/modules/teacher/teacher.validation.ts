@@ -52,7 +52,15 @@ const createStripeAccountZodSchema = z.object({
   }),
 });
 
+const addEducationZodSchema = z.object({
+  body: z.object({
+    degree: z.string(),
+    institute: z.string(),
+  }),
+});
+
 export const TeacherValidation = {
   createTeacherZodSchema,
   createStripeAccountZodSchema,
+  addEducationZodSchema,
 };

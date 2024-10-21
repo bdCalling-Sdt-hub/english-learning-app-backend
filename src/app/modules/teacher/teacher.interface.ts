@@ -11,6 +11,7 @@ export type ITeacher = {
   address: string;
   appointedBy?: string;
   email: string;
+  skills?: string[];
   password: string;
   profile?: string;
   language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;

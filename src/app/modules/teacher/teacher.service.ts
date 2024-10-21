@@ -243,7 +243,7 @@ const updateProfileToDB = async (
   id: string,
   payload: Partial<ITeacher>
 ): Promise<Partial<ITeacher | null>> => {
-  const isExistUser = await Teacher.findById(id);
+  const isExistUser: any = await Teacher.findById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
   }

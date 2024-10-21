@@ -6,6 +6,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { TeacherController } from './teacher.controller';
 import { TeacherValidation } from './teacher.validation';
 import { totalsRoutes } from './totals/totals.route';
+import { EducationRoutes } from './education/education.route';
 const router = express.Router();
 router
   .get(
@@ -38,7 +39,7 @@ router
     validateRequest(TeacherValidation.createTeacherZodSchema),
     TeacherController.createTeacher
   );
-
+router.use('/education', auth(USER_ROLES.TEACHER), EducationRoutes);
 router.use('/total', totalsRoutes);
 
 export const TeacherRoutes = router;

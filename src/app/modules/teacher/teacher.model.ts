@@ -22,6 +22,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       default: USER_ROLES.TEACHER,
       required: true,
     },
+    skills: {
+      type: [String],
+      required: false,
+    },
     appointedBy: {
       type: String,
       required: false,
@@ -126,6 +130,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     education: [
       {
+        id: {
+          type: String,
+          default: null,
+        },
         degree: {
           type: String,
           required: true,

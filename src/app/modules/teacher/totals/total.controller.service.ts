@@ -1,6 +1,7 @@
 import { Course } from '../../course/course.model';
 import { Enrollment } from '../../course/enrollment/enrollment.model';
 import { Reviews } from '../../reviews/reviews.model';
+import { Student } from '../../student/student.model';
 import { Teacher } from '../teacher.model';
 import { startOfMonth, endOfMonth } from 'date-fns';
 
@@ -93,5 +94,23 @@ const getEarnings = async (id: string) => {
     // pendingEarnings: Number(pendingIncome.toFixed(2)),
   };
 };
-
-export const totalService = { getOverallRating, getEarnings };
+const getCourseStatus = async (id: string) => {
+  const teacher = await Teacher.findById(id);
+  if (!teacher) {
+    throw new Error('Teacher not found');
+  }
+  const courses = await Course.find({ teacherID: id });
+  if (!courses) {
+    throw new Error('Courses not found');
+  }
+  const enrollments = await Enrollment.find({
+    teacherID: id,
+  });
+  const totalStudent = await Student.find();
+  return {
+    totalCourse: courses.length,
+    totalCourseTaker: enrollments.length,
+    totalStudent: totalStudent.length,
+  };
+};
+export const totalService = { getOverallRating, getEarnings, getCourseStatus };
