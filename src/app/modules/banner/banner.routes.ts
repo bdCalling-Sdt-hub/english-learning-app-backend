@@ -19,4 +19,5 @@ router.delete(
 router.get('/', BannerController.getBanner);
 router.get('/profile', BannerController.getProfileBanner);
 router.get('/:id', BannerController.getBannerById);
+
 export const BannerRoutes = router;

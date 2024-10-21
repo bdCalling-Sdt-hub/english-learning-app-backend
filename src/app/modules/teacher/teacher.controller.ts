@@ -30,7 +30,7 @@ const createTeacher = catchAsync(
       success: true,
       statusCode: StatusCodes.OK,
       message:
-        'Student Registered successfully please check your email for OTP',
+        'Teacher Registered successfully please check your email for OTP',
       data: '',
     });
   }
@@ -52,7 +52,8 @@ const getTeacherProfile = catchAsync(async (req: Request, res: Response) => {
 
 const updateProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
+    const { id } = req.user;
+    console.log(req.user);
     let profile;
     if (req.files && 'profile' in req.files && req.files.profile[0]) {
       profile = `/profiles/${req.files.profile[0].filename}`;

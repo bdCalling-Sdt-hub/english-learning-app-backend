@@ -26,15 +26,17 @@ router
   .get('/language/:language', TeacherController.getTeachersByLanguage)
   .patch(
     '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
+    auth(USER_ROLES.TEACHER),
     fileUploadHandler(),
     TeacherController.updateProfile
   )
-  .delete(
-    '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.TEACHER),
-    TeacherController.deleteTeacher
+  .patch(
+    '/',
+    auth(USER_ROLES.TEACHER),
+    fileUploadHandler(),
+    TeacherController.updateProfile
   )
+  .delete('/:id', auth(USER_ROLES.TEACHER), TeacherController.deleteTeacher)
   .route('/')
   .post(
     validateRequest(TeacherValidation.createTeacherZodSchema),

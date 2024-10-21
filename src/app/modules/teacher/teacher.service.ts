@@ -247,7 +247,12 @@ const updateProfileToDB = async (
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
   }
-
+  if (payload.email) {
+    const isExistEmail = await Teacher.findOne({ email: payload.email });
+    if (isExistEmail) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+    }
+  }
   //unlink file here
   if (payload.profile) {
     unlinkFile(isExistUser.profile!);

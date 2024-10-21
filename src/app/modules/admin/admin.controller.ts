@@ -14,7 +14,7 @@ const createSuperAdmin = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Super admin created successfully',
-    data: result,
+    data: '',
   });
 });
 
@@ -26,7 +26,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Admin created successfully',
-    data: result,
+    data: '',
   });
 });
 

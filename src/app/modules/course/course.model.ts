@@ -66,8 +66,8 @@ const courseSchema = new Schema<ICourse, CourseModel>(
     },
     status: {
       type: String,
-      enum: ['active', 'completed', 'delete'],
-      default: 'active',
+      enum: ['active', 'draft', 'completed', 'delete'],
+      default: 'draft',
     },
   },
   { timestamps: true }
@@ -78,6 +78,10 @@ courseSchema.pre('save', async function (next) {
   const isExistTecher = await Teacher.findOne({ _id: this.teacherID });
   if (!isExistTecher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
+  }
+
+  if (isExistTecher.status === 'deleted') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher deleted!');
   }
   if (isExistTecher.gender) {
     this.gender = isExistTecher.gender;
