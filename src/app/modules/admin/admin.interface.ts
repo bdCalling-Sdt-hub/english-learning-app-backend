@@ -7,6 +7,7 @@ export type IAdmin = {
   password: string;
   type?: AdminTypes;
   status?: 'active' | 'delete';
+  profile?: string;
   verified?: boolean;
   role?: USER_ROLES.ADMIN;
   authentication?: {

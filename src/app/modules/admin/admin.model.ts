@@ -20,6 +20,11 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
       type: String,
       required: [true, 'password is required'],
     },
+    profile: {
+      type: String,
+      default: '/profiles/default.png',
+      required: false,
+    },
     type: {
       type: String,
       enum: Object.values(AdminTypes),

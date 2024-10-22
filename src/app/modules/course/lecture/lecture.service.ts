@@ -116,10 +116,44 @@ const createLectureToDB = async (data: any) => {
   return result;
 };
 
+const getUpcomingLectureFromDB = async (id: string) => {
+  if (!id) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher ID is required');
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const courses = await Course.find({ teacherID: id });
+  if (!courses || courses.length === 0) {
+    return [];
+  }
+
+  const upcomingLectures = await Lecture.find({
+    courseID: { $in: courses.map(course => course._id) },
+    date: {
+      $gte: today,
+      $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+    },
+  }).sort({ date: 1 });
+
+  const result = await Promise.all(
+    upcomingLectures.map(async lecture => {
+      const course = await Course.findById(lecture.courseID);
+      return {
+        ...lecture.toObject(),
+        courseName: course?.name,
+        courseBanner: course?.banner,
+      };
+    })
+  );
+
+  return result;
+};
+
 export const LectureService = {
   getLectureByIDFromDB,
   updateLectureToDB,
   deleteLectureFromDB,
   createLectureToDB,
   updateLectureLinkToDB,
+  getUpcomingLectureFromDB,
 };

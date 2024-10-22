@@ -190,10 +190,47 @@ const handleWebSocketConnection = (socket: Socket) => {
     }
   );
 };
+const readNotification = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await NotificationService.readNotification(id);
 
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Notification read successfully',
+    data: result,
+  });
+});
+
+const getAllNotifications = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.user;
+  const result = await NotificationService.getAllNotifications(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Notifications retrieved successfully',
+    data: result,
+  });
+});
+
+const readAllNotifications = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.user;
+  const result = await NotificationService.readAllNotifications(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Notifications read successfully',
+    data: result,
+  });
+});
 export const NotificationController = {
   sendNotification,
+  readNotification,
+  readAllNotifications,
   getNotifications,
+  getAllNotifications,
   makeTeacherAppointed,
   handleWebSocketConnection,
 };

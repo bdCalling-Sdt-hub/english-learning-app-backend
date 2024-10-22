@@ -63,7 +63,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     profile: {
       type: String,
-      default: 'https://i.ibb.co/z5YHLV9/profile.png',
+      default: '/profiles/default.png',
     },
     status: {
       type: String,

@@ -7,6 +7,11 @@ import auth from '../../../middlewares/auth';
 const router = express.Router();
 
 router
+  .get(
+    '/upcoming',
+    auth(USER_ROLES.TEACHER),
+    LectureController.getUpcomingLecture
+  )
   .get('/:id', LectureController.getLectureByID)
   .post(
     '/',

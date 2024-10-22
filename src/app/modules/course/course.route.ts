@@ -18,6 +18,7 @@ router
   )
   .get('/', CourseController.getAllCourses)
   .get('/:id', CourseController.getCourseById)
+  .get('/:id/details', CourseController.getCourseDetailsById)
   .get('/teacher/:teacherID', CourseController.getCourseByTeacherId)
   .get('/:id/lectures', CourseController.getLecturesOfCourseByID)
   .get('/language/:language', CourseController.getCourseByLanguage)

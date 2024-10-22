@@ -76,10 +76,22 @@ const updateLectureLink = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUpcomingLecture = catchAsync(async (req: Request, res: Response) => {
+  const id = req.user.id.toString();
+  const result = await LectureService.getUpcomingLectureFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Today's upcoming lectures retrieved successfully",
+    data: result,
+  });
+});
+
 export const LectureController = {
   getLectureByID,
   updateLecture,
   deleteLecture,
   createLecture,
   updateLectureLink,
+  getUpcomingLecture,
 };

@@ -45,7 +45,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     },
     profile: {
       type: String,
-      default: 'https://i.ibb.co/z5YHLV9/profile.png',
+      default: '/profiles/default.png',
     },
     status: {
       type: String,

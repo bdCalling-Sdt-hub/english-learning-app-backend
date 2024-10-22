@@ -328,11 +328,37 @@ const getCourseByLanguageFromDB = async (
   return result;
 };
 
+const getCourseDetailsByIdFromDB = async (
+  id: string
+): Promise<Partial<ICourse | null>> => {
+  let result: any = await Course.findOne({ _id: id });
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
+  }
+
+  const allLectures = await Lecture.find({ courseID: id });
+  const newlectures: Array<ILecture> = await allLectures.map(
+    (lecture: any) => ({
+      _id: lecture._id,
+      title: lecture.title,
+      date: lecture.date,
+      courseID: lecture.courseID,
+    })
+  );
+
+  const finalResult = {
+    ...result._doc,
+    lectures: newlectures,
+  };
+  return finalResult;
+};
+
 export const CourseService = {
   createCourseToDB,
   getCourseByTeacherIdFromDB,
   getAllCoursesFromDB,
   getCourseByIdFromDB,
+  getCourseDetailsByIdFromDB,
   updateCourseToDB,
   getLecturesOfCourseFromDB,
   getCourseByLanguageFromDB,

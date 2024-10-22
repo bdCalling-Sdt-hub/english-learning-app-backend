@@ -12,6 +12,8 @@ export type INotification = {
   data?: object;
   link?: string;
   status?: 'unread' | 'read';
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type NotificationModel = Model<INotification>;

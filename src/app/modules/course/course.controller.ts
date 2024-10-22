@@ -135,6 +135,16 @@ const completeCourse = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getCourseDetailsById = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await CourseService.getCourseDetailsByIdFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course details retrieved successfully',
+    data: result,
+  });
+});
 
 export const CourseController = {
   deleteCourse,
@@ -146,4 +156,5 @@ export const CourseController = {
   getAllCourses,
   getLecturesOfCourseByID,
   completeCourse,
+  getCourseDetailsById,
 };

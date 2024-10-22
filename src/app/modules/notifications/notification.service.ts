@@ -252,7 +252,7 @@ const sendNotificationToAllStudents = async (
 const updateNotificationStatus = async (
   notificationId: string,
   status: 'read' | 'unread'
-) => {
+): Promise<any> => {
   try {
     const updatedNotification = await Notification.findByIdAndUpdate(
       notificationId,
@@ -314,7 +314,7 @@ const limitStoredNotifications = async (
   limit: number
 ) => {
   try {
-    const count = await Notification.countDocuments({
+    const count: number = await Notification.countDocuments({
       sendUserID: userId,
       sendTo: userRole,
     });
@@ -345,9 +345,39 @@ const clearOldNotifications = async (daysOld: number) => {
     );
   }
 };
+const readNotification = async (id: string) => {
+  const isExistNotification = await Notification.findById(id);
+  if (!isExistNotification) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Notification not found');
+  }
+  const notification = await Notification.findByIdAndUpdate(
+    id,
+    { status: 'read' },
+    { new: true }
+  );
+  return notification;
+};
+
+const getAllNotifications = async (userId: string) => {
+  const notifications = await Notification.find({ sendUserID: userId });
+  if (!notifications) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Notifications not found');
+  }
+
+  return notifications;
+};
+
+const readAllNotifications = async (userId: string) => {
+  const notifications = await Notification.updateMany(
+    { sendUserID: userId, status: 'unread' },
+    { status: 'read' }
+  );
+  return notifications;
+};
 
 export const NotificationService = {
   sendNotificationToDB,
+  getAllNotifications,
   getAdminNotificationsFromDB,
   getStudentNotificationsFromDB,
   getTeacherNotificationsFromDB,
@@ -359,4 +389,6 @@ export const NotificationService = {
   handleReconnection,
   limitStoredNotifications,
   clearOldNotifications,
+  readNotification,
+  readAllNotifications,
 };
