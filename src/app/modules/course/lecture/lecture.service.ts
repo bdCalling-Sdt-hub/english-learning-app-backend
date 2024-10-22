@@ -138,8 +138,18 @@ const getUpcomingLectureFromDB = async (id: string) => {
   const result = await Promise.all(
     upcomingLectures.map(async lecture => {
       const course = await Course.findById(lecture.courseID);
+
       return {
         ...lecture.toObject(),
+        date: lecture.date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        time: lecture.date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
         courseName: course?.name,
         courseBanner: course?.banner,
       };

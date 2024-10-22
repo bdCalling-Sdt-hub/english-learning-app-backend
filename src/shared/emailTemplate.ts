@@ -1,4 +1,7 @@
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const createAccount = (values: ICreateAccount) => {
   const data = {
