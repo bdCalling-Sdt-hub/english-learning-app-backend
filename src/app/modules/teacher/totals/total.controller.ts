@@ -4,7 +4,8 @@ import catchAsync from '../../../../shared/catchAsync';
 import { totalService } from './total.controller.service';
 
 const getOverallRating = catchAsync(async (req: Request, res: Response) => {
-  const { teacher } = req.query;
+  const teacher = req.user.id;
+  console.log(teacher);
   const result = await totalService.getOverallRating(teacher?.toString()!);
   sendResponse(res, {
     success: true,
@@ -14,7 +15,8 @@ const getOverallRating = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getEarnings = catchAsync(async (req: Request, res: Response) => {
-  const { teacher } = req.query;
+  const teacher = req.user.id;
+
   const result = await totalService.getEarnings(teacher?.toString()!);
   sendResponse(res, {
     success: true,
@@ -25,7 +27,7 @@ const getEarnings = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getCourseStatus = catchAsync(async (req: Request, res: Response) => {
-  const { teacher } = req.query;
+  const teacher = req.user.id;
   const result = await totalService.getCourseStatus(teacher?.toString()!);
   sendResponse(res, {
     success: true,

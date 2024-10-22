@@ -12,6 +12,7 @@ router
     auth(USER_ROLES.TEACHER),
     LectureController.getUpcomingLecture
   )
+  .patch('/update-link', LectureController.updateLectureLink)
   .get('/:id', LectureController.getLectureByID)
   .post(
     '/',
@@ -25,7 +26,6 @@ router
     validateRequest(LectureValidation.updateLectureZodSchema),
     LectureController.updateLecture
   )
-  .delete('/:id', auth(USER_ROLES.TEACHER), LectureController.deleteLecture)
-  .patch('/:id/update-link', LectureController.updateLectureLink);
+  .delete('/:id', auth(USER_ROLES.TEACHER), LectureController.deleteLecture);
 
 export const LectureRoutes = router;

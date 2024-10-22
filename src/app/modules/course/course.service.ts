@@ -90,9 +90,11 @@ const stripe = new Stripe(config.stripe_secret_key!, {
 
 const createCourseToDB = async (
   data: any,
-  io: Server
+  io: Server,
+  id: string
 ): Promise<Partial<ICourse>> => {
   // Validate the teacher's existence
+  data.teacherID = id;
   const isExistTeacher: any = await Teacher.findOne({ _id: data.teacherID });
 
   // @ts-ignore
@@ -341,6 +343,7 @@ const getCourseDetailsByIdFromDB = async (
     (lecture: any) => ({
       _id: lecture._id,
       title: lecture.title,
+      link: lecture.link ? lecture.link : null,
       date: lecture.date,
       courseID: lecture.courseID,
     })

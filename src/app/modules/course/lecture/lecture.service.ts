@@ -31,18 +31,18 @@ const updateLectureToDB = async (id: string, data: any) => {
 
 const updateLectureLinkToDB = async (
   id: string,
-  courseID: string,
+  courseID: any,
   link: string,
   io: Server
 ) => {
   if (!link) {
     throw new Error('Link is required');
   }
-  const isExistCourse = await Course.findOne({ _id: courseID });
+  const isExistCourse = await Course.findById(courseID);
   if (!isExistCourse) {
     throw new Error('Course not found');
   }
-  const isExistLecture: any = await Lecture.findOne({ _id: id });
+  const isExistLecture: any = await Lecture.findById(id);
   if (!isExistLecture) {
     throw new Error('Lecture not found');
   }
@@ -146,6 +146,7 @@ const getUpcomingLectureFromDB = async (id: string) => {
           month: 'long',
           day: 'numeric',
         }),
+        linkSent: lecture.link ? true : false,
         time: lecture.date.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',

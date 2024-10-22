@@ -118,10 +118,12 @@ const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
       paths.push(`/KYCs/${file.filename}`);
     }
   }
+  const user = req.user;
   console.log(paths);
   const result = await TeacherService.createTeacherStripeAccount(
     data,
     req.files,
+    user,
     paths,
     ip
   );

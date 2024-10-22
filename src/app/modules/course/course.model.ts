@@ -50,7 +50,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
     },
     teacherID: {
       type: String,
-      required: true,
+      required: false,
     },
     enrollmentsID: {
       type: [String],

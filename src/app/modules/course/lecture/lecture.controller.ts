@@ -59,11 +59,19 @@ const createLecture = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateLectureLink = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const { courseID, link } = req.body;
+  const { courseID, link, lectureID } = req.body;
+  if (!link) {
+    throw new Error('Link is required');
+  }
+  if (!courseID) {
+    throw new Error('Course ID is required');
+  }
+  if (!lectureID) {
+    throw new Error('Lecture ID is required');
+  }
   const io: Server = req.app.get('io');
   const result = await LectureService.updateLectureLinkToDB(
-    id,
+    lectureID,
     courseID,
     link,
     io

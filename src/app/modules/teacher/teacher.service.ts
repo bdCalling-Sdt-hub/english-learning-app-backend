@@ -111,16 +111,19 @@ const uploadFileToStripe = async (filePath: string): Promise<string> => {
 const createTeacherStripeAccount = async (
   data: any,
   files: any,
+  user: any,
   paths: any,
   ip: string
 ): Promise<string> => {
   const values = await JSON.parse(data);
 
-  const isExistUser = await Teacher.findOne({ email: values.email });
+  const isExistUser = await Teacher.findOne({ email: values.email.toString() });
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
-
+  if (isExistUser.email !== user.email) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Email doesn't match");
+  }
   const dob = new Date(values.dateOfBirth);
 
   // Process KYC
@@ -212,7 +215,7 @@ const createTeacherStripeAccount = async (
     isExistUser.accountInformation.externalAccountId =
       account.external_accounts.data[0].id;
     isExistUser.accountInformation.status = 'active';
-    await Teacher.findByIdAndUpdate(values.teacherID, isExistUser);
+    await Teacher.findByIdAndUpdate(user.id, isExistUser);
   }
 
   // Create account link for onboarding

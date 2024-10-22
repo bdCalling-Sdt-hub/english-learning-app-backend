@@ -8,7 +8,7 @@ export type ICourse = {
   price: number;
   language: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   studentRange: number;
-  teacherID: string;
+  teacherID?: string;
   gender: 'male' | 'female' | 'other';
   enrollmentsID: Array<string>; // id of the enrollment of this course the enrollment is a seperate model
   lectures: Array<string>;

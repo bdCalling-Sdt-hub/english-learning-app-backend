@@ -10,6 +10,7 @@ import { EnrollmentService } from './enrollment/enrollment.service';
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const { ...courseData } = req.body;
+  const id = req.user.id;
   const io: Server = req.app.get('io');
 
   let banner;
@@ -21,7 +22,7 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
     ...courseData,
   };
 
-  const result = await CourseService.createCourseToDB(data, io);
+  const result = await CourseService.createCourseToDB(data, io, id);
 
   sendResponse(res, {
     success: true,
