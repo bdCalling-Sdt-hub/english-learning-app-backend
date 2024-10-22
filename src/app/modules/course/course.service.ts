@@ -15,6 +15,7 @@ import { NotificationService } from '../notifications/notification.service';
 import { Server } from 'socket.io';
 import { Enrollment } from './enrollment/enrollment.model';
 import { EnrollmentService } from './enrollment/enrollment.service';
+import getLectureLinkStatus from '../../../shared/getLectureLinkStatus';
 
 // without stripe
 // const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
@@ -337,20 +338,37 @@ const getCourseDetailsByIdFromDB = async (
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
   }
-
+  const teacher = await Teacher.findOne({ _id: result.teacherID });
+  if (!teacher) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
+  }
   const allLectures = await Lecture.find({ courseID: id });
-  const newlectures: Array<ILecture> = await allLectures.map(
-    (lecture: any) => ({
+  const newlectures: Array<ILecture> = await Promise.all(
+    allLectures.map(async (lecture: any) => ({
       _id: lecture._id,
       title: lecture.title,
       link: lecture.link ? lecture.link : null,
-      date: lecture.date,
+      linkStatus: await getLectureLinkStatus(lecture._id),
+      date: lecture.date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+      time: lecture.date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
       courseID: lecture.courseID,
-    })
+    }))
   );
 
   const finalResult = {
     ...result._doc,
+    teacher: {
+      id: teacher._id,
+      name: teacher.name,
+      profile: teacher.profile,
+    },
     lectures: newlectures,
   };
   return finalResult;
