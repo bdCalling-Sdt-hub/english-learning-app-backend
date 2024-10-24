@@ -1,6 +1,6 @@
 import { Lecture } from '../app/modules/course/lecture/lecture.model';
 
-enum LectureLinkStatus {
+export enum LectureLinkStatus {
   DEPRECATED = 'DEPRECATED',
   NEEDTOUNLOCK = 'NEEDTOUNLOCK',
   LOCKED = 'LOCKED',

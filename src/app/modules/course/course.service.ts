@@ -15,7 +15,11 @@ import { NotificationService } from '../notifications/notification.service';
 import { Server } from 'socket.io';
 import { Enrollment } from './enrollment/enrollment.model';
 import { EnrollmentService } from './enrollment/enrollment.service';
-import getLectureLinkStatus from '../../../shared/getLectureLinkStatus';
+import getLectureLinkStatus, {
+  LectureLinkStatus,
+} from '../../../shared/getLectureLinkStatus';
+import { Student } from '../student/student.model';
+import { Reviews } from '../reviews/reviews.model';
 
 // without stripe
 // const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
@@ -361,14 +365,67 @@ const getCourseDetailsByIdFromDB = async (
       courseID: lecture.courseID,
     }))
   );
+  const enrollments = await Enrollment.find({ courseID: id });
+  const allEnrolledStudents = await Promise.all(
+    enrollments.map(async (enrollment: any) => {
+      return await Student.findById(enrollment.studentID).select(
+        'name profile _id'
+      );
+    })
+  );
+  const totalEnrolledStudents = enrollments.length;
+  const totalDeprecatedLectures = newlectures.filter(
+    (lecture: any) => lecture.linkStatus === LectureLinkStatus.DEPRECATED
+  );
+  const reviews = await Reviews.find({ courseID: id });
+  const reviewsWithStudentInfo = await Promise.all(
+    reviews.map(async (review: any) => {
+      const student = await Student.findById(review.studentID).select(
+        'name profile _id'
+      );
 
+      return {
+        ...review._doc,
+        date: review.createdAt.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        name: student?.name || 'Anonymous',
+        studentID: student?._id || null,
+        profile: student?.profile || null,
+      };
+    })
+  );
   const finalResult = {
     ...result._doc,
+    time: {
+      start: `${result.time.start.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })} at ${result.time.start.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`,
+      end: `${result.time.end.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })} at ${result.time.end.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}`,
+    },
+    completedLectures: totalDeprecatedLectures.length,
+    enrolledStudents: allEnrolledStudents,
     teacher: {
       id: teacher._id,
       name: teacher.name,
       profile: teacher.profile,
     },
+    reviews: reviewsWithStudentInfo,
+    totalEnrolledStudents,
     lectures: newlectures,
   };
   return finalResult;

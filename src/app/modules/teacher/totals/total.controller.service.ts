@@ -40,7 +40,7 @@ const getOverallRating = async (id: string) => {
   });
   return {
     avarageRating: avarageRating,
-    totalRarings: reviews.length,
+    totalRatings: reviews.length,
     totalCourseTaker: totalEnrollments,
   };
 };
