@@ -14,7 +14,7 @@ export default {
   stripe_return_url: process.env.STRIPE_RETURN_URL,
   jwt: {
     jwt_secret: process.env.JWT_SECRET,
-    jwt_expire_in: process.env.JWT_EXPIRE_IN,
+    jwt_expire_in: process.env.JWT_EXPIRE_IN as string,
   },
   email: {
     from: process.env.EMAIL_FROM,

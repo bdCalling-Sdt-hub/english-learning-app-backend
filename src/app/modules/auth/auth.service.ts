@@ -61,7 +61,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   const createToken = jwtHelper.createToken(
     { id: existUser._id, role: role, email: existUser.email },
     config.jwt.jwt_secret as Secret,
-    config.jwt.jwt_expire_in as string
+    (config.jwt.jwt_expire_in as string) || '30d'
   );
   console.log(role);
   if (existUser.role === USER_ROLES.TEACHER) {
@@ -187,7 +187,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
     const token = jwtHelper.createToken(
       { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
       config.jwt.jwt_secret as Secret,
-      config.jwt.jwt_expire_in as string
+      (config.jwt.jwt_expire_in as string) || '30d'
     );
 
     message = 'Email verified successfully';
