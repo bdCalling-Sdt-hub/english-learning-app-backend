@@ -103,16 +103,16 @@ const getLecturesOfCourseByID = catchAsync(
   }
 );
 
-const deleteCourse = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const result = await CourseService.deleteCourseFromDB(id);
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Course deleted successfully',
-    data: result,
-  });
-});
+// const deleteCourse = catchAsync(async (req: Request, res: Response) => {
+//   const id = req.params.id;
+//   const result = await CourseService.deleteCourseFromDB(id);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: StatusCodes.OK,
+//     message: 'Course deleted successfully',
+//     data: result,
+//   });
+// });
 
 const getCourseByLanguage = catchAsync(async (req: Request, res: Response) => {
   const language = req.params.language;
@@ -148,7 +148,7 @@ const getCourseDetailsById = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const CourseController = {
-  deleteCourse,
+  // deleteCourse,
   createCourse,
   getCourseByLanguage,
   updateCourse,

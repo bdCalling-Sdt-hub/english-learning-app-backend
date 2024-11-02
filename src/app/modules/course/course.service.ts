@@ -297,22 +297,22 @@ const getLecturesOfCourseFromDB = async (
   return result;
 };
 
-const deleteCourseFromDB = async (id: string): Promise<Partial<ICourse>> => {
-  const existCourse = await Course.findOne({ _id: id });
-  if (existCourse?.status === status.delete) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course deleted!');
-  }
-  if (!existCourse) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
-  }
-  const result = await Course.findByIdAndUpdate(id, {
-    status: status.delete,
-  });
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not deleted!');
-  }
-  return result;
-};
+// const deleteCourseFromDB = async (id: string): Promise<Partial<ICourse>> => {
+//   const existCourse = await Course.findOne({ _id: id });
+//   if (existCourse?.status === status.delete) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course deleted!');
+//   }
+//   if (!existCourse) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
+//   }
+//   const result = await Course.findByIdAndUpdate(id, {
+//     status: status.delete,
+//   });
+//   if (!result) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not deleted!');
+//   }
+//   return result;
+// };
 
 const getCourseByLanguageFromDB = async (
   language: string
@@ -440,5 +440,5 @@ export const CourseService = {
   updateCourseToDB,
   getLecturesOfCourseFromDB,
   getCourseByLanguageFromDB,
-  deleteCourseFromDB,
+  // deleteCourseFromDB,
 };

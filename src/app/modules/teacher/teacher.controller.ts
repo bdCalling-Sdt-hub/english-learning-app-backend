@@ -95,17 +95,17 @@ const getTeacherById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const password = req.body.password;
-  const result = await TeacherService.deleteTeacherFromDB(id, password);
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Teacher deleted successfully',
-    data: result,
-  });
-});
+// const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
+//   const id = req.params.id;
+//   const password = req.body.password;
+//   const result = await TeacherService.deleteTeacherFromDB(id, password);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: StatusCodes.OK,
+//     message: 'Teacher deleted successfully',
+//     data: result,
+//   });
+// });
 
 const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
   const data = req.body.data;
@@ -156,6 +156,6 @@ export const TeacherController = {
   getTeacherById,
   getAllTeachers,
   getTeachersByLanguage,
-  deleteTeacher,
+  // deleteTeacher,
   setUpTeacherPayment,
 };

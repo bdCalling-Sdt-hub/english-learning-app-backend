@@ -292,7 +292,7 @@ const changePasswordToDB = async (
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
-  const User = getModelAccordingToRole(isExistUser);
+  const User: any = getModelAccordingToRole(isExistUser);
 
   if (
     currentPassword &&

@@ -28,7 +28,7 @@ router
     fileUploadHandler(),
     CourseController.updateCourse
   )
-  .delete('/:id', auth(USER_ROLES.TEACHER), CourseController.deleteCourse)
+  // .delete('/:id', auth(USER_ROLES.TEACHER), CourseController.deleteCourse)
   .post(
     '/completed/:id',
     auth(USER_ROLES.TEACHER),
