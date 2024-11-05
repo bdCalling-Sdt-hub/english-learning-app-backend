@@ -8,18 +8,17 @@ import auth from '../../middlewares/auth';
 import { USER_ROLES } from '../../../enums/user';
 import { filterRoutes } from './filter/filter.route';
 const router = express.Router();
-
 router
   .post(
-    '/',
+    '',
     auth(USER_ROLES.TEACHER),
     fileUploadHandler(),
     CourseController.createCourse
   )
   .get('/', CourseController.getAllCourses)
+  .get('/my', CourseController.getCourseByTeacherId)
   .get('/:id', CourseController.getCourseById)
   .get('/:id/details', CourseController.getCourseDetailsById)
-  .get('/teacher/:teacherID', CourseController.getCourseByTeacherId)
   .get('/:id/lectures', CourseController.getLecturesOfCourseByID)
   .get('/language/:language', CourseController.getCourseByLanguage)
   .patch(
@@ -28,14 +27,14 @@ router
     fileUploadHandler(),
     CourseController.updateCourse
   )
-  // .delete('/:id', auth(USER_ROLES.TEACHER), CourseController.deleteCourse)
   .post(
     '/completed/:id',
     auth(USER_ROLES.TEACHER),
     CourseController.completeCourse
   );
+
 router.use('/lectures', LectureRoutes);
 router.use('/enrollments', EnrollmentRoutes);
-router.use('/filter', filterRoutes);
+router.use('/filters', filterRoutes);
 
 export const CourseRoutes = router;

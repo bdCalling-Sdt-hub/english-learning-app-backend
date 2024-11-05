@@ -51,7 +51,7 @@ const filterCourseByRateFromDB = async (from: number, to: number) => {
   }
 };
 
-const filterCourseBySearchFromDB = async (search: string) => {
+const filterCourseBySearchFromDB = async (search: any) => {
   if (!search) {
     throw new Error('Please provide search in the URL');
   }
@@ -105,8 +105,30 @@ const filterCourseBySearchFromDB = async (search: string) => {
   return sortedCourses;
 };
 
+const getTeacherCourses = async (id: any, queryParams: any) => {
+  const courses = await Course.find({
+    teacherID: id,
+      status: 'active',
+  });
+  if (!courses) {
+    throw new Error('Course not found!');
+  }
+  return courses;
+}
+const getMyCoursesFromDB = async (id: any, queryParams: any) => {
+  const courses = await Course.find({
+    teacherID: id,
+    ...queryParams,
+  });
+  if (!courses) {
+    throw new Error('Course not found!');
+  }
+  return courses;
+}
 export const filterService = {
   filterCourseByGenderFromDB,
+  getTeacherCourses,
+  getMyCoursesFromDB,
   filterCourseByDateFromDB,
   filterCourseByRateFromDB,
   filterCourseBySearchFromDB,

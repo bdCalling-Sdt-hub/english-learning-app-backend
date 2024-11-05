@@ -32,7 +32,7 @@ const getBannerFromDB = async () => {
 };
 
 const getProfileBannerFromDB = async () => {
-  const result = await Banner.findOne({ type: BANNER.PROFILE });
+  const result = await Banner.find({ type: BANNER.PROFILE });
   return result;
 };
 

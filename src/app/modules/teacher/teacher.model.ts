@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { model, Schema } from 'mongoose';
 import config from '../../../config';
@@ -16,6 +16,11 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     address: {
       type: String,
       required: false,
+    },
+    banner: {
+      type: String,
+      required: false,
+      default: '',
     },
     role: {
       type: String,
@@ -43,16 +48,36 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       lowercase: true,
       match: /.+\@.+\..+/, // Regex for basic email validation
     },
+    location: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    about: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    dateOfBirth: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    designation: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    experience: {
+      type: String,
+      required: false,
+      default: '',
+    },
     phone: {
       type: String,
       required: true,
     },
-    password: {
-      type: String,
-      required: true,
-      select: 0,
-      minlength: 8,
-    },
+
     earnings: {
       type: Number,
       default: 0,
@@ -82,36 +107,12 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     country: {
       type: String,
+      default: '',
     },
     gender: {
       type: String,
       default: 'male',
       enum: ['male', 'female', 'other'],
-    },
-    dateOfBirth: {
-      day: {
-        type: Number,
-        min: 1,
-        max: 31,
-      },
-      month: {
-        type: Number,
-        min: 1,
-        max: 12,
-      },
-      year: {
-        type: Number,
-        min: 1900,
-        max: new Date().getFullYear(),
-      },
-    },
-
-    designation: {
-      type: String,
-    },
-    experience: {
-      type: Number,
-      min: 0,
     },
 
     accountInformation: {
@@ -157,6 +158,12 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
         type: Date,
         default: null,
       },
+    },
+    password: {
+      type: String,
+      required: true,
+      select: 0,
+      minlength: 8,
     },
   },
   { timestamps: true }

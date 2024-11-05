@@ -7,6 +7,7 @@ import { logger } from '../../../shared/logger';
 import { CourseValidation } from './course.validation';
 import { Server } from 'socket.io';
 import { EnrollmentService } from './enrollment/enrollment.service';
+import ApiError from '../../../errors/ApiError';
 
 const createCourse = catchAsync(async (req: Request, res: Response) => {
   const { ...courseData } = req.body;
@@ -79,8 +80,12 @@ const getCourseById = catchAsync(
 
 const getCourseByTeacherId = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.teacherID;
-    const result = await CourseService.getCourseByTeacherIdFromDB(id);
+    const id = req.user.id;
+    if (!id) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User id is required');
+    }
+    const {...data} = req.query;
+    const result = await CourseService.getCourseByTeacherIdFromDB(id.toString(), data);
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
@@ -146,7 +151,20 @@ const getCourseDetailsById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
+const getMyCoursesByStatus = catchAsync(async (req: Request, res: Response) => {
+  const id = req.user.id
+  const status = req.query.status || 'active';
+  if (!status) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Status is required');
+  }
+  const result = await CourseService.getMyCoursesByStatusFromDB(id as string, status as string);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course details retrieved successfully',
+    data: result,
+  });
+})
 export const CourseController = {
   // deleteCourse,
   createCourse,
@@ -158,4 +176,5 @@ export const CourseController = {
   getLecturesOfCourseByID,
   completeCourse,
   getCourseDetailsById,
+  getMyCoursesByStatus
 };

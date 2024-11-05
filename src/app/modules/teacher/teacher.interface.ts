@@ -10,7 +10,10 @@ export type ITeacher = {
   pendingEarnings?: number;
   address: string;
   appointedBy?: string;
+  banner?: string;
   email: string;
+  about?: string;
+  location?: string;
   skills?: string[];
   password: string;
   profile?: string;
@@ -32,7 +35,7 @@ export type ITeacher = {
     status?: string;
   };
   designation?: string;
-  experience?: number;
+  experience?: string;
   education?: Education[];
 
   authentication?: {

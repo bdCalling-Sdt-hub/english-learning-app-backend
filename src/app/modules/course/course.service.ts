@@ -20,73 +20,7 @@ import getLectureLinkStatus, {
 } from '../../../shared/getLectureLinkStatus';
 import { Student } from '../student/student.model';
 import { Reviews } from '../reviews/reviews.model';
-
-// without stripe
-// const createCourseToDB = async (data: any): Promise<Partial<ICourse>> => {
-//   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
-//   const isTeacherDeleted = isExistTeacher?.status === status.delete;
-//   let lectures;
-//   if (data.lectures.length > 0) {
-//     lectures = data.lectures;
-//     delete data.lectures;
-//   }
-//   if (!isExistTeacher) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
-//   }
-//   if (isTeacherDeleted) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher deleted!');
-//   }
-//   const time = JSON.parse(data.time);
-//   data.time = {
-//     start: new Date(time.start),
-//     end: new Date(time.end),
-//   };
-//   data.price = Number(data.price);
-//   data.studentRange = Number(data.studentRange);
-//   data.time.start = data.time.start.toString();
-//   data.time.end = data.time.end.toString();
-
-//   const validateData = {
-//     body: {
-//       ...data,
-//     },
-//   };
-//   await CourseValidation.createCourseZodSchema.parseAsync(validateData);
-//   const result = await Course.create(data);
-//   if (!result) {
-//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not created!');
-//   }
-//   if (lectures) {
-//     const jsonLectures = JSON.parse(lectures);
-//     if (!Array.isArray(jsonLectures)) {
-//       throw new ApiError(
-//         StatusCodes.BAD_REQUEST,
-//         'Lectures must be an array of lectures!'
-//       );
-//     }
-//     for (const lecture of jsonLectures) {
-//       const resultLecture = await Lecture.create({
-//         ...lecture,
-//         courseID: result._id,
-//       });
-//       if (!resultLecture) {
-//         throw new ApiError(StatusCodes.BAD_REQUEST, 'Lecture not created!');
-//       }
-//       await Course.findByIdAndUpdate(result._id, {
-//         $push: {
-//           lectures: resultLecture._id,
-//         },
-//       });
-//     }
-//   } else {
-//     await Course.findByIdAndUpdate(result._id, {
-//       $push: {
-//         lectures: [],
-//       },
-//     });
-//   }
-//   return result;
-// };
+import { Types } from 'mongoose';
 
 // with stripe
 const stripe = new Stripe(config.stripe_secret_key!, {
@@ -256,29 +190,20 @@ const getCourseByIdFromDB = async (
   return result;
 };
 
+
 const getCourseByTeacherIdFromDB = async (
-  id: string
-): Promise<Partial<Array<ICourse> | null>> => {
-  const isExistTeacher = await Teacher.findOne({ _id: id });
-  if (!isExistTeacher) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
-  }
-  // @ts-ignore
-  if (isExistTeacher.status === status.delete) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher deleted!');
-  }
-  const result: any = await Course.find({
+  id: string,
+  queryParams: Record<string, unknown> = {}
+): Promise<ICourse[]> => {
+  console.log(id)
+  const courses = await Course.find({
     teacherID: id,
-    status: { $ne: status.delete },
-  });
+    ...queryParams
+  })
 
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
-  }
 
-  return result;
+  return courses;
 };
-
 const getLecturesOfCourseFromDB = async (
   id: string
 ): Promise<Partial<Array<ILecture> | null>> => {
@@ -431,6 +356,13 @@ const getCourseDetailsByIdFromDB = async (
   return finalResult;
 };
 
+const getMyCoursesByStatusFromDB = async(userid:any, status:string)=>{
+  const isExistCourse = await Course.find({ teacherID: userid, status: status });
+  if (!isExistCourse) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found!');
+  }
+  return isExistCourse
+}
 export const CourseService = {
   createCourseToDB,
   getCourseByTeacherIdFromDB,
@@ -440,5 +372,6 @@ export const CourseService = {
   updateCourseToDB,
   getLecturesOfCourseFromDB,
   getCourseByLanguageFromDB,
+  getMyCoursesByStatusFromDB,
   // deleteCourseFromDB,
 };

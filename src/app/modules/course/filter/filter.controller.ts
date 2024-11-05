@@ -62,9 +62,34 @@ const filterCourseBySearch = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const getTeacherCourses = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const filter = req.query;
+  const result = await filterService.getTeacherCourses(id, filter);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+})
+const getMyCourses = catchAsync(async (req: Request, res: Response) => {
+  const id = req.user.id;
+  const filter = req.query;
+  const result = await filterService.getMyCoursesFromDB(id, filter);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+})
 export const filterController = {
   filterCourseByGender,
   filterCourseByRate,
+  getTeacherCourses,
   filterCourseBySearch,
+  getMyCourses,
   filterCourseByDate,
 };
