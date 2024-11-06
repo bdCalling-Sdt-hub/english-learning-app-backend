@@ -20,7 +20,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     banner: {
       type: String,
       required: false,
-      default: '',
+      default: '/banners/default.png',
     },
     role: {
       type: String,

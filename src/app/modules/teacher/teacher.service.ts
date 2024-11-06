@@ -256,6 +256,11 @@ const updateProfileToDB = async (
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
     }
   }
+  if (payload.skills) {
+    //@ts-ignore
+    payload.skills = JSON.parse(payload.skills.replace(/'/g, '"'));
+  }
+
   //unlink file here
   if (payload.profile) {
     unlinkFile(isExistUser.profile!);

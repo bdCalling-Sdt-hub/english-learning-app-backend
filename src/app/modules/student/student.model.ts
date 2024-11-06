@@ -28,6 +28,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     banner: {
       type: String,
       required: false,
+      default: '/banners/default.png',
     },
     phone: {
       type: String,
