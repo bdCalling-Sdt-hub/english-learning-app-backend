@@ -17,7 +17,7 @@ export type ITeacher = {
   skills?: string[];
   password: string;
   profile?: string;
-  language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
+  // language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   country?: string;
   type?: 'platform' | 'freelancer';
   gender?: 'male' | 'female' | 'other';
@@ -36,7 +36,9 @@ export type ITeacher = {
   };
   designation?: string;
   experience?: string;
-  education?: Education[];
+  // education?: Education[];
+  degree?: string;
+  institute?: string;
 
   authentication?: {
     isResetPassword: boolean;

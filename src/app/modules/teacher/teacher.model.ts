@@ -100,11 +100,11 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       default: false,
     },
 
-    language: {
-      type: String,
-      enum: LANGUAGE,
-      default: LANGUAGE.ENGLISH,
-    },
+    // language: {
+    //   type: String,
+    //   enum: LANGUAGE,
+    //   default: LANGUAGE.ENGLISH,
+    // },
     country: {
       type: String,
       default: '',
@@ -129,22 +129,28 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
         default: 'active',
       },
     },
-    education: [
-      {
-        id: {
-          type: String,
-          default: null,
-        },
-        degree: {
-          type: String,
-          required: true,
-        },
-        institute: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
+    degree: {
+      type: String,
+    },
+    institute: {
+      type: String,
+    },
+    // education: [
+    //   {
+    //     id: {
+    //       type: String,
+    //       default: null,
+    //     },
+    //     degree: {
+    //       type: String,
+    //       required: true,
+    //     },
+    //     institute: {
+    //       type: String,
+    //       required: true,
+    //     },
+    //   },
+    // ],
     authentication: {
       isResetPassword: {
         type: Boolean,
