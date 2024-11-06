@@ -67,7 +67,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
     status: {
       type: String,
       enum: ['active', 'draft', 'completed', 'delete'],
-      default: 'draft',
+      default: 'active',
     },
   },
   { timestamps: true }

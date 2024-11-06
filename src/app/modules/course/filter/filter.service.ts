@@ -108,13 +108,13 @@ const filterCourseBySearchFromDB = async (search: any) => {
 const getTeacherCourses = async (id: any, queryParams: any) => {
   const courses = await Course.find({
     teacherID: id,
-      status: 'active',
+    status: 'active',
   });
   if (!courses) {
     throw new Error('Course not found!');
   }
   return courses;
-}
+};
 const getMyCoursesFromDB = async (id: any, queryParams: any) => {
   const courses = await Course.find({
     teacherID: id,
@@ -124,7 +124,7 @@ const getMyCoursesFromDB = async (id: any, queryParams: any) => {
     throw new Error('Course not found!');
   }
   return courses;
-}
+};
 export const filterService = {
   filterCourseByGenderFromDB,
   getTeacherCourses,
