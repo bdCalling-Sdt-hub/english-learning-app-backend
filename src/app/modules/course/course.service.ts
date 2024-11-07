@@ -188,6 +188,11 @@ const getAllCoursesFromDB = async (): Promise<Partial<any>[]> => {
       });
       return {
         ...courseObj,
+        startDate: courseObj.startDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
         teacherName: teacher?.name,
         totalLectures,
       };

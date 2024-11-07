@@ -43,6 +43,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
     startDate: {
       type: String,
       required: true,
+      default: '',
     },
     price: {
       type: Number,
