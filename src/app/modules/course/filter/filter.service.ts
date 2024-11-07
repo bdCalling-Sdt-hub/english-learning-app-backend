@@ -1,5 +1,6 @@
 import { Teacher } from '../../teacher/teacher.model';
 import { Course } from '../course.model';
+import { Lecture } from '../lecture/lecture.model';
 
 const filterCourseByGenderFromDB = async (gender: string) => {
   const result = Course.find({ gender: gender, status: { $ne: 'delete' } });
@@ -120,10 +121,22 @@ const getMyCoursesFromDB = async (id: any, queryParams: any) => {
     teacherID: id,
     ...queryParams,
   });
-  if (!courses) {
-    throw new Error('Course not found!');
-  }
-  return courses;
+  const finalResult = await Promise.all(
+    courses.map(async (course: any) => {
+      const teacher = await Teacher.findOne({ _id: course.teacherID });
+      const courseObj = course.toObject();
+      const totalLectures = await Lecture.countDocuments({
+        courseID: course._id,
+      });
+      return {
+        ...courseObj,
+
+        teacherName: teacher?.name,
+        totalLectures,
+      };
+    })
+  );
+  return finalResult;
 };
 export const filterService = {
   filterCourseByGenderFromDB,

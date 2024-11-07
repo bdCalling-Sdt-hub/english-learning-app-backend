@@ -40,6 +40,10 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       default: LANGUAGE.ENGLISH,
       required: true,
     },
+    startDate: {
+      type: String,
+      required: true,
+    },
     price: {
       type: Number,
       required: true,
@@ -61,8 +65,8 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       required: true,
     },
     time: {
-      start: { type: Date, required: true },
-      end: { type: Date, required: true },
+      start: { type: String, required: true },
+      end: { type: String, required: true },
     },
     status: {
       type: String,

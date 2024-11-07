@@ -17,6 +17,7 @@ const createCourseZodSchema = z.object({
       start: z.string({ required_error: 'Start time is required' }),
       end: z.string({ required_error: 'End time is required' }),
     }),
+    startDate: z.string({ required_error: 'Start Date is required' }),
     teacherID: z
       .string({ required_error: 'Teacher ID is required' })
       .optional(),
@@ -38,6 +39,7 @@ const updateCourseValidation = z.object({
     details: z.string().optional(),
     banner: z.string().optional(),
     price: z.number().optional(),
+    startDate: z.string().optional(),
     language: z
       .enum([LANGUAGE.ENGLISH, LANGUAGE.HEBREW, LANGUAGE.SPANISH])
       .optional(),

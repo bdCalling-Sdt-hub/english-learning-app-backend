@@ -172,9 +172,29 @@ const updateCourseToDB = async (
   return result;
 };
 
-const getAllCoursesFromDB = async (): Promise<Partial<ICourse>[]> => {
-  const result = await Course.find();
-  return result;
+const getAllCoursesFromDB = async (): Promise<Partial<any>[]> => {
+  // Get all non-deleted courses
+  const courses = await Course.find({ status: { $ne: 'delete' } });
+
+  // Use Promise.all to wait for all teacher lookups to complete
+  const finalResult = await Promise.all(
+    courses.map(async (course: any) => {
+      const teacher = await Teacher.findOne({ _id: course.teacherID });
+      // Convert mongoose document to plain object before spreading
+      const courseObj = course.toObject();
+      const teacherObj = teacher ? teacher.toObject() : null;
+      const totalLectures = await Lecture.countDocuments({
+        courseID: course._id,
+      });
+      return {
+        ...courseObj,
+        teacherName: teacher?.name,
+        totalLectures,
+      };
+    })
+  );
+
+  return finalResult;
 };
 
 const getCourseByIdFromDB = async (
@@ -187,20 +207,19 @@ const getCourseByIdFromDB = async (
   if (result.status === status.delete) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course deleted!');
   }
+
   return result;
 };
-
 
 const getCourseByTeacherIdFromDB = async (
   id: string,
   queryParams: Record<string, unknown> = {}
 ): Promise<ICourse[]> => {
-  console.log(id)
+  console.log(id);
   const courses = await Course.find({
     teacherID: id,
-    ...queryParams
-  })
-
+    ...queryParams,
+  });
 
   return courses;
 };
@@ -356,13 +375,28 @@ const getCourseDetailsByIdFromDB = async (
   return finalResult;
 };
 
-const getMyCoursesByStatusFromDB = async(userid:any, status:string)=>{
-  const isExistCourse = await Course.find({ teacherID: userid, status: status });
-  if (!isExistCourse) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found!');
-  }
-  return isExistCourse
-}
+const getMyCoursesByStatusFromDB = async (userid: any, status: string) => {
+  const courses = await Course.find({
+    teacherID: userid,
+    status: status,
+  });
+  const finalResult = await Promise.all(
+    courses.map(async (course: any) => {
+      const teacher = await Teacher.findOne({ _id: course.teacherID });
+      const courseObj = course.toObject();
+      const totalLectures = await Lecture.countDocuments({
+        courseID: course._id,
+      });
+      return {
+        ...courseObj,
+
+        teacherName: teacher?.name,
+        totalLectures,
+      };
+    })
+  );
+  return finalResult;
+};
 export const CourseService = {
   createCourseToDB,
   getCourseByTeacherIdFromDB,
