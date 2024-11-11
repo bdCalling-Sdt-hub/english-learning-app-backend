@@ -188,11 +188,7 @@ const getAllCoursesFromDB = async (): Promise<Partial<any>[]> => {
       });
       return {
         ...courseObj,
-        startDate: courseObj.startDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        startDate: courseObj.startDate,
         teacherName: teacher?.name,
         totalLectures,
       };
@@ -302,15 +298,8 @@ const getCourseDetailsByIdFromDB = async (
       title: lecture.title,
       link: lecture.link ? lecture.link : null,
       linkStatus: await getLectureLinkStatus(lecture._id),
-      date: lecture.date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-      time: lecture.date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+      date: lecture.date,
+      time: lecture.date,
       courseID: lecture.courseID,
     }))
   );
@@ -335,11 +324,7 @@ const getCourseDetailsByIdFromDB = async (
 
       return {
         ...review._doc,
-        date: review.createdAt.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        date: review.createdAt,
         name: student?.name || 'Anonymous',
         studentID: student?._id || null,
         profile: student?.profile || null,
@@ -349,22 +334,8 @@ const getCourseDetailsByIdFromDB = async (
   const finalResult = {
     ...result._doc,
     time: {
-      start: `${result.time.start.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })} at ${result.time.start.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`,
-      end: `${result.time.end.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })} at ${result.time.end.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`,
+      start: `${result.time.start} `,
+      end: `${result.time.end}`,
     },
     completedLectures: totalDeprecatedLectures.length,
     enrolledStudents: allEnrolledStudents,

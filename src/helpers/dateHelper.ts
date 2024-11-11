@@ -1,27 +1,19 @@
+import dayjs from 'dayjs';
+
 export function checkIfTodayIs(
   dateStr: string,
   timeStr: string,
   action: any = null
 ) {
-  const [day, month, year] = dateStr.split('-').map(Number);
+  // Parse the date and time strings
+  const targetDate = dayjs(`${dateStr} ${timeStr}`, 'D-M-YYYY h:mm A');
 
-  const [time, period] = timeStr.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
+  // Check if the target date is today
+  const isSameDay = targetDate.isSame(dayjs(), 'day');
 
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
-
-  const targetDate = new Date(year, month - 1, day, hours, minutes);
-
-  const today = new Date();
-
-  const isSameDay =
-    today.getFullYear() === targetDate.getFullYear() &&
-    today.getMonth() === targetDate.getMonth() &&
-    today.getDate() === targetDate.getDate();
-
+  // If it's the same day, either perform the action or return the result
   if (isSameDay) {
-    if (action !== null) {
+    if (action) {
       action();
     } else {
       return isSameDay;

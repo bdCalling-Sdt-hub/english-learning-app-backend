@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { NotificationService } from '../notifications/notification.service';
 import { USER_ROLES } from '../../../enums/user';
 import { Student } from '../student/student.model';
+import dayjs from 'dayjs';
 
 const createSeminarToDB = async (data: ISeminar, io: Server) => {
   const validateData = {
@@ -15,7 +16,18 @@ const createSeminarToDB = async (data: ISeminar, io: Server) => {
     },
   };
   await SeminarValidation.createSeminarValidation.parseAsync(validateData);
-
+  const format = 'D-M-YYYY';
+  const isValidDate = dayjs(data.date, format, true).isValid();
+  if (!isValidDate) {
+    throw new Error('Invalid date format the date should be like 01-01-2023');
+  }
+  const timeFormat = 'h:mm A';
+  const isValidTime = dayjs(data.time, timeFormat, true).isValid();
+  if (!isValidTime) {
+    throw new Error(
+      'Invalid time format the time should be like 01:00 AM or 01:00 PM'
+    );
+  }
   const result = await Seminar.create(data);
   const isExistTeacher = await Teacher.findById(data.teacherID);
   if (!isExistTeacher) {

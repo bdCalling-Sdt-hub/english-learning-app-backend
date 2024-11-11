@@ -141,16 +141,9 @@ const getUpcomingLectureFromDB = async (id: string) => {
 
       return {
         ...lecture.toObject(),
-        date: lecture.date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        date: lecture.date,
         linkSent: lecture.link ? true : false,
-        time: lecture.date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+        time: lecture.date,
         courseName: course?.name,
         courseBanner: course?.banner,
       };
