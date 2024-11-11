@@ -20,7 +20,9 @@ const getLectureLinkStatus = async (
   // Set both dates to the start of their respective days for accurate comparison
   now.setHours(0, 0, 0, 0);
   lectureDate.setHours(0, 0, 0, 0);
-
+  // @ts-ignore
+  if (lecture.link !== null && lecture?.link?.length > 0)
+    return LectureLinkStatus.DEPRECATED;
   if (lectureDate < now) {
     return LectureLinkStatus.DEPRECATED;
   } else if (lectureDate.getTime() === now.getTime()) {
