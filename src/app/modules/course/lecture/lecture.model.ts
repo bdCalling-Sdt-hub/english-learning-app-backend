@@ -16,6 +16,12 @@ const lectureSchema = new Schema<ILecture, LectureModel>(
       type: String,
       required: false,
     },
+    lectureStatus: {
+      type: String,
+      enum: ['complete', 'incomplete'],
+      default: 'incomplete',
+      required: false,
+    },
     date: {
       type: Date,
       required: [true, 'Lecture date is required'],

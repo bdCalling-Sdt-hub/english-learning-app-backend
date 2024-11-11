@@ -95,11 +95,24 @@ const getUpcomingLecture = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const completeLecture = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const io: Server = req.app.get('io');
+  const result = await LectureService.completeLectureToDB(id, io);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Lecture completed successfully',
+    data: result,
+  });
+});
+
 export const LectureController = {
   getLectureByID,
   updateLecture,
   deleteLecture,
   createLecture,
   updateLectureLink,
+  completeLecture,
   getUpcomingLecture,
 };

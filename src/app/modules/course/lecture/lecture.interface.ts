@@ -4,6 +4,7 @@ export type ILecture = {
   courseID: ObjectId;
   title: string;
   link?: string;
+  lectureStatus?: 'complete' | 'incomplete';
   date: Date;
 };
 

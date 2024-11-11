@@ -21,6 +21,7 @@ import getLectureLinkStatus, {
 import { Student } from '../student/student.model';
 import { Reviews } from '../reviews/reviews.model';
 import { Types } from 'mongoose';
+import dayjs from 'dayjs';
 
 // with stripe
 const stripe = new Stripe(config.stripe_secret_key!, {
@@ -292,14 +293,14 @@ const getCourseDetailsByIdFromDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
   }
   const allLectures = await Lecture.find({ courseID: id });
-  const newlectures: Array<ILecture> = await Promise.all(
+  const newlectures: Array<any> = await Promise.all(
     allLectures.map(async (lecture: any) => ({
       _id: lecture._id,
       title: lecture.title,
       link: lecture.link ? lecture.link : null,
       linkStatus: await getLectureLinkStatus(lecture._id),
-      date: lecture.date,
-      time: lecture.date,
+      date: dayjs(lecture.date).format('DD-MM-YYYY'),
+      time: dayjs(lecture.time).format('hh:mm A'),
       courseID: lecture.courseID,
     }))
   );
@@ -324,7 +325,7 @@ const getCourseDetailsByIdFromDB = async (
 
       return {
         ...review._doc,
-        date: review.createdAt,
+        date: dayjs(review.createdAt).format('DD-MM-YYYY'),
         name: student?.name || 'Anonymous',
         studentID: student?._id || null,
         profile: student?.profile || null,

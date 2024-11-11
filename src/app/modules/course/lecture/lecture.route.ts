@@ -26,6 +26,11 @@ router
     validateRequest(LectureValidation.updateLectureZodSchema),
     LectureController.updateLecture
   )
+  .patch(
+    '/:id/complete',
+    auth(USER_ROLES.TEACHER),
+    LectureController.completeLecture
+  )
   .delete('/:id', auth(USER_ROLES.TEACHER), LectureController.deleteLecture);
 
 export const LectureRoutes = router;

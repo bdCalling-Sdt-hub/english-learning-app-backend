@@ -152,12 +152,30 @@ const getUpcomingLectureFromDB = async (id: string) => {
 
   return result;
 };
+const completeLectureToDB = async (id: string, io: Server) => {
+  const isExistLecture = await Lecture.findOne({ _id: id });
+  if (!isExistLecture) {
+    throw new Error('Lecture not found');
+  }
+  const result = await Lecture.findByIdAndUpdate(
+    id,
+    { lectureStatus: 'complete' },
+    {
+      new: true,
+    }
+  );
+  if (!result) {
+    throw new Error('Lecture not updated');
+  }
 
+  return result;
+};
 export const LectureService = {
   getLectureByIDFromDB,
   updateLectureToDB,
   deleteLectureFromDB,
   createLectureToDB,
+  completeLectureToDB,
   updateLectureLinkToDB,
   getUpcomingLectureFromDB,
 };
