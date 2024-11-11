@@ -301,7 +301,7 @@ const getCourseDetailsByIdFromDB = async (
       linkStatus: await getLectureLinkStatus(lecture._id),
       date: dayjs(lecture.date).format('DD-MM-YYYY'),
       time: dayjs(lecture.time).format('hh:mm A'),
-      status: lecture.lectureStatus,
+      lectureStatus: lecture.lectureStatus,
       courseID: lecture.courseID,
     }))
   );
