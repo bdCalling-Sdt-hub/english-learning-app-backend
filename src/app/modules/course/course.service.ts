@@ -308,6 +308,9 @@ const getCourseDetailsByIdFromDB = async (
   const enrollments = await Enrollment.find({ courseID: id });
   const allEnrolledStudents = await Promise.all(
     enrollments.map(async (enrollment: any) => {
+      console.log(
+        await Student.findById(enrollment.studentID).select('name profile _id')
+      );
       return await Student.findById(enrollment.studentID).select(
         'name profile _id'
       );
