@@ -8,6 +8,7 @@ import { Teacher } from '../../teacher/teacher.model';
 import { Server } from 'socket.io';
 import { NotificationService } from '../../notifications/notification.service';
 import { USER_ROLES } from '../../../../enums/user';
+import { Lecture } from '../lecture/lecture.model';
 
 const stripe = new Stripe(config.stripe_secret_key!);
 
@@ -183,6 +184,10 @@ const payTeacherForCourse = async (courseId: string, io: Server) => {
     destination: teacher.accountInformation.stripeAccountId!,
     transfer_group: courseId,
   });
+  await Lecture.updateMany(
+    { courseID: course._id },
+    { lectureStatus: 'complete' }
+  );
   if (!transfer) {
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,

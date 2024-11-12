@@ -1,3 +1,4 @@
+import { Course } from '../app/modules/course/course.model';
 import { Lecture } from '../app/modules/course/lecture/lecture.model';
 
 export enum LectureLinkStatus {
@@ -13,7 +14,13 @@ const getLectureLinkStatus = async (
   if (!lecture) {
     throw new Error('Lecture not found');
   }
-
+  const isExistCourse = await Course.findById(lecture.courseID);
+  if (!isExistCourse) {
+    throw new Error('Course not found');
+  }
+  if (isExistCourse.status === 'completed') {
+    return LectureLinkStatus.DEPRECATED;
+  }
   const now = new Date();
   const lectureDate = new Date(lecture.date);
 
