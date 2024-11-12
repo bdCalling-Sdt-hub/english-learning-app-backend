@@ -23,7 +23,7 @@ const lectureSchema = new Schema<ILecture, LectureModel>(
       required: false,
     },
     date: {
-      type: Date,
+      type: String,
       required: [true, 'Lecture date is required'],
     },
   },

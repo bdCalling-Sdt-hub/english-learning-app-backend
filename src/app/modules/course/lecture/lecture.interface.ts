@@ -5,7 +5,7 @@ export type ILecture = {
   title: string;
   link?: string;
   lectureStatus?: 'complete' | 'incomplete';
-  date: Date;
+  date: string;
 };
 
 export type LectureModel = Model<ILecture>;

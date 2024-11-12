@@ -6,6 +6,7 @@ import { USER_ROLES } from '../../../../enums/user';
 import { Enrollment } from '../enrollment/enrollment.model';
 import ApiError from '../../../../errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
+import dayjs from 'dayjs';
 const getLectureByIDFromDB = async (id: string) => {
   const result = await Lecture.findOne({ _id: id });
   if (!result) {
@@ -120,8 +121,15 @@ const getUpcomingLectureFromDB = async (id: string) => {
   if (!id) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher ID is required');
   }
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+
+  // Get start of today (e.g., 2024-11-11 00:00:00)
+  const today = dayjs().startOf('day');
+  // Get start of tomorrow (e.g., 2024-11-12 00:00:00)
+  const tomorrow = today.add(1, 'day');
+
+  // Get current time to filter upcoming lectures
+  const currentTime = dayjs();
+
   const courses = await Course.find({ teacherID: id });
   if (!courses || courses.length === 0) {
     return [];
@@ -130,10 +138,10 @@ const getUpcomingLectureFromDB = async (id: string) => {
   const upcomingLectures = await Lecture.find({
     courseID: { $in: courses.map(course => course._id) },
     date: {
-      $gte: today,
-      $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      $gte: currentTime.toDate(), // Only get lectures that haven't happened yet
+      $lt: tomorrow.toDate(), // Before tomorrow starts
     },
-  }).sort({ date: 1 });
+  }).sort({ date: 1 }); // Sort by time, earliest first
 
   const result = await Promise.all(
     upcomingLectures.map(async lecture => {
@@ -141,9 +149,9 @@ const getUpcomingLectureFromDB = async (id: string) => {
 
       return {
         ...lecture.toObject(),
-        date: lecture.date,
+        date: dayjs(lecture.date).format('DD-MM-YYYY'),
         linkSent: lecture.link ? true : false,
-        time: lecture.date,
+        time: dayjs(lecture.date).format('HH:mm'),
         courseName: course?.name,
         courseBanner: course?.banner,
       };
