@@ -116,6 +116,11 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
 
     accountInformation: {
+      bankAccountNumber: {
+        type: String,
+        default: null,
+        required: false,
+      },
       stripeAccountId: {
         type: String,
         default: null,

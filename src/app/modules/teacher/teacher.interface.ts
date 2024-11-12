@@ -30,6 +30,7 @@ export type ITeacher = {
     year: number;
   };
   accountInformation: {
+    bankAccountNumber?: string;
     stripeAccountId?: string;
     externalAccountId?: string;
     status?: string;

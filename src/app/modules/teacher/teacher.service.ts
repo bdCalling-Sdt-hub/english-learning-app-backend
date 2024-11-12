@@ -212,6 +212,8 @@ const createTeacherStripeAccount = async (
   // Save to the DB
   if (account.id && account?.external_accounts?.data.length) {
     isExistUser.accountInformation.stripeAccountId = account.id;
+    isExistUser.accountInformation.bankAccountNumber =
+      values.bank_info.account_number;
     isExistUser.accountInformation.externalAccountId =
       account.external_accounts.data[0].id;
     isExistUser.accountInformation.status = 'active';
