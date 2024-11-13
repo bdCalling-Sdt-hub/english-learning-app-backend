@@ -47,7 +47,7 @@ const createCourseToDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Payment not setup');
   }
   // Handle lectures if they exist
-  if (data.lectures.length > 0) {
+  if (data.lectures && data.lectures.length > 0) {
     lectures = data.lectures;
     delete data.lectures;
   }
@@ -58,16 +58,8 @@ const createCourseToDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher deleted!');
   }
 
-  // Parse and format time
-  const time = JSON.parse(data.time);
-  data.time = {
-    start: new Date(time.start),
-    end: new Date(time.end),
-  };
   data.price = Number(data.price);
   data.studentRange = Number(data.studentRange);
-  data.time.start = data.time.start.toString();
-  data.time.end = data.time.end.toString();
   data.type = isExistTeacher?.type;
   // Validate the course data
   const validateData = {

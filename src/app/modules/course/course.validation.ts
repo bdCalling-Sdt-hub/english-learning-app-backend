@@ -10,13 +10,9 @@ const createCourseZodSchema = z.object({
       .enum([LANGUAGE.ENGLISH, LANGUAGE.HEBREW, LANGUAGE.SPANISH])
       .optional(),
     studentRange: z.number({ required_error: 'Student Range is required' }),
-    duration: z
-      .string({ required_error: 'Course Duration is required' })
-      .regex(/^[0-9]+(m|h|d|w)$/, { message: 'Invalid duration format' }),
-    time: z.object({
-      start: z.string({ required_error: 'Start time is required' }),
-      end: z.string({ required_error: 'End time is required' }),
-    }),
+
+    startTime: z.string({ required_error: 'Start time is required' }),
+    endTime: z.string({ required_error: 'End time is required' }),
     startDate: z.string({ required_error: 'Start Date is required' }),
     teacherID: z
       .string({ required_error: 'Teacher ID is required' })
@@ -44,15 +40,12 @@ const updateCourseValidation = z.object({
       .enum([LANGUAGE.ENGLISH, LANGUAGE.HEBREW, LANGUAGE.SPANISH])
       .optional(),
     studentRange: z.number().optional(),
-    duration: z
-      .string({ required_error: 'Course Duration is required' })
-      .regex(/^[0-9]+(m|h|d|w)$/, { message: 'Invalid duration format' })
+
+    startTime: z
+      .string({ invalid_type_error: 'startTime should be a string' })
       .optional(),
-    time: z
-      .object({
-        start: z.string({ required_error: 'Start time is required' }),
-        end: z.string({ required_error: 'End time is required' }),
-      })
+    endTime: z
+      .string({ invalid_type_error: 'endTime should be a string' })
       .optional(),
     teacherID: z
       .string({ required_error: 'Teacher ID is required' })

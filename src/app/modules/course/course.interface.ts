@@ -6,6 +6,8 @@ export type ICourse = {
   banner: string;
   details: string;
   price: number;
+  startTime: string;
+  endTime: string;
   language: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   studentRange: number;
   startDate?: string;

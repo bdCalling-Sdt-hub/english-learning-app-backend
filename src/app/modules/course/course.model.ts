@@ -65,10 +65,8 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       type: [String],
       required: false,
     },
-    time: {
-      start: { type: String, required: true },
-      end: { type: String, required: true },
-    },
+    startTime: { type: String, required: true },
+    endTime: { type: String, required: true },
     status: {
       type: String,
       enum: ['active', 'draft', 'completed', 'delete'],
