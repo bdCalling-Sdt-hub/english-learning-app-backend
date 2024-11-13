@@ -331,8 +331,8 @@ const getCourseDetailsByIdFromDB = async (
   const finalResult = {
     ...result._doc,
     time: {
-      start: `${result.time.start} `,
-      end: `${result.time.end}`,
+      start: `${result.startTime} `,
+      end: `${result.endTime}`,
     },
     completedLectures: totalDeprecatedLectures.length,
     enrolledStudents: allEnrolledStudents,
