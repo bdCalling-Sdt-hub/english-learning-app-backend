@@ -63,7 +63,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
     },
     lectures: {
       type: [String],
-      required: true,
+      required: false,
     },
     time: {
       start: { type: String, required: true },

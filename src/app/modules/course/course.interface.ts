@@ -12,7 +12,7 @@ export type ICourse = {
   teacherID?: string;
   gender: 'male' | 'female' | 'other';
   enrollmentsID: Array<string>; // id of the enrollment of this course the enrollment is a seperate model
-  lectures: Array<string>;
+  lectures?: Array<string>;
   type: 'platform' | 'freelancer';
   time: {
     start: string;
