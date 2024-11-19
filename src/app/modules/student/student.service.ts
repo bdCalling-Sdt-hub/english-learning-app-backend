@@ -105,10 +105,9 @@ const updateProfileToDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student deleted!');
   }
   //unlink file here
-  if (payload.profile) {
+  if (payload.profile && isExistUser.profile?.length > 2) {
     unlinkFile(isExistUser.profile);
   }
-
   const updateDoc = await Student.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });

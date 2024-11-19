@@ -264,8 +264,8 @@ const updateProfileToDB = async (
   }
 
   //unlink file here
-  if (payload.profile) {
-    unlinkFile(isExistUser.profile!);
+  if (payload.profile && isExistUser.profile?.length > 2) {
+    unlinkFile(isExistUser.profile);
   }
 
   const updateDoc = await Teacher.findOneAndUpdate({ _id: id }, payload, {
