@@ -325,11 +325,40 @@ const changePasswordToDB = async (
 
   return { message: 'Password changed successfully' };
 };
+const resendEmailOTP = async (email: string) => {
+  const isExistUser = await findInStudentAndTeacher(email, 'email');
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
 
+  const User: any = getModelAccordingToRole(isExistUser);
+
+  const otp = generateOTP();
+
+  const updateData = {
+    authentication: {
+      isResetPassword: true,
+      oneTimeCode: otp,
+      expireAt: new Date(Date.now() + 3 * 60000), // OTP expires in 3 minutes
+    },
+  };
+  // @ts-ignore
+
+  await User.findOneAndUpdate({ email: isExistUser.email }, updateData, {
+    new: true,
+  });
+
+  const emailData = { otp, email: isExistUser.email };
+  const resetPasswordEmail = emailTemplate.resetPassword(emailData);
+  emailHelper.sendEmail(resetPasswordEmail);
+
+  return { message: 'OTP sent successfully' };
+};
 export const AuthService = {
   verifyEmailToDB,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,
+  resendEmailOTP,
   changePasswordToDB,
 };

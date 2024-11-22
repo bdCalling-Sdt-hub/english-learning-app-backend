@@ -248,6 +248,7 @@ const updateProfileToDB = async (
   id: string,
   payload: Partial<ITeacher>
 ): Promise<Partial<ITeacher | null>> => {
+  console.log(await JSON.stringify(payload));
   const isExistUser: any = await Teacher.findById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
@@ -258,14 +259,14 @@ const updateProfileToDB = async (
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
     }
   }
-  if (payload.skills) {
+  if (typeof payload.skills === 'string') {
     //@ts-ignore
     payload.skills = JSON.parse(payload.skills.replace(/'/g, '"'));
   }
 
   //unlink file here
-  if (payload.profile && isExistUser.profile?.length > 2) {
-    unlinkFile(isExistUser.profile);
+  if (payload.profile && isExistUser.profile?.toString().length > 2) {
+    await unlinkFile(isExistUser.profile);
   }
 
   const updateDoc = await Teacher.findOneAndUpdate({ _id: id }, payload, {

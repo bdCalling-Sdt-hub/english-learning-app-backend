@@ -72,11 +72,22 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const resendEmail = catchAsync(async (req: Request, res: Response) => {
+  const email = req.body.email;
+  const result = await AuthService.resendEmailOTP(email as string);
 
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Please check your email, we send a OTP!',
+    data: result,
+  });
+});
 export const AuthController = {
   verifyEmail,
   loginUser,
   forgetPassword,
   resetPassword,
+  resendEmail,
   changePassword,
 };

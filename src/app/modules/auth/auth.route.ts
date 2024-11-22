@@ -17,7 +17,7 @@ router.post(
   validateRequest(AuthValidation.createForgetPasswordZodSchema),
   AuthController.forgetPassword
 );
-
+router.post('/resend-verify-email', AuthController.resendEmail);
 router.post(
   '/verify-email',
   validateRequest(AuthValidation.createVerifyEmailZodSchema),
