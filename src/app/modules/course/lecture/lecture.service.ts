@@ -122,13 +122,8 @@ const getUpcomingLectureFromDB = async (id: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher ID is required');
   }
 
-  // Get start of today (e.g., 2024-11-11 00:00:00)
-  const today = dayjs().startOf('day');
-  // Get start of tomorrow (e.g., 2024-11-12 00:00:00)
-  const tomorrow = today.add(1, 'day');
-
-  // Get current time to filter upcoming lectures
-  const currentTime = dayjs();
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0]; // Gets "2024-11-23"
 
   const courses = await Course.find({ teacherID: id });
   if (!courses || courses.length === 0) {
@@ -137,14 +132,20 @@ const getUpcomingLectureFromDB = async (id: string) => {
 
   const upcomingLectures = await Lecture.find({
     courseID: { $in: courses.map(course => course._id) },
-    date: {
-      $gte: currentTime.toDate(), // Only get lectures that haven't happened yet
-      $lt: tomorrow.toDate(), // Before tomorrow starts
-    },
-  }).sort({ date: 1 }); // Sort by time, earliest first
+    lectureStatus: 'incomplete',
+    // Match the exact date string format
+    date: today + ' 00:00:00.000Z',
+  });
+
+  // Since we're getting exact day matches, we can sort in memory
+  const sortedLectures = upcomingLectures.sort((a, b) => {
+    const timeA = dayjs(a.date).format('HH:mm');
+    const timeB = dayjs(b.date).format('HH:mm');
+    return timeA.localeCompare(timeB);
+  });
 
   const result = await Promise.all(
-    upcomingLectures.map(async lecture => {
+    sortedLectures.map(async lecture => {
       const course = await Course.findById(lecture.courseID);
 
       return {
