@@ -53,8 +53,8 @@ const updateCourseValidation = z.object({
     lectures: z
       .array(
         z.object({
-          title: z.string({ required_error: 'Lecture title is required' }),
-          date: z.string({ required_error: 'Lecture date is required' }),
+          title: z.string().optional(),
+          date: z.string().optional(),
         }),
         { invalid_type_error: 'Lectures must be an array' }
       )

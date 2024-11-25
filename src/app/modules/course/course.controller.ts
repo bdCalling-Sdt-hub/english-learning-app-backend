@@ -84,8 +84,11 @@ const getCourseByTeacherId = catchAsync(
     if (!id) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User id is required');
     }
-    const {...data} = req.query;
-    const result = await CourseService.getCourseByTeacherIdFromDB(id.toString(), data);
+    const { ...data } = req.query;
+    const result = await CourseService.getCourseByTeacherIdFromDB(
+      id.toString(),
+      data
+    );
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
@@ -152,19 +155,32 @@ const getCourseDetailsById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getMyCoursesByStatus = catchAsync(async (req: Request, res: Response) => {
-  const id = req.user.id
+  const id = req.user.id;
   const status = req.query.status || 'active';
   if (!status) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Status is required');
   }
-  const result = await CourseService.getMyCoursesByStatusFromDB(id as string, status as string);
+  const result = await CourseService.getMyCoursesByStatusFromDB(
+    id as string,
+    status as string
+  );
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Course details retrieved successfully',
     data: result,
   });
-})
+});
+const getEnrolledCourses = catchAsync(async (req: Request, res: Response) => {
+  const id = req.user.id;
+  const result = await CourseService.getEnrolledCourses(id as string);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course details retrieved successfully',
+    data: result,
+  });
+});
 export const CourseController = {
   // deleteCourse,
   createCourse,
@@ -176,5 +192,6 @@ export const CourseController = {
   getLecturesOfCourseByID,
   completeCourse,
   getCourseDetailsById,
-  getMyCoursesByStatus
+  getMyCoursesByStatus,
+  getEnrolledCourses,
 };

@@ -4,14 +4,20 @@ import validateRequest from '../../../middlewares/validateRequest';
 import { EnrollmentValidation } from './enrollment.validation';
 import { USER_ROLES } from '../../../../enums/user';
 import auth from '../../../middlewares/auth';
+import { CourseController } from '../course.controller';
 
 const router = express.Router();
 
 router.post(
   '/',
-  // auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
+  auth(USER_ROLES.STUDENT),
   validateRequest(EnrollmentValidation.createEnrollmentZodSchema),
   EnrollmentController.createEnrollment
+);
+router.get(
+  '/enrolled',
+  auth(USER_ROLES.STUDENT),
+  CourseController.getEnrolledCourses
 );
 
 export const EnrollmentRoutes = router;

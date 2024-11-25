@@ -370,6 +370,19 @@ const getMyCoursesByStatusFromDB = async (userid: any, status: string) => {
   );
   return finalResult;
 };
+
+const getEnrolledCourses = async (id: string) => {
+  const isExistStudent = await Student.findOne({ _id: id });
+  if (!isExistStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student not found!');
+  }
+  const enrollments = await Enrollment.find({ studentID: id }).populate(
+    'courseID'
+  );
+
+  return enrollments;
+};
+
 export const CourseService = {
   createCourseToDB,
   getCourseByTeacherIdFromDB,
@@ -380,5 +393,6 @@ export const CourseService = {
   getLecturesOfCourseFromDB,
   getCourseByLanguageFromDB,
   getMyCoursesByStatusFromDB,
+  getEnrolledCourses,
   // deleteCourseFromDB,
 };

@@ -21,6 +21,7 @@ router
   .get('/:id/details', CourseController.getCourseDetailsById)
   .get('/:id/lectures', CourseController.getLecturesOfCourseByID)
   .get('/language/:language', CourseController.getCourseByLanguage)
+
   .patch(
     '/:id',
     auth(USER_ROLES.TEACHER),
