@@ -376,11 +376,16 @@ const getEnrolledCourses = async (id: string) => {
   if (!isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student not found!');
   }
-  const enrollments = await Enrollment.find({ studentID: id }).populate(
-    'courseID'
+  const enrollments = await Enrollment.find({ studentID: id }).populate({
+    path: 'courseID',
+  });
+  const allCourses = await Promise.all(
+    enrollments.map(async (enrollment: any) => {
+      const course = enrollment.courseID;
+      return course;
+    })
   );
-
-  return enrollments;
+  return allCourses;
 };
 
 export const CourseService = {
