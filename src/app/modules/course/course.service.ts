@@ -392,19 +392,40 @@ const getMyCoursesByStatusFromDB = async (userid: any, status: string) => {
 };
 
 const getEnrolledCourses = async (id: string) => {
+  // Verify student exists
   const isExistStudent = await Student.findOne({ _id: id });
   if (!isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student not found!');
   }
+
+  // Get enrollments with populated courseID
   const enrollments = await Enrollment.find({ studentID: id }).populate({
     path: 'courseID',
   });
+
+  // Map and resolve all course data
   const allCourses = await Promise.all(
     enrollments.map(async (enrollment: any) => {
-      const course = getCourseDetailsByIdFromDB(enrollment.courseID._id);
-      return course;
+      // Await the course query
+      const courseObj = await Course.findById(enrollment.courseID._id);
+
+      const totalLectures = await Lecture.countDocuments({
+        courseID: enrollment.courseID._id,
+      });
+      //@ts-ignore
+      const teacher = await Teacher.findOne({ _id: courseObj.teacherID });
+
+      const finalData = {
+        //@ts-ignore
+        ...courseObj.toObject(), // Convert mongoose document to plain object
+        teacherName: teacher?.name,
+        totalLectures,
+      };
+
+      return finalData;
     })
   );
+
   return allCourses;
 };
 
