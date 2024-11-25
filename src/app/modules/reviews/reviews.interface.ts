@@ -4,6 +4,7 @@ export type IReviews = {
   star: number;
   description: string;
   courseID: string;
+  teacher: ObjectId;
   studentID: string;
 };
 

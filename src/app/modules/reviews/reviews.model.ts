@@ -20,6 +20,11 @@ const reviewSchema = new Schema<IReviews, ReviewsModel>(
       type: String,
       required: [true, 'courseID is required'],
     },
+    teacher: {
+      type: Schema.Types.ObjectId,
+      ref: 'Teacher',
+      required: [true, 'teacher is required'],
+    },
     studentID: {
       type: String,
       required: [true, 'studentID is required'],

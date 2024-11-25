@@ -328,7 +328,8 @@ const getCourseDetailsByIdFromDB = async (
       };
     })
   );
-  const avarageReview = reviews.reduce(
+  const totalTeacherReviews = await Reviews.find({ teacher: teacher._id });
+  const avarageReview = totalTeacherReviews.reduce(
     (acc: number, review: any) => acc + review.star,
     0
   );
