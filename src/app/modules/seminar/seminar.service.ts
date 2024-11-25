@@ -184,6 +184,18 @@ const addLinkToSeminar = async (id: string, link: string, io: Server) => {
   });
   return result;
 };
+const getBookedSeminarFromDB = async (userId: string) => {
+  const result = await Seminar.find({
+    bookings: { $in: [userId] },
+  })
+    .populate({
+      path: 'teacher',
+      select: 'name profile', // Exclude sensitive data
+    })
+    .sort({ createdAt: -1 }); // Most recent first
+
+  return result;
+};
 export const seminarService = {
   createSeminarToDB,
   updateSeminarToDB,
@@ -193,5 +205,6 @@ export const seminarService = {
   getSeminarByTeacherIdFromDB,
   bookSeminarToDB,
   completeSeminarFromDB,
+  getBookedSeminarFromDB,
   addLinkToSeminar,
 };

@@ -132,6 +132,16 @@ const addLinkToSeminar = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getBookedSeminar = catchAsync(async (req: Request, res: Response) => {
+  const id = req.user.id;
+  const result = await seminarService.getBookedSeminarFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Seminar retrieved successfully',
+    data: result,
+  });
+});
 
 export const SeminarController = {
   createSeminar,
@@ -143,4 +153,5 @@ export const SeminarController = {
   bookSeminar,
   completeSeminar,
   addLinkToSeminar,
+  getBookedSeminar,
 };

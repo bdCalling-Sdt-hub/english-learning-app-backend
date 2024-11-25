@@ -7,7 +7,11 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import { SeminarValidation } from './seminar.validation';
 
 const router = express.Router();
-
+router.get(
+  '/booked',
+  auth(USER_ROLES.STUDENT),
+  SeminarController.getBookedSeminar
+);
 router.post(
   '/',
   auth(USER_ROLES.TEACHER),
