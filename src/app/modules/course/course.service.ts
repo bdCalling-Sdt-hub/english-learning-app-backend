@@ -176,14 +176,14 @@ const getAllCoursesFromDB = async (): Promise<Partial<any>[]> => {
       // Convert mongoose document to plain object before spreading
       const courseObj = course.toObject();
       const teacherObj = teacher ? teacher.toObject() : null;
-      const totalLectures = await Lecture.countDocuments({
+      const totalLectures = await Lecture.find({
         courseID: course._id,
       });
       return {
         ...courseObj,
         startDate: courseObj.startDate,
         teacherName: teacher?.name,
-        totalLectures,
+        totalLectures: course?.lectures?.length,
       };
     })
   );
@@ -406,23 +406,22 @@ const getEnrolledCourses = async (id: string) => {
   // Map and resolve all course data
   const allCourses = await Promise.all(
     enrollments.map(async (enrollment: any) => {
-      // Await the course query
       const courseObj = await Course.findById(enrollment.courseID._id);
-
-      const totalLectures = await Lecture.countDocuments({
-        courseID: enrollment.courseID._id,
-      });
-      //@ts-ignore
+      // @ts-ignore
       const teacher = await Teacher.findOne({ _id: courseObj.teacherID });
 
-      const finalData = {
-        //@ts-ignore
-        ...courseObj.toObject(), // Convert mongoose document to plain object
-        teacherName: teacher?.name,
-        totalLectures,
-      };
+      const totalLectures = await Lecture.find({
+        courseID: enrollment.courseID._id,
+      });
 
-      return finalData;
+      return {
+        // @ts-ignore
+        ...courseObj.toObject(),
+        // @ts-ignore
+        startDate: courseObj.startDate,
+        teacherName: teacher?.name,
+        totalLectures: courseObj?.lectures?.length,
+      };
     })
   );
 

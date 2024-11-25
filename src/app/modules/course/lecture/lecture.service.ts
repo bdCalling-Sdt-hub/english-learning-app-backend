@@ -88,6 +88,10 @@ const deleteLectureFromDB = async (id: string) => {
   if (!isExistLecture) {
     throw new Error('Lecture not found');
   }
+  await Course.findOneAndUpdate(
+    { _id: isExistLecture.courseID },
+    { $pull: { lectures: id } }
+  );
   const result = await Lecture.deleteOne({ _id: id });
   if (!result) {
     throw new Error('Lecture not deleted');
