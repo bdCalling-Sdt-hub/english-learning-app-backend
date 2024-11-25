@@ -346,6 +346,7 @@ const getCourseDetailsByIdFromDB = async (
       name: teacher.name,
       profile: teacher.profile,
     },
+    phoneNumber: teacher.phone,
     reviews: reviewsWithStudentInfo,
     totalEnrolledStudents,
     totalReviews: reviews.length,
