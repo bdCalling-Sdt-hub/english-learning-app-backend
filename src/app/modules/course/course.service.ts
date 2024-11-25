@@ -328,6 +328,10 @@ const getCourseDetailsByIdFromDB = async (
       };
     })
   );
+  const avarageReview = reviews.reduce(
+    (acc: number, review: any) => acc + review.star,
+    0
+  );
   const finalResult = {
     ...result._doc,
     time: {
@@ -343,6 +347,8 @@ const getCourseDetailsByIdFromDB = async (
     },
     reviews: reviewsWithStudentInfo,
     totalEnrolledStudents,
+    totalReviews: reviews.length,
+    avarageRating: avarageReview / reviews.length,
     lectures: newlectures,
   };
   return finalResult;

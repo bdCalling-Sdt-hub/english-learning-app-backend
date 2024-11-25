@@ -138,10 +138,18 @@ const getMyCoursesFromDB = async (id: any, queryParams: any) => {
   );
   return finalResult;
 };
+const getCourseByTypeFromDB = async (type: string) => {
+  const courses = await Course.find({ type: type as string, status: 'active' });
+  if (!courses) {
+    throw new Error('Course not found!');
+  }
+  return courses;
+};
 export const filterService = {
   filterCourseByGenderFromDB,
   getTeacherCourses,
   getMyCoursesFromDB,
+  getCourseByTypeFromDB,
   filterCourseByDateFromDB,
   filterCourseByRateFromDB,
   filterCourseBySearchFromDB,

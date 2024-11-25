@@ -73,7 +73,7 @@ const getTeacherCourses = catchAsync(async (req: Request, res: Response) => {
     message: 'Course retrieved successfully',
     data: result,
   });
-})
+});
 const getMyCourses = catchAsync(async (req: Request, res: Response) => {
   const id = req.user.id;
   const filter = req.query;
@@ -84,11 +84,31 @@ const getMyCourses = catchAsync(async (req: Request, res: Response) => {
     message: 'Course retrieved successfully',
     data: result,
   });
-})
+});
+const getFreelancerCourses = catchAsync(async (req: Request, res: Response) => {
+  const result = await filterService.getCourseByTypeFromDB('freelancer');
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+});
+const getPlatformCourses = catchAsync(async (req: Request, res: Response) => {
+  const result = await filterService.getCourseByTypeFromDB('platform');
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+});
 export const filterController = {
   filterCourseByGender,
   filterCourseByRate,
   getTeacherCourses,
+  getFreelancerCourses,
+  getPlatformCourses,
   filterCourseBySearch,
   getMyCourses,
   filterCourseByDate,
