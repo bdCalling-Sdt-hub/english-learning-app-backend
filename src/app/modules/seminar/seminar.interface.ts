@@ -1,4 +1,4 @@
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 
 export type ISeminar = {
   title: string;
@@ -6,7 +6,7 @@ export type ISeminar = {
   date: string;
   time: string;
   duration: string;
-  teacherID: string;
+  teacher: Types.ObjectId;
   link?: string;
   banner: string;
   bookings: [string];

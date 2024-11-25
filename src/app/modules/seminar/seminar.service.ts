@@ -21,15 +21,12 @@ const createSeminarToDB = async (data: ISeminar, io: Server) => {
   if (!isValidDate) {
     throw new Error('Invalid date format the date should be like 01-01-2023');
   }
-  const timeFormat = 'h:mm A';
-  const isValidTime = dayjs(data.time, timeFormat, true).isValid();
-  if (!isValidTime) {
-    throw new Error(
-      'Invalid time format the time should be like 01:00 AM or 01:00 PM'
-    );
+  if (dayjs(data.date, format).isBefore(dayjs().startOf('day'))) {
+    throw new Error('Seminar date cannot be in the past');
   }
+
   const result = await Seminar.create(data);
-  const isExistTeacher = await Teacher.findById(data.teacherID);
+  const isExistTeacher = await Teacher.findById(data.teacher);
   if (!isExistTeacher) {
     throw new Error('Teacher not found');
   }
@@ -38,7 +35,7 @@ const createSeminarToDB = async (data: ISeminar, io: Server) => {
   }
   const message = `${isExistTeacher.name} has created a new seminar.`;
   const seminarData = {
-    teacherID: data.teacherID,
+    teacher: data.teacher,
     seminarID: result._id,
   };
   const notificationSent =
@@ -89,7 +86,10 @@ const deleteSeminarFromDB = async (id: string): Promise<any> => {
 };
 
 const getAllSeminarFromDB = async () => {
-  const result = await Seminar.find({ status: 'published' });
+  const result = await Seminar.find({ status: 'published' }).populate({
+    path: 'teacher',
+    select: 'name profile',
+  });
   if (!result) {
     throw new Error('Seminar not found');
   }
@@ -105,7 +105,7 @@ const getSeminarByIdFromDB = async (id: string) => {
 };
 
 const getSeminarByTeacherIdFromDB = async (id: string) => {
-  const result = await Seminar.find({ teacherID: id });
+  const result = await Seminar.find({ teacher: id });
   if (!result) {
     throw new Error('Seminar not found');
   }
@@ -136,7 +136,7 @@ const bookSeminarToDB = async (Data: any, io: Server) => {
   const message = `${isExistStudent.name} has booked a seminar.`;
   const sendData = {
     sendTo: USER_ROLES.TEACHER,
-    sendUserID: isExistSeminar.teacherID,
+    sendUserID: isExistSeminar.teacher,
     message: message,
     data: { seminarID: Data.seminarID },
   };

@@ -109,6 +109,7 @@ const createAppointedTeacherToDB = async (
     ...userData,
     appointedBy: adminId,
     type: 'platform',
+    verified: true,
   };
   const createdTeacher = await Teacher.create(data);
   if (!createdTeacher) {

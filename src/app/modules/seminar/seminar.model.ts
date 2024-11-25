@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import ApiError from '../../../errors/ApiError';
 import { ISeminar, SeminarModel } from './seminar.interface';
 import { Teacher } from '../teacher/teacher.model';
@@ -27,8 +27,9 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
       type: String,
       required: [true, 'duration is required'],
     },
-    teacherID: {
-      type: String,
+    teacher: {
+      type: Schema.ObjectId,
+      ref: 'Teacher',
       required: [true, 'teacherID is required'],
     },
     link: {
@@ -42,7 +43,7 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
     status: {
       type: String,
       enum: ['draft', 'published', 'completed', 'deleted'],
-      default: 'draft',
+      default: 'published',
     },
     bookings: {
       type: [String],
@@ -54,7 +55,7 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
 );
 
 seminarSchema.pre('save', async function (next) {
-  const isTeacherExist = await Teacher.findOne({ _id: this.teacherID });
+  const isTeacherExist = await Teacher.findOne({ _id: this.teacher });
   if (!isTeacherExist) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
   }

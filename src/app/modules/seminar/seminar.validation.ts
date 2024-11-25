@@ -7,7 +7,6 @@ const createSeminarValidation = z.object({
     description: z.string({ required_error: 'This is required' }),
     time: z.string({ required_error: 'This is required' }),
     duration: z.string({ required_error: 'This is required' }),
-    teacherID: z.string({ required_error: 'This is required' }),
     banner: z.string({ required_error: 'This is required' }),
     bookings: z.string().optional(),
   }),

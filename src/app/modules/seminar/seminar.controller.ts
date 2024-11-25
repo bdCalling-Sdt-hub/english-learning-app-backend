@@ -8,6 +8,7 @@ import ApiError from '../../../errors/ApiError';
 
 const createSeminar = catchAsync(async (req: Request, res: Response) => {
   const { ...seminarData } = req.body;
+  const teacher = req.user.id;
   const io: Server = req.app.get('io');
   let banner;
   if (req.files && 'banner' in req.files && req.files.banner[0]) {
@@ -15,6 +16,7 @@ const createSeminar = catchAsync(async (req: Request, res: Response) => {
   }
   const data = {
     banner,
+    teacher,
     ...seminarData,
   };
   const result = await seminarService.createSeminarToDB(data, io);

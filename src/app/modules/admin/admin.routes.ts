@@ -12,18 +12,34 @@ router.post(
   AdminController.createSuperAdmin
 );
 router.post('/', auth(AdminTypes.SUPERADMIN), AdminController.createAdmin);
-router.patch('/:id', auth(USER_ROLES.ADMIN), AdminController.updateAdmin);
-router.get('/', auth(USER_ROLES.ADMIN), AdminController.getAllAdmins);
-router.get('/:id', auth(USER_ROLES.ADMIN), AdminController.getAdminById);
-router.delete('/:id', auth(USER_ROLES.ADMIN), AdminController.deleteAdmin);
+router.patch(
+  '/:id',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.updateAdmin
+);
+router.get(
+  '/',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.getAllAdmins
+);
+router.get(
+  '/:id',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.getAdminById
+);
+router.delete(
+  '/:id',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.deleteAdmin
+);
 router.post(
   '/:adminId/create-appointed-teacher',
-  auth(USER_ROLES.ADMIN),
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.createAppointedTeacher
 );
 router.post(
   '/:adminId/make-teacher-appointed/:id',
-  auth(USER_ROLES.ADMIN),
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.makeTeacherAppointed
 );
 router.post(
