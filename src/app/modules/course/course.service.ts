@@ -273,19 +273,24 @@ const getCourseByLanguageFromDB = async (
   return result;
 };
 
-const getCourseDetailsByIdFromDB = async (
-  id: string
-): Promise<Partial<ICourse | null>> => {
-  let result: any = await Course.findOne({ _id: id });
+const getCourseDetailsByIdFromDB = async (id: string): Promise<any> => {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid course ID format');
+  }
+
+  const result = await Course.findOne({ _id: id });
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
   }
+
   const teacher = await Teacher.findOne({ _id: result.teacherID });
   if (!teacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher not found!');
   }
+
+  // Get all lectures and process them
   const allLectures = await Lecture.find({ courseID: id });
-  const newlectures: Array<any> = await Promise.all(
+  const newlectures = await Promise.all(
     allLectures.map(async (lecture: any) => ({
       _id: lecture._id,
       title: lecture.title,
@@ -297,21 +302,23 @@ const getCourseDetailsByIdFromDB = async (
       courseID: lecture.courseID,
     }))
   );
+
+  // Get enrollments and students
   const enrollments = await Enrollment.find({ courseID: id });
   const allEnrolledStudents = await Promise.all(
     enrollments.map(async (enrollment: any) => {
-      console.log(
-        await Student.findById(enrollment.studentID).select('name profile _id')
-      );
       return await Student.findById(enrollment.studentID).select(
         'name profile _id'
       );
     })
   );
+
   const totalEnrolledStudents = enrollments.length;
   const totalDeprecatedLectures = newlectures.filter(
     (lecture: any) => lecture.linkStatus === LectureLinkStatus.DEPRECATED
   );
+
+  // Get and process reviews
   const reviews = await Reviews.find({ courseID: id });
   const reviewsWithStudentInfo = await Promise.all(
     reviews.map(async (review: any) => {
@@ -328,15 +335,19 @@ const getCourseDetailsByIdFromDB = async (
       };
     })
   );
+
+  // Calculate average review
   const totalTeacherReviews = await Reviews.find({ teacher: teacher._id });
   const avarageReview = totalTeacherReviews.reduce(
     (acc: number, review: any) => acc + review.star,
     0
   );
+
   const finalResult = {
+    //@ts-ignore
     ...result._doc,
     time: {
-      start: `${result.startTime} `,
+      start: `${result.startTime} `, // Note the space after startTime
       end: `${result.endTime}`,
     },
     completedLectures: totalDeprecatedLectures.length,
@@ -350,9 +361,10 @@ const getCourseDetailsByIdFromDB = async (
     reviews: reviewsWithStudentInfo,
     totalEnrolledStudents,
     totalReviews: reviews.length,
-    avarageRating: avarageReview / reviews.length,
+    avarageRating: avarageReview / reviews.length, // Kept the original spelling 'avarage'
     lectures: newlectures,
   };
+
   return finalResult;
 };
 
@@ -370,7 +382,7 @@ const getMyCoursesByStatusFromDB = async (userid: any, status: string) => {
       });
       return {
         ...courseObj,
-
+        phoneNumber: teacher?.phone,
         teacherName: teacher?.name,
         totalLectures,
       };
