@@ -389,7 +389,7 @@ const getEnrolledCourses = async (id: string) => {
   });
   const allCourses = await Promise.all(
     enrollments.map(async (enrollment: any) => {
-      const course = enrollment.courseID;
+      const course = getCourseDetailsByIdFromDB(enrollment.courseID._id);
       return course;
     })
   );
