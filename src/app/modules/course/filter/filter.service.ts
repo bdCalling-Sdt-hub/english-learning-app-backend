@@ -143,7 +143,25 @@ const getCourseByTypeFromDB = async (type: string) => {
   if (!courses) {
     throw new Error('Course not found!');
   }
-  return courses;
+  const finalResult = await Promise.all(
+    courses.map(async (course: any) => {
+      const teacher = await Teacher.findOne({ _id: course.teacherID });
+      // Convert mongoose document to plain object before spreading
+      const courseObj = course.toObject();
+      const teacherObj = teacher ? teacher.toObject() : null;
+      const totalLectures = await Lecture.find({
+        courseID: course._id,
+      });
+      return {
+        ...courseObj,
+        startDate: courseObj.startDate,
+        teacherName: teacher?.name,
+        totalLectures: course?.lectures?.length,
+      };
+    })
+  );
+
+  return finalResult;
 };
 export const filterService = {
   filterCourseByGenderFromDB,
