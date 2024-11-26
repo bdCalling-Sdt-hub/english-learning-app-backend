@@ -139,35 +139,54 @@ const getMyCoursesFromDB = async (id: any, queryParams: any) => {
   );
   return finalResult;
 };
-const getCourseByTypeFromDB = async (type: string, studentId: string) => {
-  const wishlist: any =
-    (await Student.findOne({ _id: studentId }).select('wishlist')) || [];
-  const courses = await Course.find({ type: type as string, status: 'active' });
-  if (!courses) {
-    throw new Error('Course not found!');
-  }
-  const finalResult = await Promise.all(
-    courses.map(async (course: any) => {
-      const teacher = await Teacher.findOne({ _id: course.teacherID });
-      // Convert mongoose document to plain object before spreading
-      const courseObj = course.toObject();
-      const teacherObj = teacher ? teacher.toObject() : null;
-      const totalLectures = await Lecture.find({
-        courseID: course._id,
-      });
-      const isWishlisted =
-        wishlist.length > 0 ? wishlist.includes(course._id as string) : false;
-      return {
-        ...courseObj,
-        startDate: courseObj.startDate,
-        isWishlisted: isWishlisted,
-        teacherName: teacher?.name,
-        totalLectures: course?.lectures?.length,
-      };
-    })
-  );
+const getCourseByTypeFromDB = async (type: string, studentId: string = '') => {
+  try {
+    // Find courses by type and active status
+    const courses = await Course.find({
+      type: type as string,
+      status: 'active',
+    });
 
-  return finalResult;
+    // Throw error if no courses found
+    if (courses.length === 0) {
+      throw new Error('Course not found!');
+    }
+
+    // Find student only if studentId is provided
+    const student = studentId
+      ? await Student.findOne({ _id: studentId }).select('wishlist')
+      : null;
+
+    // Map courses with additional details
+    const finalResult = await Promise.all(
+      courses.map(async (course: any) => {
+        // Find teacher for the course
+        const teacher = await Teacher.findOne({ _id: course.teacherID });
+
+        // Convert mongoose document to plain object
+        const courseObj = course.toObject();
+
+        // Check if course is in student's wishlist
+        const isWishlisted = student
+          ? //@ts-ignore
+            student.wishlist.includes(course._id)
+          : false;
+
+        return {
+          ...courseObj,
+          startDate: courseObj.startDate,
+          isFavourite: isWishlisted,
+          teacherName: teacher?.name,
+          totalLectures: course?.lectures?.length,
+        };
+      })
+    );
+
+    return finalResult;
+  } catch (error) {
+    console.error('Error in getCourseByTypeFromDB:', error);
+    throw error;
+  }
 };
 export const filterService = {
   filterCourseByGenderFromDB,

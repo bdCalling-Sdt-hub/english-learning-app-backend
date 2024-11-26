@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import sendResponse from '../../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import { filterService } from './filter.service';
+import { jwtHelper } from '../../../../helpers/jwtHelper';
+import config from '../../../../config';
 
 const filterCourseByGender = catchAsync(async (req: Request, res: Response) => {
   const gender = req.params.gender;
@@ -86,11 +88,36 @@ const getMyCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getFreelancerCourses = catchAsync(async (req: Request, res: Response) => {
-  const studentId = req.user.id;
+  // Extract bearer token from Authorization header
+  const authorization = req.headers.authorization;
+  const bearerToken = authorization?.split(' ')[1];
+
+  let studentId = '';
+
+  // Verify token and get user (if token exists)
+  if (bearerToken) {
+    try {
+      const user = await jwtHelper.verifyToken(
+        bearerToken,
+        config.jwt.jwt_secret as string
+      );
+
+      // Safely extract studentId
+      studentId = user?.id || '';
+    } catch (error) {
+      // Token verification failed
+      console.error('Token verification error:', error);
+      studentId = '';
+    }
+  }
+
+  // Fetch freelancer courses
   const result = await filterService.getCourseByTypeFromDB(
     'freelancer',
     studentId
   );
+
+  // Send response
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -99,11 +126,36 @@ const getFreelancerCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getPlatformCourses = catchAsync(async (req: Request, res: Response) => {
-  const studentId = req.user.id;
+  // Extract bearer token from Authorization header
+  const authorization = req.headers.authorization;
+  const bearerToken = authorization?.split(' ')[1];
+
+  let studentId = '';
+
+  // Verify token and get user (if token exists)
+  if (bearerToken) {
+    try {
+      const user = await jwtHelper.verifyToken(
+        bearerToken,
+        config.jwt.jwt_secret as string
+      );
+
+      // Safely extract studentId
+      studentId = user?.id || '';
+    } catch (error) {
+      // Token verification failed
+      console.error('Token verification error:', error);
+      studentId = '';
+    }
+  }
+
+  // Fetch freelancer courses
   const result = await filterService.getCourseByTypeFromDB(
     'platform',
     studentId
   );
+
+  // Send response
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
