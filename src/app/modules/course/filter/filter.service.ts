@@ -155,11 +155,12 @@ const getCourseByTypeFromDB = async (type: string, studentId: string) => {
       const totalLectures = await Lecture.find({
         courseID: course._id,
       });
-      const isWishlisted = wishlist.includes(course._id);
+      const isWishlisted =
+        wishlist.length > 0 ? wishlist.includes(course._id as string) : false;
       return {
         ...courseObj,
         startDate: courseObj.startDate,
-        isWishlisted,
+        isWishlisted: isWishlisted,
         teacherName: teacher?.name,
         totalLectures: course?.lectures?.length,
       };
