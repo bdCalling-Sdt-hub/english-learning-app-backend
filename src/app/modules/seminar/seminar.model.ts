@@ -35,6 +35,7 @@ const seminarSchema = new Schema<ISeminar, SeminarModel>(
     link: {
       type: String,
       required: false,
+      default: '',
     },
     banner: {
       type: String,

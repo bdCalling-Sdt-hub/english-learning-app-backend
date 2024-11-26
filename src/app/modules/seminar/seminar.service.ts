@@ -97,9 +97,15 @@ const getAllSeminarFromDB = async () => {
 };
 
 const getSeminarByIdFromDB = async (id: string) => {
-  const result = await Seminar.findById(id);
+  const result = await Seminar.findById(id).populate({
+    path: 'teacher',
+    select: 'name profile',
+  });
   if (!result) {
     throw new Error('Seminar not found');
+  }
+  if (!result.link) {
+    result.link = undefined;
   }
   return result;
 };
