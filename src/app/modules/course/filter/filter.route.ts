@@ -3,8 +3,16 @@ import { filterController } from './filter.controller';
 import auth from '../../../middlewares/auth';
 import { USER_ROLES } from '../../../../enums/user';
 const router = express.Router();
-router.get('/freelancer', filterController.getFreelancerCourses);
-router.get('/platform', filterController.getPlatformCourses);
+router.get(
+  '/freelancer',
+  auth(USER_ROLES.STUDENT),
+  filterController.getFreelancerCourses
+);
+router.get(
+  '/platform',
+  auth(USER_ROLES.STUDENT),
+  filterController.getPlatformCourses
+);
 router.get('/gender/:gender', filterController.filterCourseByGender);
 router.get('/date/:date', filterController.filterCourseByDate);
 router.get('/rate', filterController.filterCourseByRate);

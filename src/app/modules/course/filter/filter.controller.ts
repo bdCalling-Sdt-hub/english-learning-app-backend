@@ -86,7 +86,11 @@ const getMyCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getFreelancerCourses = catchAsync(async (req: Request, res: Response) => {
-  const result = await filterService.getCourseByTypeFromDB('freelancer');
+  const studentId = req.user.id;
+  const result = await filterService.getCourseByTypeFromDB(
+    'freelancer',
+    studentId
+  );
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -95,7 +99,11 @@ const getFreelancerCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getPlatformCourses = catchAsync(async (req: Request, res: Response) => {
-  const result = await filterService.getCourseByTypeFromDB('platform');
+  const studentId = req.user.id;
+  const result = await filterService.getCourseByTypeFromDB(
+    'platform',
+    studentId
+  );
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

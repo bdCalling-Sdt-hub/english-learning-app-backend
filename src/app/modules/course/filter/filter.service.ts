@@ -1,3 +1,4 @@
+import { Student } from '../../student/student.model';
 import { Teacher } from '../../teacher/teacher.model';
 import { Course } from '../course.model';
 import { Lecture } from '../lecture/lecture.model';
@@ -138,7 +139,9 @@ const getMyCoursesFromDB = async (id: any, queryParams: any) => {
   );
   return finalResult;
 };
-const getCourseByTypeFromDB = async (type: string) => {
+const getCourseByTypeFromDB = async (type: string, studentId: string) => {
+  const wishlist: any =
+    (await Student.findOne({ _id: studentId }).select('wishlist')) || [];
   const courses = await Course.find({ type: type as string, status: 'active' });
   if (!courses) {
     throw new Error('Course not found!');
@@ -152,9 +155,11 @@ const getCourseByTypeFromDB = async (type: string) => {
       const totalLectures = await Lecture.find({
         courseID: course._id,
       });
+      const isWishlisted = wishlist.includes(course._id);
       return {
         ...courseObj,
         startDate: courseObj.startDate,
+        isWishlisted,
         teacherName: teacher?.name,
         totalLectures: course?.lectures?.length,
       };
