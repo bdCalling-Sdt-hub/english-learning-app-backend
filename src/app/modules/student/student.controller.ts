@@ -128,6 +128,17 @@ const selectBannerByID = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getWishlist = catchAsync(async (req: Request, res: Response) => {
+  const studentId = req.user.id;
+  const result = await StudentService.getWishlistFromDB(studentId);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Wishlist retrieved successfully',
+    data: result,
+  });
+});
+
 export const StudentController = {
   createStudent,
   getStudentProfile,
@@ -137,5 +148,6 @@ export const StudentController = {
   removeFromWishlist,
   deleteStudent,
   addToWishlist,
+  getWishlist,
   selectBannerByID,
 };

@@ -5,6 +5,7 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import validateRequest from '../../middlewares/validateRequest';
 import { StudentController } from './student.controller';
 import { StudentValidation } from './student.validation';
+import { WishlistRoutes } from './wishlist/wishlist.route';
 const router = express.Router();
 
 router
@@ -14,6 +15,7 @@ router
     auth(USER_ROLES.STUDENT),
     StudentController.getStudentProfile
   )
+
   .get('/:id', StudentController.getStudentById)
   .patch(
     '/:id',
@@ -25,7 +27,10 @@ router
     '/:id',
     auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
     StudentController.deleteStudent
-  )
+  );
+router.post('/banner/select', StudentController.selectBannerByID);
+
+router
   .route('/')
   .post(
     validateRequest(StudentValidation.createStudentZodSchema),
@@ -36,17 +41,6 @@ router
     fileUploadHandler(),
     StudentController.updateProfile
   );
-router
-  .post(
-    '/wishlist/add',
-    auth(USER_ROLES.STUDENT),
-    StudentController.addToWishlist
-  )
-  .post(
-    '/wishlist/remove',
-    auth(USER_ROLES.STUDENT),
-    StudentController.removeFromWishlist
-  )
-  .post('/banner/select', StudentController.selectBannerByID);
 
+router.use('/wishlist', WishlistRoutes);
 export const StudentRoutes = router;

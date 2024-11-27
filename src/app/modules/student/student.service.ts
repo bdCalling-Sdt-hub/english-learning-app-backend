@@ -223,6 +223,31 @@ const selectBannerByIDToDB = async (bannerId: string, studentId: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Banner not selected!');
   }
 };
+const getWishlistFromDB = async (studentId: string) => {
+  const existStudent = await Student.findOne({ _id: studentId });
+  if (!existStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
+  }
+  if (existStudent.status === 'delete') {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
+  }
+  const list = await Student.findOne({ _id: studentId })
+    .populate('wishlist')
+    .select('wishlist')
+    .lean();
+  if (!list || !list.wishlist) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Wishlist not found!');
+  }
+  console.log(list.wishlist);
+  const result = await Promise.all(
+    list.wishlist.map(async (course: any) => {
+      const courseData = await Course.findOne({ _id: course });
+      return courseData;
+    })
+  );
+
+  return result;
+};
 
 export const StudentService = {
   createStudentToDB,
@@ -234,4 +259,5 @@ export const StudentService = {
   addToWishlistToDB,
   removeFromWishlistToDB,
   selectBannerByIDToDB,
+  getWishlistFromDB,
 };
