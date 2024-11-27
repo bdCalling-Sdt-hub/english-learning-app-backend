@@ -2,6 +2,7 @@ import { Student } from '../../student/student.model';
 import { Teacher } from '../../teacher/teacher.model';
 import { Course } from '../course.model';
 import { Lecture } from '../lecture/lecture.model';
+import { CourseFilterParams } from './filter.interface';
 
 const filterCourseByGenderFromDB = async (gender: string) => {
   const result = Course.find({ gender: gender, status: { $ne: 'delete' } });
@@ -11,25 +12,50 @@ const filterCourseByGenderFromDB = async (gender: string) => {
   return result;
 };
 const filterCourseByDateFromDB = async (date: string) => {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
-  const dateString = '2024-10-01T09:00:00Z';
-  const dateFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+  // Validate date format using a regex
+  const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+
+  // Check if the date matches the expected format
   if (!dateRegex.test(date)) {
-    console.log(
-      `Invalid date format date should be in this ${dateFormat} for example ${dateString}`
+    const dateFormat = 'DD-MM-YYYY';
+    const dateExample = '11-12-2024';
+
+    throw new Error(
+      `Invalid date format. Date should be in this format: ${dateFormat}. Example: ${dateExample}`
     );
   }
-  const result = await Course.find({
-    //@ts-ignore
-    'time.start': date,
-    status: { $ne: 'delete' },
-  });
-  if (!result) {
-    throw new Error('Course not found!');
-  }
-  return result;
-};
 
+  // Optional: Additional date validation
+  const [day, month, year] = date.split('-').map(Number);
+  const isValidDate = () => {
+    const dateObj = new Date(year, month - 1, day);
+    return (
+      dateObj.getFullYear() === year &&
+      dateObj.getMonth() === month - 1 &&
+      dateObj.getDate() === day
+    );
+  };
+
+  if (!isValidDate()) {
+    throw new Error('Invalid date. Please provide a valid date.');
+  }
+
+  try {
+    const result = await Course.find({
+      startDate: date, // Exact match on the startDate string
+      status: { $ne: 'delete' },
+    });
+
+    if (result.length === 0) {
+      throw new Error(`No courses found for the date: ${date}`);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error filtering courses:', error);
+    throw error;
+  }
+};
 const filterCourseByRateFromDB = async (from: number, to: number) => {
   if (from > to) {
     throw new Error('Invalid range: from should be less than to');
@@ -54,10 +80,6 @@ const filterCourseByRateFromDB = async (from: number, to: number) => {
 };
 
 const filterCourseBySearchFromDB = async (search: any) => {
-  if (!search) {
-    throw new Error('Please provide search in the URL');
-  }
-
   const regexSearch = new RegExp(search, 'i'); // Case-insensitive regex for search
 
   // Query to find any courses that match in `name` or `details`
@@ -188,6 +210,162 @@ const getCourseByTypeFromDB = async (type: string, studentId: string = '') => {
     throw error;
   }
 };
+
+const unifiedCourseFilter = async (queryParams: CourseFilterParams) => {
+  try {
+    // Base query to exclude deleted courses
+    const query: any = { status: { $ne: 'delete' } };
+
+    // Search filter
+    if (queryParams.search) {
+      const regexSearch = new RegExp(queryParams.search, 'i');
+      query.$or = [
+        { name: { $regex: regexSearch } },
+        { details: { $regex: regexSearch } },
+      ];
+    }
+
+    // Date filter
+    if (queryParams.date) {
+      // Validate date format
+      const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+      if (!dateRegex.test(queryParams.date)) {
+        throw new Error(`Invalid date format. Use DD-MM-YYYY`);
+      }
+
+      // Additional date validation
+      const [day, month, year] = queryParams.date.split('-').map(Number);
+      const dateObj = new Date(year, month - 1, day);
+      if (
+        dateObj.getFullYear() !== year ||
+        dateObj.getMonth() !== month - 1 ||
+        dateObj.getDate() !== day
+      ) {
+        throw new Error('Invalid date');
+      }
+
+      query.startDate = queryParams.date;
+    }
+
+    // Gender filter
+    if (queryParams.gender) {
+      query.gender = queryParams.gender;
+    }
+
+    // Price range filter
+    if (
+      queryParams.priceFrom !== undefined &&
+      queryParams.priceTo !== undefined
+    ) {
+      if (queryParams.priceFrom > queryParams.priceTo) {
+        throw new Error('Invalid price range');
+      }
+      query.price = {
+        $gte: queryParams.priceFrom,
+        $lte: queryParams.priceTo,
+      };
+    }
+
+    // Type filter
+    if (queryParams.type) {
+      query.type = queryParams.type;
+    }
+
+    // Perform the base query
+    const courses = await Course.find(query);
+
+    // If no courses found
+    if (courses.length === 0) {
+      throw new Error('No courses found matching the criteria');
+    }
+
+    // If student ID is provided, enrich with wishlist and teacher info
+    if (queryParams.studentId) {
+      const finalResult = await Promise.all(
+        courses.map(async (course: any) => {
+          // Find student and teacher
+          const [student, teacher] = await Promise.all([
+            Student.findOne({ _id: queryParams.studentId }).select('wishlist'),
+            Teacher.findOne({ _id: course.teacherID }),
+          ]);
+
+          // Convert to plain object
+          const courseObj = course.toObject();
+
+          // Check if course is in student's wishlist
+          const isWishlisted = student
+            ? //@ts-ignore
+              student.wishlist.includes(course._id)
+            : false;
+
+          return {
+            ...courseObj,
+            isFavourite: isWishlisted,
+            teacherName: teacher?.name,
+            totalLectures: course?.lectures?.length,
+          };
+        })
+      );
+
+      // Custom sorting for search results if search is provided
+      return queryParams.search
+        ? sortSearchResults(finalResult, queryParams.search)
+        : finalResult;
+    }
+    let finalResult = await Promise.all(
+      courses.map(async (course: any) => {
+        const teacher = await Teacher.findOne({ _id: course.teacherID });
+        const courseObj = course.toObject();
+
+        return {
+          ...courseObj,
+          startDate: courseObj.startDate,
+          teacherName: teacher?.name,
+          totalLectures: course?.lectures?.length,
+        };
+      })
+    );
+    return finalResult;
+  } catch (error) {
+    console.error('Error in unified course filter:', error);
+    throw error;
+  }
+};
+
+// Helper function for sorting search results
+const sortSearchResults = (courses: any[], search: string) => {
+  return courses.sort((a, b) => {
+    const searchLower = search.toLowerCase();
+
+    const aName = a.name.toLowerCase();
+    const bName = b.name.toLowerCase();
+    const aDetails = a.details.toLowerCase();
+    const bDetails = b.details.toLowerCase();
+
+    // 1. Exact match in `name` comes first
+    if (aName === searchLower) return -1;
+    if (bName === searchLower) return 1;
+
+    // 2. Partial match in `name` comes next
+    if (aName.startsWith(searchLower) && !bName.startsWith(searchLower))
+      return -1;
+    if (bName.startsWith(searchLower) && !aName.startsWith(searchLower))
+      return 1;
+
+    // 3. `name` contains the search term but is not a match at the start
+    if (aName.includes(searchLower) && !bName.includes(searchLower)) return -1;
+    if (bName.includes(searchLower) && !aName.includes(searchLower)) return 1;
+
+    // 4. Match in `details` comes last
+    if (aDetails.includes(searchLower) && !bDetails.includes(searchLower))
+      return -1;
+    if (bDetails.includes(searchLower) && !aDetails.includes(searchLower))
+      return 1;
+
+    return 0;
+  });
+};
+
 export const filterService = {
   filterCourseByGenderFromDB,
   getTeacherCourses,
@@ -195,5 +373,6 @@ export const filterService = {
   getCourseByTypeFromDB,
   filterCourseByDateFromDB,
   filterCourseByRateFromDB,
+  unifiedCourseFilter,
   filterCourseBySearchFromDB,
 };

@@ -10,5 +10,6 @@ router.get('/date/:date', filterController.filterCourseByDate);
 router.get('/rate', filterController.filterCourseByRate);
 router.get('/search', filterController.filterCourseBySearch);
 router.get('/teacher/:id', filterController.getTeacherCourses);
+router.get('/filter', filterController.filterCourse);
 router.get('/my', auth(USER_ROLES.TEACHER), filterController.getMyCourses);
 export const filterRoutes = router;

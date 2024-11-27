@@ -52,10 +52,8 @@ const filterCourseByRate = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const filterCourseBySearch = catchAsync(async (req: Request, res: Response) => {
-  const search = req.query.search;
-  if (!search) {
-    throw new Error('Please provide search in the URL');
-  }
+  const search = req.query.search || '';
+
   const result = await filterService.filterCourseBySearchFromDB(search);
   sendResponse(res, {
     success: true,
@@ -163,6 +161,16 @@ const getPlatformCourses = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const filterCourse = catchAsync(async (req: Request, res: Response) => {
+  const filter = req.query;
+  const result = await filterService.unifiedCourseFilter(filter);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course retrieved successfully',
+    data: result,
+  });
+});
 export const filterController = {
   filterCourseByGender,
   filterCourseByRate,
@@ -170,6 +178,7 @@ export const filterController = {
   getFreelancerCourses,
   getPlatformCourses,
   filterCourseBySearch,
+  filterCourse,
   getMyCourses,
   filterCourseByDate,
 };
