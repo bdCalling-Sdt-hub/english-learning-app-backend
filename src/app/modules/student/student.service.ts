@@ -224,31 +224,48 @@ const selectBannerByIDToDB = async (bannerId: string, studentId: string) => {
   }
 };
 const getWishlistFromDB = async (studentId: string) => {
-  const existStudent = await Student.findOne({ _id: studentId });
+  // Validate student existence and status in a single query
+  const existStudent = await Student.findOne({
+    _id: studentId,
+    status: { $ne: 'delete' },
+  });
+
   if (!existStudent) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "Student doesn't exist or has been deleted!"
+    );
   }
-  if (existStudent.status === 'delete') {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
-  }
-  const list = await Student.findOne({ _id: studentId })
-    .populate('wishlist')
-    .select('wishlist')
-    .lean();
-  if (!list || !list.wishlist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Wishlist not found!');
-  }
-  console.log(list.wishlist);
-  const result = await Promise.all(
-    list.wishlist.map(async (course: any) => {
-      const courseData = await Course.findOne({ _id: course });
-      return courseData;
+
+  // Fetch wishlist with population in a single query
+  const list = await Student.findById(studentId)
+    .populate({
+      path: 'wishlist',
+      model: 'Course',
+      populate: {
+        path: 'teacherID',
+        model: 'Teacher',
+        select: 'name',
+      },
     })
-  );
+    .lean();
+
+  if (!list?.wishlist?.length) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Wishlist is empty!');
+  }
+
+  // Map wishlist courses with required details
+  const result = list.wishlist.map(course => ({
+    //@ts-ignore
+    ...course,
+    //@ts-ignore
+    teacherName: course.teacherID?.name,
+    //@ts-ignore
+    totalLectures: course.lectures?.length || 0,
+  }));
 
   return result;
 };
-
 export const StudentService = {
   createStudentToDB,
   getStudentProfileFromDB,
