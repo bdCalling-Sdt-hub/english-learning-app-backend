@@ -232,7 +232,7 @@ const getWishlistFromDB = async (studentId: string) => {
 
   if (!existStudent) {
     throw new ApiError(
-      StatusCodes.BAD_REQUEST,
+      StatusCodes.OK,
       "Student doesn't exist or has been deleted!"
     );
   }
