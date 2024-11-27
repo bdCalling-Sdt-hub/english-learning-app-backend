@@ -248,7 +248,7 @@ const getWishlistFromDB = async (studentId: string) => {
     .lean();
 
   if (!list?.wishlist?.length) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Wishlist is empty!');
+    return [];
   }
 
   // Map wishlist courses with required details
