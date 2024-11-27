@@ -18,6 +18,8 @@ import { Student } from '../student/student.model';
 import { Admin } from '../admin/admin.model';
 import { TeacherValidation } from './teacher.validation';
 import { LANGUAGE } from '../../../enums/language';
+import { Course } from '../course/course.model';
+import { Reviews } from '../reviews/reviews.model';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -284,7 +286,30 @@ const getTeacherByIdFromDB = async (
   id: string
 ): Promise<Partial<ITeacher | null>> => {
   const result = await Teacher.findOne({ _id: id }, { password: 0 });
-  return result;
+  if (!result)
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
+  const courses = await Course.find({ teacherID: id });
+  const reviews = await Reviews.find({ teacher: id }).select('star').lean();
+  const totalStar = reviews.reduce((acc, review) => acc + review.star, 0);
+  const teacherRating = totalStar / reviews.length;
+  const finalCourseData = await Promise.all(
+    courses.map(async course => {
+      return {
+        //@ts-ignore
+        ...course._doc,
+        teacherName: result.name,
+        //@ts-ignore
+        totalLectures: course.lectures.length,
+      };
+    })
+  );
+  const finalResult = {
+    //@ts-ignore
+    ...result._doc,
+    finalCourseData,
+    teacherRating,
+  };
+  return finalResult;
 };
 
 // const deleteTeacherFromDB = async (

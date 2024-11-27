@@ -231,10 +231,7 @@ const getWishlistFromDB = async (studentId: string) => {
   });
 
   if (!existStudent) {
-    throw new ApiError(
-      StatusCodes.OK,
-      "Student doesn't exist or has been deleted!"
-    );
+    return [];
   }
 
   // Fetch wishlist with population in a single query
