@@ -1,3 +1,5 @@
+import { LANGUAGE } from '../../../../enums/language';
+
 export interface CourseFilterParams {
   search?: string;
   date?: string;
@@ -6,4 +8,5 @@ export interface CourseFilterParams {
   priceTo?: number;
   type?: string;
   studentId?: string;
+  language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
 }

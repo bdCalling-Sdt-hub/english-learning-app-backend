@@ -270,13 +270,16 @@ const unifiedCourseFilter = async (queryParams: CourseFilterParams) => {
     if (queryParams.type) {
       query.type = queryParams.type;
     }
-
+    // language filter
+    if (queryParams.language) {
+      query.language = queryParams.language.toUpperCase() as string;
+    }
     // Perform the base query
     const courses = await Course.find(query);
 
     // If no courses found
     if (courses.length === 0) {
-      throw new Error('No courses found matching the criteria');
+      return [];
     }
 
     // If student ID is provided, enrich with wishlist and teacher info
