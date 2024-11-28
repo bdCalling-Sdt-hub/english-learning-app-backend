@@ -253,13 +253,14 @@ const unifiedCourseFilter = async (queryParams: CourseFilterParams) => {
     }
 
     // Price range filter
+
     if (
-      queryParams.priceFrom !== undefined &&
-      queryParams.priceTo !== undefined
+      queryParams.priceFrom &&
+      queryParams.priceTo &&
+      queryParams.priceFrom <= queryParams.priceTo &&
+      queryParams.priceTo > 0 &&
+      queryParams.priceFrom > 0
     ) {
-      if (queryParams.priceFrom > queryParams.priceTo) {
-        throw new Error('Invalid price range');
-      }
       query.price = {
         $gte: queryParams.priceFrom,
         $lte: queryParams.priceTo,
