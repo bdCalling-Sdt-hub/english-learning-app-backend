@@ -14,6 +14,8 @@ export type IStudent = {
   profile?: string;
   status: 'active' | 'delete';
   verified: boolean;
+  education?: string;
+  cardNumber?: string;
   gender: string;
   dateOfBirth: Date;
   language: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;

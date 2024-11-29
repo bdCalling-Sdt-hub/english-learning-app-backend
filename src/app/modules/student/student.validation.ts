@@ -18,6 +18,8 @@ const updateStudentZodSchema = z.object({
     address: z.string().optional(),
     profile: z.string().optional(),
     password: z.string().optional(),
+    education: z.string().optional(),
+    cardNumber: z.string().optional(),
     dateOfBirth: z.date().optional(),
     status: z.string().optional(),
     gender: z

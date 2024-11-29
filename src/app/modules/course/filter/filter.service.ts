@@ -230,7 +230,7 @@ const unifiedCourseFilter = async (queryParams: CourseFilterParams) => {
       // Validate date format
       const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
       if (!dateRegex.test(queryParams.date)) {
-        throw new Error(`Invalid date format. Use DD-MM-YYYY`);
+        queryParams.date = queryParams.date.split(' ')[0];
       }
 
       // Additional date validation

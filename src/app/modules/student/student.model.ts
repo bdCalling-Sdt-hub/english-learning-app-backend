@@ -78,6 +78,12 @@ const userSchema = new Schema<IStudent, StudentModel>(
       default: [],
       required: false,
     },
+    education: {
+      type: String,
+    },
+    cardNumber: {
+      type: String,
+    },
     authentication: {
       type: {
         isResetPassword: {
