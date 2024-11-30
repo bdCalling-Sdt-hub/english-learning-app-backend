@@ -18,16 +18,12 @@ router
 
   .get('/:id', StudentController.getStudentById)
   .patch(
-    '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
+    '/',
+    auth(USER_ROLES.STUDENT),
     fileUploadHandler(),
     StudentController.updateProfile
   )
-  .delete(
-    '/:id',
-    auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
-    StudentController.deleteStudent
-  );
+  .delete('/:id', auth(USER_ROLES.STUDENT), StudentController.deleteStudent);
 router.post('/banner/select', StudentController.selectBannerByID);
 
 router
@@ -35,11 +31,6 @@ router
   .post(
     validateRequest(StudentValidation.createStudentZodSchema),
     StudentController.createStudent
-  )
-  .patch(
-    auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
-    fileUploadHandler(),
-    StudentController.updateProfile
   );
 
 router.use('/wishlist', WishlistRoutes);

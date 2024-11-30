@@ -36,10 +36,10 @@ const getStudentProfile = catchAsync(async (req: Request, res: Response) => {
 //update profile
 const updateProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
+    const id = req.user.id;
     let profile;
     if (req.files && 'profile' in req.files && req.files.profile[0]) {
-      profile = `/profiles/${req.files.image[0].filename}`;
+      profile = `/profiles/${req.files.profile[0].filename}`;
     }
 
     const data = {

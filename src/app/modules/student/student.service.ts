@@ -96,7 +96,7 @@ const updateProfileToDB = async (
   id: string,
   payload: Partial<IStudent>
 ): Promise<Partial<IStudent | null>> => {
-  const isExistUser = await Student.isExistStudentById(id);
+  const isExistUser = await Student.findById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -105,7 +105,9 @@ const updateProfileToDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student deleted!');
   }
   //unlink file here
+  //@ts-ignore
   if (payload.profile && isExistUser.profile?.length > 2) {
+    //@ts-ignore
     unlinkFile(isExistUser.profile);
   }
   const updateDoc = await Student.findOneAndUpdate({ _id: id }, payload, {
