@@ -79,8 +79,7 @@ const getStudentById = catchAsync(async (req: Request, res: Response) => {
 });
 const deleteStudent = catchAsync(async (req: Request, res: Response) => {
   const id = req.user.id;
-  const password = req.body.password;
-  const result = await StudentService.deleteStudentFromDB(id, password);
+  const result = await StudentService.deleteStudentFromDB(id);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

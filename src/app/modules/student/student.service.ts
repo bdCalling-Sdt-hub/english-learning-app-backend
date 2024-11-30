@@ -127,7 +127,7 @@ const getAllStudentsFromDB = async (): Promise<IStudent[]> => {
 const getStudentByIdFromDB = async (
   id: string
 ): Promise<Partial<IStudent | null>> => {
-  const result = await Student.findOne({ _id: id }, { password: 0 });
+  const result = await Student.findOne({ _id: id });
   const isDeleted = isStudentDeleted(result);
   if (isDeleted) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student deleted!');
@@ -135,14 +135,10 @@ const getStudentByIdFromDB = async (
   return result;
 };
 
-const deleteStudentFromDB = async (id: string, password: string) => {
-  const existStudent = await Student.isExistStudentById(id);
+const deleteStudentFromDB = async (id: string) => {
+  const existStudent = await Student.findById(id);
   if (!existStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
-  }
-  const isPasswordMatch = await existStudent.isMatchPassword(password);
-  if (!isPasswordMatch) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid password!');
   }
   if (existStudent.status === 'delete') {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
