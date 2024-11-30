@@ -23,7 +23,7 @@ router
     fileUploadHandler(),
     StudentController.updateProfile
   )
-  .delete('/:id', auth(USER_ROLES.STUDENT), StudentController.deleteStudent);
+  .delete('/', auth(USER_ROLES.STUDENT), StudentController.deleteStudent);
 router.post('/banner/select', StudentController.selectBannerByID);
 
 router
