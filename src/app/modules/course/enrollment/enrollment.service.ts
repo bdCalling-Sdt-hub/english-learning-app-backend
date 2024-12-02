@@ -169,17 +169,33 @@ const payTeacherForCourse = async (courseId: string, io: Server) => {
   if (!course) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found');
   }
+
   const enrollments = await Enrollment.find({ courseID: courseId });
-  if (!enrollments) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Enrollments not found');
+  if (enrollments.length === 0) {
+    throw new ApiError(
+      StatusCodes.NOT_FOUND,
+      'No enrollments found for this course'
+    );
   }
+
   const teacher = await Teacher.findById(course.teacherID);
   if (!teacher) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
   }
-  const teacherShare = Math.round(course.price * 0.8 * 100);
+
+  const teacherShare = Math.round(Number(course.price) * 0.8 * 100);
+  const transferAmount = teacherShare * enrollments.length;
+
+  // Ensure minimum transfer amount of 1 cent
+  if (transferAmount < 1) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Insufficient funds for transfer'
+    );
+  }
+
   const transfer = await stripe.transfers.create({
-    amount: teacherShare * course.enrollmentsID.length,
+    amount: transferAmount,
     currency: 'usd',
     destination: teacher.accountInformation.stripeAccountId!,
     transfer_group: courseId,
