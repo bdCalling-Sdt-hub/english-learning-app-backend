@@ -39,7 +39,7 @@ const getAllComplains = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getEnrolledTeachers = catchAsync(async (req: Request, res: Response) => {
-  const email = req.params.email;
+  const email = req.user.email;
   const result = await complainService.getEnrolledTeachersFromDB(email);
   sendResponse(res, {
     success: true,

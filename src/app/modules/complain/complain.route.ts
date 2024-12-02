@@ -8,7 +8,7 @@ router.post('/', auth(USER_ROLES.STUDENT), ComplainController.createComplain);
 router.get('/:id', ComplainController.getComplainById);
 router.get('/', ComplainController.getAllComplains);
 router.get(
-  '/teacher/enrolled/:email',
+  '/teacher/enrolled/',
   auth(USER_ROLES.STUDENT),
   ComplainController.getEnrolledTeachers
 );
