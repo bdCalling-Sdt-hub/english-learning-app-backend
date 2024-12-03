@@ -24,6 +24,7 @@ export type ITeacher = {
   status?: 'active' | 'deleted';
   verified?: boolean;
   earnings?: number;
+
   dateOfBirth?: {
     day: number;
     month: number;
@@ -40,6 +41,7 @@ export type ITeacher = {
   // education?: Education[];
   degree?: string;
   institute?: string;
+  educationFiles?: string[];
 
   authentication?: {
     isResetPassword: boolean;

@@ -11,6 +11,7 @@ import { Teacher } from './teacher.model';
 import fs from 'fs';
 import path from 'path';
 import { createLogger } from 'winston';
+import { Server } from 'socket.io';
 
 const stripeSecretKey = config.stripe_secret_key;
 
@@ -58,12 +59,23 @@ const updateProfile = catchAsync(
     if (req.files && 'profile' in req.files && req.files.profile[0]) {
       profile = `/profiles/${req.files.profile[0].filename}`;
     }
-
+    let educationFiles = [];
+    if (
+      req.files &&
+      'educationFiles' in req.files &&
+      req.files.educationFiles
+    ) {
+      for (const file of req.files.educationFiles) {
+        educationFiles.push(`/educationFiles/${file.filename}`);
+      }
+    }
     const data = {
       profile,
+      educationFiles,
       ...req.body,
     };
-    const result = await TeacherService.updateProfileToDB(id, data);
+    const io: Server = req.app.get('io');
+    const result = await TeacherService.updateProfileToDB(id, data, io);
 
     sendResponse(res, {
       success: true,

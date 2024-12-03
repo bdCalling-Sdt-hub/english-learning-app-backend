@@ -5,7 +5,7 @@ type IData<T> = {
   statusCode: number;
   message?: string;
   pagination?: {
-    page: number;
+    currentPage: number;
     limit: number;
     totalPage: number;
     total: number;

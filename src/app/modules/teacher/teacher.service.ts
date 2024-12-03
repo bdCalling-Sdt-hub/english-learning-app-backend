@@ -20,6 +20,8 @@ import { TeacherValidation } from './teacher.validation';
 import { LANGUAGE } from '../../../enums/language';
 import { Course } from '../course/course.model';
 import { Reviews } from '../reviews/reviews.model';
+import { NotificationService } from '../notifications/notification.service';
+import { Server } from 'socket.io';
 const stripeSecretKey = config.stripe_secret_key;
 
 if (!stripeSecretKey) {
@@ -248,7 +250,8 @@ const getTeacherProfileFromDB = async (
 
 const updateProfileToDB = async (
   id: string,
-  payload: Partial<ITeacher>
+  payload: Partial<ITeacher>,
+  io: Server
 ): Promise<Partial<ITeacher | null>> => {
   console.log(await JSON.stringify(payload));
   const isExistUser: any = await Teacher.findById(id);
@@ -264,6 +267,24 @@ const updateProfileToDB = async (
   if (typeof payload.skills === 'string') {
     //@ts-ignore
     payload.skills = JSON.parse(payload.skills.replace(/'/g, '"'));
+  }
+  if (payload.educationFiles && payload.educationFiles.length >= 1) {
+    await NotificationService.sendNotificationToAllUsersOfARole(
+      USER_ROLES.ADMIN,
+      {
+        sendTo: USER_ROLES.ADMIN,
+        message: `${isExistUser.name} has uploaded new education files. Please verify them.`,
+        data: {
+          teacherID: id,
+        },
+      },
+      io
+    );
+    if (isExistUser.educationFiles && isExistUser.educationFiles.length >= 1) {
+      for (const file of isExistUser.educationFiles) {
+        await unlinkFile(file);
+      }
+    }
   }
 
   //unlink file here

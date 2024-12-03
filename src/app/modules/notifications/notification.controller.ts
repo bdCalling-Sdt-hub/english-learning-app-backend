@@ -52,8 +52,14 @@ const getNotifications = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
+    pagination: {
+      currentPage: page,
+      limit,
+      totalPage: Math.ceil(result.total / limit),
+      total: result.notifications.length,
+    },
     message: 'Notifications retrieved successfully',
-    data: result,
+    data: result.notifications,
   });
 });
 

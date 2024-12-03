@@ -96,7 +96,13 @@ const getNotificationsFromDB = async (
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    return notifications;
+    const total = await Notification.countDocuments({
+      sendUserID: userId,
+    });
+    return {
+      notifications,
+      total,
+    };
   } catch (error) {
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,

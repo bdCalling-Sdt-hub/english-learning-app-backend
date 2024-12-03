@@ -140,6 +140,10 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     institute: {
       type: String,
     },
+    educationFiles: {
+      type: [String],
+      required: false,
+    },
     // education: [
     //   {
     //     id: {
