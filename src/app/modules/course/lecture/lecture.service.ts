@@ -72,7 +72,8 @@ const updateLectureLinkToDB = async (
         {
           sendTo: USER_ROLES.STUDENT,
           sendUserID: studentID.toString(),
-          message: sendNotificationMessage,
+          title: 'New Meeting Link',
+          description: sendNotificationMessage,
           status: 'unread' as const,
         },
         io

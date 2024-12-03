@@ -273,7 +273,8 @@ const updateProfileToDB = async (
       USER_ROLES.ADMIN,
       {
         sendTo: USER_ROLES.ADMIN,
-        message: `${isExistUser.name} has uploaded new education files. Please verify them.`,
+        title: `${isExistUser.name} has uploaded new education files. Please verify them.`,
+        description: 'Please verify the uploaded education files.',
         data: {
           teacherID: id,
         },

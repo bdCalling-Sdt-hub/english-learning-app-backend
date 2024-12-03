@@ -86,7 +86,8 @@ const updateInfoToDB = async (
         USER_ROLES.TEACHER,
         {
           sendTo: USER_ROLES.TEACHER,
-          message: notificationMessage,
+          title: 'Admin Updated',
+          description: notificationMessage,
           data: { type: whatUpdated },
         },
         io
@@ -96,7 +97,8 @@ const updateInfoToDB = async (
         USER_ROLES.STUDENT,
         {
           sendTo: USER_ROLES.STUDENT,
-          message: notificationMessage,
+          title: 'Admin Updated',
+          description: notificationMessage,
           data: { type: whatUpdated },
         },
         io

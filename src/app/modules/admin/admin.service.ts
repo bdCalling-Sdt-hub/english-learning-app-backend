@@ -121,7 +121,8 @@ const createAppointedTeacherToDB = async (
       USER_ROLES.STUDENT,
       {
         sendTo: USER_ROLES.STUDENT,
-        message: studentMessage,
+        title: 'Appointed Teacher',
+        description: studentMessage,
         status: 'unread' as const,
       },
       io
@@ -169,7 +170,8 @@ const makeTeacherAppointedToDB = async (
   const notificationData = {
     sendTo: USER_ROLES.TEACHER,
     sendUserID: isExistTeacher._id.toString(),
-    message: 'You have been appointed as a platform teacher.',
+    title: 'Appointed as Platform Teacher',
+    description: 'You have been appointed as a platform teacher.',
     status: 'unread' as const,
   };
 

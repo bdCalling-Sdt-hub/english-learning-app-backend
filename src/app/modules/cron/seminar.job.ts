@@ -23,7 +23,8 @@ const seminerReminder = async () => {
           {
             sendTo: USER_ROLES.STUDENT,
             sendUserID: id.toString(),
-            message: `The seminar ${seminar.title} will be held today at ${seminar.time}`,
+            title: 'Seminar Reminder',
+            description: `The seminar ${seminar.title} will be held today at ${seminar.time}`,
             data: { seminarID: seminar._id },
           },
           exportIO
@@ -37,7 +38,8 @@ const seminerReminder = async () => {
         {
           sendTo: USER_ROLES.TEACHER,
           sendUserID: seminar.teacher.toString(),
-          message: `Your seminar ${seminar.title} will be held today at ${seminar.time}`,
+          title: 'Seminar Reminder',
+          description: `Your seminar ${seminar.title} will be held today at ${seminar.time}`,
           data: { seminarID: seminar._id },
         },
         exportIO

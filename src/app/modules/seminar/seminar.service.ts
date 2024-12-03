@@ -43,7 +43,8 @@ const createSeminarToDB = async (data: ISeminar, io: Server) => {
       USER_ROLES.STUDENT,
       {
         sendTo: USER_ROLES.STUDENT,
-        message: message,
+        title: 'Admin Created',
+        description: message,
         data: seminarData,
       },
       io
@@ -146,7 +147,8 @@ const bookSeminarToDB = async (Data: any, io: Server) => {
   const sendData = {
     sendTo: USER_ROLES.TEACHER,
     sendUserID: isExistSeminar.teacher,
-    message: message,
+    title: 'Admin Created',
+    description: message,
     data: { seminarID: Data.seminarID },
   };
   const notificationSent = await NotificationService.sendNotificationToDB(
@@ -185,7 +187,8 @@ const addLinkToSeminar = async (id: string, link: string, io: Server) => {
       {
         sendTo: USER_ROLES.STUDENT,
         sendUserID: studentID,
-        message: 'Link added to seminar click to join the seminar',
+        title: 'Link added to seminar',
+        description: 'click to join the seminar',
         data: { seminarID: id, link: link },
       },
       io

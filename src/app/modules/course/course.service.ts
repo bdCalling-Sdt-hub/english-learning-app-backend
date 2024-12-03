@@ -134,7 +134,8 @@ const createCourseToDB = async (
       USER_ROLES.STUDENT,
       {
         sendTo: USER_ROLES.STUDENT,
-        message: notificationMessage,
+        title: 'New Course Added',
+        description: `A new course "${result.name}" has been added by ${isExistTeacher?.name}`,
         data: { courseID: result._id, teacherID: isExistTeacher._id },
       },
       io
@@ -145,7 +146,8 @@ const createCourseToDB = async (
     USER_ROLES.ADMIN,
     {
       sendTo: USER_ROLES.ADMIN,
-      message: adminNotificationMessage,
+      title: 'New Course Added',
+      description: adminNotificationMessage,
       data: { courseID: result._id, teacherID: isExistTeacher._id },
     },
     io

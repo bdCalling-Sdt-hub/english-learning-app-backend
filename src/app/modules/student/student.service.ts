@@ -69,7 +69,8 @@ const createStudentToDB = async (
     USER_ROLES.ADMIN,
     {
       sendTo: USER_ROLES.ADMIN,
-      message: 'New student registered',
+      title: 'New student registered',
+      description: 'A new student has registered',
       data: { studentID: createUser._id },
     },
     io

@@ -41,7 +41,8 @@ const createComplainToDB = async (data: any, io: Server) => {
     {
       sendTo: USER_ROLES.TEACHER,
       sendUserID: isExistTeacherEnrollment._id.toString(),
-      message: message,
+      title: 'Complain Raised',
+      description: message,
       data: { complainID: result._id.toString() },
     },
     io
@@ -50,7 +51,8 @@ const createComplainToDB = async (data: any, io: Server) => {
     USER_ROLES.ADMIN,
     {
       sendTo: USER_ROLES.ADMIN,
-      message: message,
+      title: 'Complain Raised',
+      description: message,
       data: { complainID: result._id.toString() },
     },
     io

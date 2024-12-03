@@ -8,7 +8,8 @@ export type INotification = {
     | USER_ROLES.TEACHER
     | AdminTypes.SUPERADMIN;
   sendUserID?: string;
-  message: string;
+  title: string;
+  description: string;
   data?: object;
   link?: string;
   status?: 'unread' | 'read';

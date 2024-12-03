@@ -92,7 +92,8 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
     teacher._id.toString(),
     {
       sendTo: USER_ROLES.TEACHER,
-      message: teacherNotificationMessage,
+      title: 'New Student Enrolled',
+      description: teacherNotificationMessage,
       data: { courseID: updatedCourse._id },
     },
     io
@@ -102,7 +103,8 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
     {
       sendTo: USER_ROLES.STUDENT,
       sendUserID: data.studentID,
-      message: studentNotificationMessage,
+      title: 'Enrollment Successful',
+      description: studentNotificationMessage,
       data: { courseID: updatedCourse._id },
     },
     io
@@ -227,18 +229,20 @@ const payTeacherForCourse = async (courseId: string, io: Server) => {
     {
       sendTo: USER_ROLES.TEACHER,
       sendUserID: teacher._id.toString(),
-      message: teacherNotificationMessage,
+      title: 'Course Completed',
+      description: teacherNotificationMessage,
     },
     io
   );
-  const studentNotificationMessage = `Your course "${course.name}" has been completed. Let us know your feedback`;
+  const studentNotificationMessage = `Your course "${course.name}" has been completed. Let us know your feedback.`;
   Promise.all(
     enrollments.map(async enrollment => {
       await NotificationService.sendNotificationToDB(
         {
           sendTo: USER_ROLES.STUDENT,
           sendUserID: `${enrollment.studentID}`,
-          message: studentNotificationMessage,
+          title: 'Course Completed',
+          description: studentNotificationMessage,
         },
         io
       );

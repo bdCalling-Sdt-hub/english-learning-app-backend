@@ -17,9 +17,13 @@ const NotificationSchema = new Schema<INotification, NotificationModel>(
       type: String,
       required: false,
     },
-    message: {
+    title: {
       type: String,
-      required: [true, 'message is required'],
+      required: [true, 'title is required'],
+    },
+    description: {
+      type: String,
+      required: [true, 'description is required'],
     },
     data: {
       type: Object,
