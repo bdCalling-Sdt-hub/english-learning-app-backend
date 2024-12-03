@@ -368,11 +368,16 @@ const getAllNotifications = async (userId: string) => {
 };
 
 const readAllNotifications = async (userId: string) => {
-  const notifications = await Notification.updateMany(
+  const isExistNotification = await Notification.find({ sendUserID: userId });
+  if (!isExistNotification) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Notification not found');
+  }
+  await Notification.updateMany(
     { sendUserID: userId, status: 'unread' },
     { status: 'read' }
   );
-  return notifications;
+
+  return isExistNotification;
 };
 
 export const NotificationService = {
