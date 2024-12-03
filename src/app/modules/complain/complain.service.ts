@@ -1,10 +1,13 @@
+import { Server } from 'socket.io';
 import { Course } from '../course/course.model';
 import { Enrollment } from '../course/enrollment/enrollment.model';
+import { NotificationService } from '../notifications/notification.service';
 import { Student } from '../student/student.model';
 import { Teacher } from '../teacher/teacher.model';
 import { Complain } from './complain.model';
+import { USER_ROLES } from '../../../enums/user';
 
-const createComplainToDB = async (data: any) => {
+const createComplainToDB = async (data: any, io: Server) => {
   const result = await Complain.create(data);
   const isExistTeacher = await Teacher.findOne({ _id: data.teacherID });
   if (!isExistTeacher) {
@@ -33,6 +36,25 @@ const createComplainToDB = async (data: any) => {
   if (!result) {
     throw new Error('Complain not created');
   }
+  const message = `${isExistStudent.name} has raised a complain.`;
+  await NotificationService.sendNotificationToDB(
+    {
+      sendTo: USER_ROLES.TEACHER,
+      sendUserID: isExistTeacherEnrollment._id.toString(),
+      message: message,
+      data: { complainID: result._id.toString() },
+    },
+    io
+  );
+  await NotificationService.sendNotificationToAllUsersOfARole(
+    USER_ROLES.ADMIN,
+    {
+      sendTo: USER_ROLES.ADMIN,
+      message: message,
+      data: { complainID: result._id.toString() },
+    },
+    io
+  );
   return result;
 };
 

@@ -15,7 +15,7 @@ const NotificationSchema = new Schema<INotification, NotificationModel>(
     },
     sendUserID: {
       type: String,
-      required: [true, 'sendUserID is required'],
+      required: false,
     },
     message: {
       type: String,

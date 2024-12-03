@@ -88,9 +88,13 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
 
   // Send notifications
   const teacherNotificationMessage = `A new student has enrolled in your course "${updatedCourse.name}".`;
-  await NotificationService.sendNotificationToTeacher(
+  await NotificationService.sendNotificationToAllUsersOfARole(
     teacher._id.toString(),
-    teacherNotificationMessage,
+    {
+      sendTo: USER_ROLES.TEACHER,
+      message: teacherNotificationMessage,
+      data: { courseID: updatedCourse._id },
+    },
     io
   );
   const studentNotificationMessage = `You have successfully enrolled in the course "${updatedCourse.name}".`;
@@ -99,7 +103,7 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
       sendTo: USER_ROLES.STUDENT,
       sendUserID: data.studentID,
       message: studentNotificationMessage,
-      status: 'unread' as const,
+      data: { courseID: updatedCourse._id },
     },
     io
   );

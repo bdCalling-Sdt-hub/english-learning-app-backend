@@ -7,7 +7,7 @@ export type INotification = {
     | USER_ROLES.STUDENT
     | USER_ROLES.TEACHER
     | AdminTypes.SUPERADMIN;
-  sendUserID: string;
+  sendUserID?: string;
   message: string;
   data?: object;
   link?: string;

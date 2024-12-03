@@ -130,19 +130,24 @@ const createCourseToDB = async (
   }
   if (isExistTeacher.type === 'platform') {
     const notificationMessage: string = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
-    await NotificationService.sendNotificationToAllUserOfARole(
-      notificationMessage,
-      io,
-      USER_ROLES.STUDENT
+    await NotificationService.sendNotificationToAllUsersOfARole(
+      USER_ROLES.STUDENT,
+      {
+        sendTo: USER_ROLES.STUDENT,
+        message: notificationMessage,
+        data: { courseID: result._id, teacherID: isExistTeacher._id },
+      },
+      io
     );
     const adminNotificationMessage: string = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
-    await NotificationService.sendNotificationToAllUserOfARole(
-      adminNotificationMessage,
-      io,
+    await NotificationService.sendNotificationToAllUsersOfARole(
       USER_ROLES.ADMIN,
       {
+        sendTo: USER_ROLES.ADMIN,
+        message: adminNotificationMessage,
         data: { courseID: result._id, teacherID: isExistTeacher._id },
-      }
+      },
+      io
     );
   }
   return result;
