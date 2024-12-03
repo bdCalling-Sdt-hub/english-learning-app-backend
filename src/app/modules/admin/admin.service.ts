@@ -117,10 +117,14 @@ const createAppointedTeacherToDB = async (
   }
   const studentMessage = `${createdTeacher.name} have became an appointed teacher.`;
   const notificationSentStudent =
-    await NotificationService.sendNotificationToAllUserOfARole(
-      studentMessage,
-      io,
-      USER_ROLES.STUDENT
+    await NotificationService.sendNotificationToAllUsersOfARole(
+      USER_ROLES.STUDENT,
+      {
+        sendTo: USER_ROLES.STUDENT,
+        message: studentMessage,
+        status: 'unread' as const,
+      },
+      io
     );
 
   if (!notificationSentStudent) {

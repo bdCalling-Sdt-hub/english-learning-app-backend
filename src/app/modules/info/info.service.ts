@@ -82,16 +82,24 @@ const updateInfoToDB = async (
   const notificationMessage = `Admin updated the ${whatUpdated}`;
   if (whatUpdated !== null) {
     const sendToTeachers =
-      await NotificationService.sendNotificationToAllUserOfARole(
-        notificationMessage,
-        io,
-        USER_ROLES.TEACHER
+      await NotificationService.sendNotificationToAllUsersOfARole(
+        USER_ROLES.TEACHER,
+        {
+          sendTo: USER_ROLES.TEACHER,
+          message: notificationMessage,
+          data: { type: whatUpdated },
+        },
+        io
       );
     const sendToStudents =
-      await NotificationService.sendNotificationToAllUserOfARole(
-        notificationMessage,
-        io,
-        USER_ROLES.STUDENT
+      await NotificationService.sendNotificationToAllUsersOfARole(
+        USER_ROLES.STUDENT,
+        {
+          sendTo: USER_ROLES.STUDENT,
+          message: notificationMessage,
+          data: { type: whatUpdated },
+        },
+        io
       );
 
     if (!sendToStudents || !sendToTeachers) {

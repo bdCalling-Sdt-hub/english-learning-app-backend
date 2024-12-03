@@ -36,7 +36,7 @@ const seminerReminder = async () => {
       await NotificationService.sendNotificationToDB(
         {
           sendTo: USER_ROLES.TEACHER,
-          sendUserID: seminar.teacherID,
+          sendUserID: seminar.teacher.toString(),
           message: `Your seminar ${seminar.title} will be held today at ${seminar.time}`,
           data: { seminarID: seminar._id },
         },

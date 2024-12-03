@@ -39,11 +39,14 @@ const createSeminarToDB = async (data: ISeminar, io: Server) => {
     seminarID: result._id,
   };
   const notificationSent =
-    await NotificationService.sendNotificationToAllUserOfARole(
-      message,
-      io,
+    await NotificationService.sendNotificationToAllUsersOfARole(
       USER_ROLES.STUDENT,
-      seminarData
+      {
+        sendTo: USER_ROLES.STUDENT,
+        message: message,
+        data: seminarData,
+      },
+      io
     );
 
   if (!notificationSent) {

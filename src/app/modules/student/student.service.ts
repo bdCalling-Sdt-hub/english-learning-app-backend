@@ -65,13 +65,14 @@ const createStudentToDB = async (
     { _id: createUser._id },
     { $set: { authentication } }
   );
-  await NotificationService.sendNotificationToAllUserOfARole(
-    'New student registered',
-    io,
+  await NotificationService.sendNotificationToAllUsersOfARole(
     USER_ROLES.ADMIN,
     {
+      sendTo: USER_ROLES.ADMIN,
+      message: 'New student registered',
       data: { studentID: createUser._id },
-    }
+    },
+    io
   );
   return createUser;
 };

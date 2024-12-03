@@ -3,13 +3,15 @@ import { NextFunction, Request, Response } from 'express';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { complainService } from './complain.service';
+import { Server } from 'socket.io';
 
 const createComplain = catchAsync(async (req: Request, res: Response) => {
   const { ...complainData } = req.body;
   const data = {
     ...complainData,
   };
-  const result = await complainService.createComplainToDB(data);
+  const io: Server = req.app.get('io');
+  const result = await complainService.createComplainToDB(data, io);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
