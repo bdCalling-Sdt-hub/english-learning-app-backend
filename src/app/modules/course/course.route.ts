@@ -5,7 +5,7 @@ import { CourseValidation } from './course.validation';
 import { LectureRoutes } from './lecture/lecture.route';
 import { EnrollmentRoutes } from './enrollment/enrollment.route';
 import auth from '../../middlewares/auth';
-import { USER_ROLES } from '../../../enums/user';
+import { AdminTypes, USER_ROLES } from '../../../enums/user';
 import { filterRoutes } from './filter/filter.route';
 const router = express.Router();
 router
@@ -27,6 +27,11 @@ router
     auth(USER_ROLES.TEACHER),
     fileUploadHandler(),
     CourseController.updateCourse
+  )
+  .patch(
+    '/:id/approve',
+    auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+    CourseController.approveCourse
   )
   .post(
     '/completed/:id',

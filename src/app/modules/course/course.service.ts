@@ -139,17 +139,17 @@ const createCourseToDB = async (
       },
       io
     );
-    const adminNotificationMessage: string = `A new course "${result.name}" has been added by ${isExistTeacher?.name}`;
-    await NotificationService.sendNotificationToAllUsersOfARole(
-      USER_ROLES.ADMIN,
-      {
-        sendTo: USER_ROLES.ADMIN,
-        message: adminNotificationMessage,
-        data: { courseID: result._id, teacherID: isExistTeacher._id },
-      },
-      io
-    );
   }
+  const adminNotificationMessage: string = `A new course "${result.name}" has been added by ${isExistTeacher?.name} please check if it can be approved or not`;
+  await NotificationService.sendNotificationToAllUsersOfARole(
+    USER_ROLES.ADMIN,
+    {
+      sendTo: USER_ROLES.ADMIN,
+      message: adminNotificationMessage,
+      data: { courseID: result._id, teacherID: isExistTeacher._id },
+    },
+    io
+  );
   return result;
 };
 
@@ -432,7 +432,17 @@ const getEnrolledCourses = async (id: string) => {
 
   return allCourses;
 };
-
+const approveCourseFromDB = async (id: string) => {
+  const result = await Course.findOneAndUpdate(
+    { _id: id },
+    { status: 'active', isApproved: true },
+    { new: true }
+  );
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Course not found!');
+  }
+  return result;
+};
 export const CourseService = {
   createCourseToDB,
   getCourseByTeacherIdFromDB,
@@ -443,6 +453,7 @@ export const CourseService = {
   getLecturesOfCourseFromDB,
   getCourseByLanguageFromDB,
   getMyCoursesByStatusFromDB,
+  approveCourseFromDB,
   getEnrolledCourses,
   // deleteCourseFromDB,
 };

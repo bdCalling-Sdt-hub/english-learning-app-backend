@@ -181,9 +181,20 @@ const getEnrolledCourses = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const approveCourse = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await CourseService.approveCourseFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Course approved successfully',
+    data: result,
+  });
+});
 export const CourseController = {
   // deleteCourse,
   createCourse,
+  approveCourse,
   getCourseByLanguage,
   updateCourse,
   getCourseById,

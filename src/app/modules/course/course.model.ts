@@ -65,12 +65,16 @@ const courseSchema = new Schema<ICourse, CourseModel>(
       type: [String],
       required: false,
     },
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },
     status: {
       type: String,
       enum: ['active', 'draft', 'completed', 'delete'],
-      default: 'active',
+      default: 'draft',
     },
   },
   { timestamps: true }
