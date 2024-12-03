@@ -13,11 +13,6 @@ const sendNotificationToDB = async (
   io: Server
 ): Promise<INotification> => {
   try {
-    const isExistUser = await Student.findOne({ _id: data.sendUserID });
-    if (!isExistUser) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
-    }
-
     const notification = await Notification.create(data);
     io.emit(
       `${SOCKET_EVENTS.NEW_NOTIFICATION}::${data.sendUserID}`,
@@ -25,6 +20,7 @@ const sendNotificationToDB = async (
     );
     return notification;
   } catch (error) {
+    console.log(error);
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
       'Failed to send notification'
