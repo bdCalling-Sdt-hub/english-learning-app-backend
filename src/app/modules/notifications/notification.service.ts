@@ -8,290 +8,67 @@ import { Student } from '../student/student.model';
 import { Teacher } from '../teacher/teacher.model';
 import { SOCKET_EVENTS } from '../../../shared/socketEvents';
 import { Admin } from '../admin/admin.model';
-
-const sendNotificationToDB = async (data: INotification, io: Server) => {
+const sendNotificationToDB = async (
+  data: INotification,
+  io: Server
+): Promise<INotification> => {
   try {
-    if (!data.sendTo || !data.sendUserID || !data.message) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'sendTo, sendUserID and message are required'
-      );
+    const isExistUser = await Student.findOne({ _id: data.sendUserID });
+    if (!isExistUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
     }
+
     const notification = await Notification.create(data);
-    if (!notification) {
-      throw new ApiError(
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to send notification'
-      );
-    }
-    const roomIdentifier = data.sendUserID;
-    let eventName;
-    switch (data.sendTo) {
-      case USER_ROLES.TEACHER:
-        eventName = SOCKET_EVENTS.TEACHER.SPECIFIC;
-        break;
-      case USER_ROLES.STUDENT:
-        eventName = SOCKET_EVENTS.STUDENT.SPECIFIC;
-        break;
-      case USER_ROLES.ADMIN:
-        eventName = SOCKET_EVENTS.ADMIN.SPECIFIC;
-        break;
-      case AdminTypes.SUPERADMIN:
-        eventName = SOCKET_EVENTS.ADMIN.SPECIFIC;
-        break;
-      default:
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid user role');
-    }
-    io.emit(`${eventName}::${roomIdentifier}`, notification);
+    io.emit(
+      `${SOCKET_EVENTS.NEW_NOTIFICATION}::${data.sendUserID}`,
+      notification
+    );
     return notification;
   } catch (error) {
-    console.log(error);
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
       'Failed to send notification'
     );
   }
 };
-
-const sendNotificationToAllUserOfARole = async (
-  message: any,
-  io: Server,
+const sendNotificationToAllUsersOfARole = async (
   role: string,
-  data: any = null,
-  batchSize = 1000
-) => {
-  try {
-    let User;
-    let Event;
-    switch (role) {
-      case USER_ROLES.STUDENT:
-        User = Student;
-        Event = SOCKET_EVENTS.STUDENT.ALL;
-        break;
-      case USER_ROLES.TEACHER:
-        User = Teacher;
-        Event = SOCKET_EVENTS.TEACHER.ALL;
-        break;
-      case USER_ROLES.ADMIN:
-        User = Admin;
-        Event = SOCKET_EVENTS.ADMIN.ALL;
-        break;
-      case AdminTypes.SUPERADMIN:
-        User = Admin;
-        Event = SOCKET_EVENTS.ADMIN.ALL;
-        break;
-      default:
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid user role');
-    }
-
-    const totalUsers = await User.countDocuments();
-    let processedUsers = 0;
-
-    while (processedUsers < totalUsers) {
-      // @ts-ignore
-      const users = await User.find({}, '_id')
-        .skip(processedUsers)
-        .limit(batchSize);
-      // @ts-ignore
-      const notifications = users.map(user => ({
-        sendTo: role.toUpperCase(),
-        sendUserID: user._id.toString(),
-        message,
-        data,
-        status: 'unread' as const,
-      }));
-
-      const createdNotifications = await Notification.insertMany(notifications);
-
-      createdNotifications.forEach(notification => {
-        io.emit(Event as string, notification);
-      });
-
-      processedUsers += users.length;
-    }
-
-    console.log(`Notifications sent to ${totalUsers} ${role} users`);
-    return { message: `Notifications sent to ${totalUsers} students` };
-  } catch (error) {
-    console.error(error);
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      `Failed to send notifications to all ${role} users`
-    );
-  }
-};
-
-const sendNotificationToTeacher = async (
-  teacherId: string,
-  message: string,
+  data: INotification,
   io: Server
 ) => {
   try {
-    const notificationData = {
-      sendTo: USER_ROLES.TEACHER,
-      sendUserID: teacherId,
-      message,
-      status: 'unread' as const,
-    };
-
-    const notification = await Notification.create(notificationData);
-    io.emit(`newNotification::${teacherId}`, notification);
-
-    return notification;
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to send notification to teacher'
+    const allUsers =
+      role == USER_ROLES.ADMIN
+        ? await Admin.find()
+        : role == USER_ROLES.STUDENT
+        ? await Student.find()
+        : await Teacher.find();
+    const sentNotifications = await Promise.all(
+      allUsers.map(user => {
+        sendNotificationToDB(data, io);
+        io.emit(`${SOCKET_EVENTS.NEW_NOTIFICATION}::${user._id}`, data);
+        return data;
+      })
     );
-  }
-};
-const getAdminNotificationsFromDB = async (
-  adminId: string,
-  page = 1,
-  limit = 20
-) => {
-  try {
-    const skip = (page - 1) * limit;
-    const notifications = await Notification.find({
-      $or: [{ sendUserID: adminId }, { sendTo: USER_ROLES.ADMIN }],
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    return notifications;
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to retrieve admin notifications'
-    );
-  }
-};
-
-const getStudentNotificationsFromDB = async (
-  studentId: string,
-  page = 1,
-  limit = 20
-) => {
-  try {
-    const skip = (page - 1) * limit;
-    const notifications = await Notification.find({
-      $or: [{ sendUserID: studentId }, { sendTo: USER_ROLES.STUDENT }],
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    return notifications;
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to retrieve student notifications'
-    );
-  }
-};
-
-const getTeacherNotificationsFromDB = async (
-  teacherId: string,
-  page = 1,
-  limit = 20
-) => {
-  try {
-    const skip = (page - 1) * limit;
-    const notifications = await Notification.find({
-      $or: [{ sendUserID: teacherId }, { sendTo: USER_ROLES.TEACHER }],
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    return notifications;
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to retrieve teacher notifications'
-    );
-  }
-};
-const sendNotificationToAllStudents = async (
-  message: string,
-  io: Server,
-  batchSize = 1000
-) => {
-  try {
-    const totalStudents = await Student.countDocuments();
-    let processedStudents = 0;
-
-    while (processedStudents < totalStudents) {
-      const students = await Student.find({}, '_id')
-        .skip(processedStudents)
-        .limit(batchSize);
-
-      const notifications = students.map(student => ({
-        sendTo: USER_ROLES.STUDENT,
-        sendUserID: student._id.toString(),
-        message,
-        status: 'unread' as const,
-      }));
-
-      const createdNotifications = await Notification.insertMany(notifications);
-
-      createdNotifications.forEach(notification => {
-        io.emit('newStudentNotification', notification);
-      });
-
-      processedStudents += students.length;
+    if (!sentNotifications) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to send notification'
+      );
     }
-
-    return { message: `Notifications sent to ${totalStudents} students` };
+    return sentNotifications;
   } catch (error) {
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to send notifications to all students'
+      'Failed to send notification'
     );
   }
 };
-
-const updateNotificationStatus = async (
-  notificationId: string,
-  status: 'read' | 'unread'
-): Promise<any> => {
-  try {
-    const updatedNotification = await Notification.findByIdAndUpdate(
-      notificationId,
-      { status },
-      { new: true }
-    );
-    if (!updatedNotification) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Notification not found');
-    }
-    return updatedNotification;
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to update notification status'
-    );
-  }
-};
-
-const markNotificationsAsRead = async (
-  userId: string,
-  userRole: USER_ROLES
-) => {
-  try {
-    await Notification.updateMany(
-      { sendUserID: userId, sendTo: userRole, status: 'unread' },
-      { status: 'read' }
-    );
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to mark notifications as read'
-    );
-  }
-};
-
 const handleReconnection = async (
   userId: string,
   userRole: USER_ROLES,
-  lastConnectedTime: Date
+  lastConnectedTime: Date,
+  io: Server
 ) => {
   try {
     const missedNotifications = await Notification.find({
@@ -307,93 +84,64 @@ const handleReconnection = async (
     );
   }
 };
-
-const limitStoredNotifications = async (
+const getNotificationsFromDB = async (
   userId: string,
-  userRole: USER_ROLES,
+  page: number,
   limit: number
 ) => {
   try {
-    const count: number = await Notification.countDocuments({
+    const notifications = await Notification.find({
       sendUserID: userId,
-      sendTo: userRole,
-    });
-    if (count > limit) {
-      const notificationsToDelete = count - limit;
-      await Notification.find({ sendUserID: userId, sendTo: userRole })
-        .sort({ createdAt: 1 })
-        .limit(notificationsToDelete)
-        .deleteMany();
-    }
+    })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    return notifications;
   } catch (error) {
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to limit stored notifications'
-    );
-  }
-};
-
-const clearOldNotifications = async (daysOld: number) => {
-  try {
-    const dateThreshold = new Date();
-    dateThreshold.setDate(dateThreshold.getDate() - daysOld);
-    await Notification.deleteMany({ createdAt: { $lt: dateThreshold } });
-  } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Failed to clear old notifications'
+      'Failed to retrieve notifications'
     );
   }
 };
 const readNotification = async (id: string) => {
-  const isExistNotification = await Notification.findById(id);
-  if (!isExistNotification) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Notification not found');
+  try {
+    const notification = await Notification.findById(id);
+    if (!notification) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Notification not found');
+    }
+    notification.status = 'read';
+    await notification.save();
+    return notification;
+  } catch (error) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Failed to read notification'
+    );
   }
-  const notification = await Notification.findByIdAndUpdate(
-    id,
-    { status: 'read' },
-    { new: true }
-  );
-  return notification;
 };
-
-const getAllNotifications = async (userId: string) => {
-  const notifications = await Notification.find({ sendUserID: userId });
-  if (!notifications) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Notifications not found');
+const markNotificationsAsRead = async (userId: string) => {
+  try {
+    const notifications = await Notification.updateMany(
+      {
+        sendUserID: userId,
+        status: 'unread',
+      },
+      { status: 'read' }
+    );
+    return notifications;
+  } catch (error) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Failed to mark notifications as read'
+    );
   }
-
-  return notifications;
 };
-
-const readAllNotifications = async (userId: string) => {
-  const isExistNotification = await Notification.find({ sendUserID: userId });
-  if (!isExistNotification) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Notification not found');
-  }
-  await Notification.updateMany(
-    { sendUserID: userId, status: 'unread' },
-    { status: 'read' }
-  );
-
-  return isExistNotification;
-};
-
 export const NotificationService = {
-  sendNotificationToDB,
-  getAllNotifications,
-  getAdminNotificationsFromDB,
-  getStudentNotificationsFromDB,
-  getTeacherNotificationsFromDB,
-  sendNotificationToAllUserOfARole,
-  sendNotificationToAllStudents,
-  sendNotificationToTeacher,
-  updateNotificationStatus,
-  markNotificationsAsRead,
   handleReconnection,
-  limitStoredNotifications,
-  clearOldNotifications,
+  sendNotificationToDB,
+  sendNotificationToAllUsersOfARole,
+  getNotificationsFromDB,
   readNotification,
-  readAllNotifications,
+  markNotificationsAsRead,
 };

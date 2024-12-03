@@ -8,45 +8,37 @@ import { NotificationValidation } from './notification.validation';
 const router = express.Router();
 
 router.post(
-  '/send',
+  '/',
   auth(
     USER_ROLES.ADMIN,
     AdminTypes.SUPERADMIN,
-    USER_ROLES.TEACHER,
-    USER_ROLES.STUDENT
+    USER_ROLES.STUDENT,
+    USER_ROLES.TEACHER
   ),
   validateRequest(NotificationValidation.sendNotificationZodSchema),
   NotificationController.sendNotification
 );
 
-router.post(
-  '/read/:id',
-  auth(
-    USER_ROLES.ADMIN,
-    AdminTypes.SUPERADMIN,
-    USER_ROLES.TEACHER,
-    USER_ROLES.STUDENT
-  ),
-  NotificationController.readNotification
-);
-router.post(
-  '/read-all',
-  auth(
-    USER_ROLES.ADMIN,
-    AdminTypes.SUPERADMIN,
-    USER_ROLES.TEACHER,
-    USER_ROLES.STUDENT
-  ),
-  NotificationController.readAllNotifications
-);
 router.get(
   '/all',
   auth(
     USER_ROLES.ADMIN,
     AdminTypes.SUPERADMIN,
-    USER_ROLES.TEACHER,
-    USER_ROLES.STUDENT
+    USER_ROLES.STUDENT,
+    USER_ROLES.TEACHER
   ),
-  NotificationController.getAllNotifications
+  NotificationController.getNotifications
 );
+router.patch(
+  '/mark-all',
+  auth(
+    USER_ROLES.ADMIN,
+    AdminTypes.SUPERADMIN,
+    USER_ROLES.STUDENT,
+    USER_ROLES.TEACHER
+  ),
+  NotificationController.markNotificationsAsRead
+);
+router.patch('/mark/:id', NotificationController.markNotificationAsRead);
+
 export const NotificationRoutes = router;
