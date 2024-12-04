@@ -35,7 +35,7 @@ router
     fileUploadHandler(),
     TeacherController.updateProfile
   )
-  // .delete('/:id', auth(USER_ROLES.TEACHER), TeacherController.deleteTeacher)
+  .delete('/:id', auth(USER_ROLES.ADMIN), TeacherController.deleteTeacher)
   .route('/')
   .post(
     validateRequest(TeacherValidation.createTeacherZodSchema),
