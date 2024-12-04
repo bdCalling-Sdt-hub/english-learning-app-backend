@@ -3,6 +3,7 @@ import { Student } from '../student/student.model';
 import { Reviews } from './reviews.model';
 
 const createReviewsToDB = async (data: any) => {
+  data.star = Number(data.star);
   const isExistCourse = await Course.findOne({ _id: data.courseID });
   if (!isExistCourse) {
     throw new Error('Course not found');
