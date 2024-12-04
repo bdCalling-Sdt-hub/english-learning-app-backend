@@ -8,6 +8,13 @@ const createReviewsToDB = async (data: any) => {
   if (!isExistCourse) {
     throw new Error('Course not found');
   }
+  const isExistReview = await Reviews.findOne({
+    courseID: data.courseID,
+    studentID: data.studentID,
+  });
+  if (isExistReview) {
+    throw new Error('Review already exist');
+  }
   const result = await Reviews.create({
     ...data,
     teacher: isExistCourse.teacherID,
