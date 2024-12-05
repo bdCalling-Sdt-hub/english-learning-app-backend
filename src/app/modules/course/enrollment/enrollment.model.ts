@@ -37,10 +37,6 @@ const enrollmentSchema = new Schema<IEnrollment, EnrollmentModel>(
       type: String,
       required: false,
     },
-    paymentIntentId: {
-      type: String,
-      required: true,
-    },
   },
   { timestamps: true }
 );

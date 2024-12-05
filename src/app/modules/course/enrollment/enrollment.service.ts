@@ -45,7 +45,6 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
   const enrollmentData = {
     studentID: data.studentID,
     courseID: data.courseID,
-    paymentIntentId: data.paymentIntentId,
     transactionId: data.transactionId,
   };
 
@@ -116,7 +115,7 @@ const payTeacherForEnrollment = async (enrollmentId: string) => {
       amount: teacherShare,
       currency: 'usd',
       destination: teacher.accountInformation.stripeAccountId!,
-      transfer_group: enrollment.paymentIntentId,
+      transfer_group: enrollment.transactionId,
     });
 
     if (!transfer) {
@@ -134,7 +133,7 @@ const payTeacherForEnrollment = async (enrollmentId: string) => {
     );
 
     // Update enrollment to mark that teacher has been paid
-    await Enrollment.findByIdAndUpdate(enrollmentId, { teacherPaid: true });
+    await Enrollment.updateMany({ _id: enrollmentId }, { teacherPaid: true });
 
     return transfer;
   } catch (error) {
