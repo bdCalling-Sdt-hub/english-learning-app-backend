@@ -30,9 +30,16 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
   if (!teacher) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Teacher not found');
   }
+  const isExistTransaction = await stripe.paymentIntents.retrieve(
+    data.transactionId
+  );
+  if (!isExistTransaction) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Transaction not found');
+  }
   const isStudentEnrolled: any = await Enrollment.findOne({
     studentID: data.studentID,
     courseID: data.courseID,
+    transactionId: data.transactionId,
   });
   if (isStudentEnrolled) {
     throw new ApiError(
