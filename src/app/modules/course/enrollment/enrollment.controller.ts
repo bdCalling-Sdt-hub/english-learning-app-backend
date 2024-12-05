@@ -38,9 +38,7 @@ const isEnrolled = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: `So You are ${
-      result ? 'enrolled' : 'not enrolled'
-    } in this course`,
+    message: `You are ${result ? 'already enrolled' : 'not enrolled'}.`,
     data: result,
   });
 });
