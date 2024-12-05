@@ -27,11 +27,16 @@ const enrollmentSchema = new Schema<IEnrollment, EnrollmentModel>(
       default: false,
       required: false,
     },
+
     // courseCompleted: {
     //   type: Boolean,
     //   default: false,
     //   required: false,
     // },
+    transactionId: {
+      type: String,
+      required: false,
+    },
     paymentIntentId: {
       type: String,
       required: true,

@@ -14,6 +14,13 @@ router.post(
   // validateRequest(EnrollmentValidation.createEnrollmentZodSchema),
   EnrollmentController.createEnrollment
 );
+
+router.post(
+  '/create-payment-intent',
+  auth(USER_ROLES.STUDENT),
+  EnrollmentController.createPaymentIntent
+);
+
 router.get(
   '/enrolled',
   auth(USER_ROLES.STUDENT),

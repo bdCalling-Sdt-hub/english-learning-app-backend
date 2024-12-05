@@ -6,6 +6,7 @@ export type IEnrollment = {
   paymentIntentId: string;
   teacherID?: string;
   teacherPaid?: boolean;
+  transactionId?: string;
   // courseCompleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;

@@ -40,35 +40,13 @@ const createEnrollmentToDB = async (data: any, io: Server) => {
       'Student is already enrolled in this course'
     );
   }
-  let paymentIntent;
-
-  try {
-    // Create payment intent for student
-    paymentIntent = await stripe.paymentIntents.create({
-      amount: isExistCourse.price * 100, // amount in cents
-      currency: 'usd',
-      payment_method: data.paymentMethodId,
-      confirm: true,
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: 'never', // Disable redirect-based payments
-      },
-      metadata: {
-        courseID: data.courseID,
-        studentID: data.studentID,
-      },
-      description: `Payment for course ${isExistCourse.name}`,
-    });
-  } catch (error) {
-    console.error(error);
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Payment failed');
-  }
 
   // Enroll the student in the course after successful payment
   const enrollmentData = {
     studentID: data.studentID,
     courseID: data.courseID,
-    paymentIntentId: paymentIntent.id,
+    paymentIntentId: data.paymentIntentId,
+    transactionId: data.transactionId,
   };
 
   const result = await Enrollment.create(enrollmentData);
@@ -167,6 +145,7 @@ const payTeacherForEnrollment = async (enrollmentId: string) => {
     );
   }
 };
+
 const payTeacherForCourse = async (courseId: string, io: Server) => {
   const course = await Course.findById(courseId);
   if (course?.status === 'completed' || course?.status === 'delete') {
@@ -251,8 +230,36 @@ const payTeacherForCourse = async (courseId: string, io: Server) => {
   return transfer;
 };
 
+const createPaymentIntent = async (courseId: string) => {
+  const course = await Course.findById(courseId);
+  if (!course) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Course not found');
+  }
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: course.price * 100, // convert to cents
+      currency: 'usd',
+      metadata: {
+        courseId: courseId,
+      },
+    });
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      amount: course.price,
+    };
+  } catch (error) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Failed to create payment intent'
+    );
+  }
+};
+
 export const EnrollmentService = {
   createEnrollmentToDB,
+  createPaymentIntent,
   payTeacherForEnrollment,
   payTeacherForCourse,
 };

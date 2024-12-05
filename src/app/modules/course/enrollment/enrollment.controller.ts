@@ -20,6 +20,19 @@ const createEnrollment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createPaymentIntent = catchAsync(async (req: Request, res: Response) => {
+  const { courseId } = req.body;
+  const result = await EnrollmentService.createPaymentIntent(courseId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Payment intent created successfully',
+    data: result,
+  });
+});
+
 export const EnrollmentController = {
   createEnrollment,
+  createPaymentIntent,
 };
