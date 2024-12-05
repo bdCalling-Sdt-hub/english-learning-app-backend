@@ -26,5 +26,9 @@ router.get(
   auth(USER_ROLES.STUDENT),
   CourseController.getEnrolledCourses
 );
-
+router.get(
+  '/isenrolled/:id',
+  auth(USER_ROLES.STUDENT),
+  EnrollmentController.isEnrolled
+);
 export const EnrollmentRoutes = router;

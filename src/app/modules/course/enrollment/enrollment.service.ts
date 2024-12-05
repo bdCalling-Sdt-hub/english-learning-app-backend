@@ -263,10 +263,20 @@ const createPaymentIntent = async (courseId: string) => {
     );
   }
 };
-
+const isEnrolled = async (studentID: string, courseID: string) => {
+  const enrollment = await Enrollment.findOne({
+    studentID: studentID,
+    courseID: courseID,
+  });
+  if (!enrollment) {
+    return false;
+  }
+  return true;
+};
 export const EnrollmentService = {
   createEnrollmentToDB,
   createPaymentIntent,
   payTeacherForEnrollment,
   payTeacherForCourse,
+  isEnrolled,
 };

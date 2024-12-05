@@ -31,8 +31,21 @@ const createPaymentIntent = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
+const isEnrolled = catchAsync(async (req: Request, res: Response) => {
+  const studentID = req.user.id;
+  const courseID = req.params.id;
+  const result = await EnrollmentService.isEnrolled(studentID, courseID);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: `So You are ${
+      result ? 'enrolled' : 'not enrolled'
+    } in this course`,
+    data: result,
+  });
+});
 export const EnrollmentController = {
   createEnrollment,
   createPaymentIntent,
+  isEnrolled,
 };
