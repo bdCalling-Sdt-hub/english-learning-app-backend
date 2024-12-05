@@ -237,17 +237,18 @@ const createPaymentIntent = async (courseId: string) => {
   }
 
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: course.price * 100, // convert to cents
-      currency: 'usd',
-      metadata: {
-        courseId: courseId,
-      },
-    });
+    const paymentIntent: Stripe.PaymentIntent =
+      await stripe.paymentIntents.create({
+        amount: course.price * 100, // convert to cents
+        currency: 'usd',
+        metadata: {
+          courseId: courseId,
+        },
+      });
 
     return {
-      clientSecret: paymentIntent.client_secret,
-      amount: course.price,
+      client_secret: paymentIntent.client_secret,
+      transactionId: paymentIntent.id,
     };
   } catch (error) {
     throw new ApiError(
