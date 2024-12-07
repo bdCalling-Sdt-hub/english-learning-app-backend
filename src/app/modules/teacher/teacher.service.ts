@@ -121,7 +121,7 @@ const createTeacherStripeAccount = async (
 ): Promise<string> => {
   const values = await JSON.parse(data);
 
-  const isExistUser = await Teacher.findOne({ email: values.email.toString() });
+  const isExistUser = await Teacher.findOne({ email: user?.email });
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -154,10 +154,10 @@ const createTeacherStripeAccount = async (
           month: dob.getMonth() + 1,
           year: dob.getFullYear(),
         },
-        id_number: values.idNumber,
+        // id_number: values.idNumber,
         first_name: values.firstName,
         last_name: values.lastName,
-        email: values.email,
+        email: user.email,
         phone: values.phoneNumber,
         address: {
           city: values.address.city,
@@ -166,7 +166,7 @@ const createTeacherStripeAccount = async (
           state: values.address.state,
           postal_code: values.address.postal_code,
         },
-        ssn_last_4: values.idNumber.slice(-4),
+        // ssn_last_4: values.idNumber.slice(-4),
 
         verification: {
           document: {
@@ -183,15 +183,15 @@ const createTeacherStripeAccount = async (
   const account = await stripe.accounts.create({
     type: 'custom',
     country: values.address.country,
-    email: isExistUser.email,
+    email: values.email || isExistUser.email,
     capabilities: {
       card_payments: { requested: true },
       transfers: { requested: true },
     },
     business_profile: {
       mcc: '5734',
-      name: values.business_profile.business_name || isExistUser.name,
-      url: values.business_profile.website || 'https://example.com',
+      name: `${isExistUser.name}'s course business on Global Class`,
+      url: 'https://medspaceconnect.com',
     },
     external_account: {
       object: 'bank_account',

@@ -129,8 +129,11 @@ const setUpTeacherPayment = catchAsync(async (req: Request, res: Response) => {
       paths.push(`/KYCs/${file.filename}`);
     }
   }
+  console.log(data);
   const user = req.user;
-  console.log(paths);
+  if (!req.user.email) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
   const result = await TeacherService.createTeacherStripeAccount(
     data,
     req.files,
