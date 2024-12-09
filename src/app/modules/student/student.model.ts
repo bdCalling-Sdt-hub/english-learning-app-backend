@@ -65,7 +65,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
       default: 'male',
     },
     dateOfBirth: {
-      type: Date,
+      type: String,
       default: null,
     },
     language: {

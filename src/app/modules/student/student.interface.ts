@@ -17,7 +17,7 @@ export type IStudent = {
   education?: string;
   cardNumber?: string;
   gender: string;
-  dateOfBirth: Date;
+  dateOfBirth: string;
   language: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   authentication?: {
     isResetPassword: boolean;
