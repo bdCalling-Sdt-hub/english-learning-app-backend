@@ -154,9 +154,15 @@ const createTeacherStripeAccount = async (
           month: dob.getMonth() + 1,
           year: dob.getFullYear(),
         },
-        // id_number: values.idNumber,
-        first_name: values.firstName,
-        last_name: values.lastName,
+        id_number: values.idNumber,
+        first_name:
+          values.name.split(' ')[0] ||
+          isExistUser.name.split(' ')[0] ||
+          isExistUser.name,
+        last_name:
+          values.name.split(' ')[1] ||
+          isExistUser.name.split(' ')[1] ||
+          isExistUser.name,
         email: user.email,
         phone: values.phoneNumber,
         address: {
@@ -166,8 +172,7 @@ const createTeacherStripeAccount = async (
           state: values.address.state,
           postal_code: values.address.postal_code,
         },
-        // ssn_last_4: values.idNumber.slice(-4),
-
+        ssn_last_4: values.idNumber.slice(-4),
         verification: {
           document: {
             front: frontFileId,
@@ -190,7 +195,7 @@ const createTeacherStripeAccount = async (
     },
     business_profile: {
       mcc: '5734',
-      name: `${isExistUser.name}'s course business on Global Class`,
+      name: `${isExistUser.name}`,
       url: 'https://medspaceconnect.com',
     },
     external_account: {
