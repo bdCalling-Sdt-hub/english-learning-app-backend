@@ -172,7 +172,7 @@ const createTeacherStripeAccount = async (
           state: values.address.state,
           postal_code: values.address.postal_code,
         },
-        ssn_last_4: values.idNumber.slice(-4),
+        ...(values.idNumber && { ssn_last_4: values.idNumber.slice(-4) }),
         verification: {
           document: {
             front: frontFileId,
