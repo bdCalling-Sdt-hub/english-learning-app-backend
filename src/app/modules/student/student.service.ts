@@ -24,6 +24,22 @@ const createStudentToDB = async (
 ): Promise<IStudent> => {
   //set role
   payload.role = USER_ROLES.STUDENT;
+  const email = payload.email;
+  const validDomains = [
+    'gmail.com',
+    'yahoo.com',
+    'hotmail.com',
+    'aol.com',
+    'outlook.com',
+  ];
+  for (const domain of validDomains) {
+    if (email?.toString().includes(domain)) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Please provide a valid email address'
+      );
+    }
+  }
   const isExistTeacher = await Teacher.findOne({ email: payload.email });
   if (isExistTeacher) {
     throw new ApiError(
