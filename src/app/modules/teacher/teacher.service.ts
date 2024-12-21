@@ -33,6 +33,22 @@ const stripe = new Stripe(stripeSecretKey, {
 });
 
 const createTeacherToDB = async (req: any) => {
+  const email = req.body.email;
+  const validDomains = [
+    'gmail.com',
+    'yahoo.com',
+    'hotmail.com',
+    'aol.com',
+    'outlook.com',
+  ];
+  for (const domain of validDomains) {
+    if (email.toString().includes(domain)) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Please provide a valid email address'
+      );
+    }
+  }
   const { ...user } = req.body;
   const isExistStudent = await Student.findOne({ email: user.email });
   const isExistAdmin = await Admin.findOne({ email: user.email });
