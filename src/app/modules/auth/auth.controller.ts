@@ -83,6 +83,17 @@ const resendEmail = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const socialLogin = catchAsync(async (req: Request, res: Response) => {
+  const { ...loginData } = req.body;
+  const result = await AuthService.socialLoginFromDB(loginData);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'User login successfully',
+    data: result,
+  });
+});
 export const AuthController = {
   verifyEmail,
   loginUser,
@@ -90,4 +101,5 @@ export const AuthController = {
   resetPassword,
   resendEmail,
   changePassword,
+  socialLogin,
 };

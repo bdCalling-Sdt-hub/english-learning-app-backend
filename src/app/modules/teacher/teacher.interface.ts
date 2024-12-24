@@ -6,9 +6,9 @@ import { LANGUAGE } from '../../../enums/language';
 export type ITeacher = {
   name: string;
   role?: USER_ROLES;
-  phone: string;
+  phone?: string;
   pendingEarnings?: number;
-  address: string;
+  address?: string;
   appointedBy?: string;
   banner?: string;
   email: string;
@@ -16,6 +16,8 @@ export type ITeacher = {
   location?: string;
   skills?: string[];
   password: string;
+  appId?: string;
+  provider?: string;
   profile?: string;
   // language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   country?: string;
@@ -30,7 +32,7 @@ export type ITeacher = {
     month: number;
     year: number;
   };
-  accountInformation: {
+  accountInformation?: {
     bankAccountNumber?: string;
     stripeAccountId?: string;
     externalAccountId?: string;

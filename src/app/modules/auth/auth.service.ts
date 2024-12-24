@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 import { JwtPayload, Secret } from 'jsonwebtoken';
 import config from '../../../config';
@@ -50,7 +51,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
     );
   }
 
-  if (password && !(await User.isMatchPassword(password, existUser.password))) {
+  if (
+    password &&
+    !(await User.isMatchPassword(password, existUser.password!))
+  ) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
   }
   let role: any = existUser.role;
@@ -80,7 +84,7 @@ const forgetPasswordToDB = async (email: string) => {
   const User: any = getModelAccordingToRole(isExistUser);
   const otp = generateOTP();
 
-  const emailData = { otp, email: isExistUser.email };
+  const emailData = { otp, email: isExistUser.email! };
   const resetPasswordEmail = emailTemplate.resetPassword(emailData);
   emailHelper.sendEmail(resetPasswordEmail);
 
@@ -348,11 +352,54 @@ const resendEmailOTP = async (email: string) => {
     new: true,
   });
 
-  const emailData = { otp, email: isExistUser.email };
+  const emailData = { otp, email: isExistUser?.email! };
   const resetPasswordEmail = emailTemplate.resetPassword(emailData);
   emailHelper.sendEmail(resetPasswordEmail);
 
   return { message: 'OTP sent successfully' };
+};
+const socialLoginFromDB = async (payload: any) => {
+  const { appId, role, type } = payload;
+  const User: UserModel = getModelAccordingToRole({ role });
+  //@ts-ignore
+  const isExistUser = await User.findOne({
+    appId,
+    provider: type,
+  });
+
+  if (isExistUser) {
+    const accessToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role },
+      config.jwt.jwt_secret as Secret
+    );
+
+    return { accessToken };
+  } else {
+    const userData = {
+      name: payload.name,
+      appId,
+      role,
+      provider: type,
+      verified: true,
+      password: crypto.randomBytes(20).toString('hex'),
+    };
+    //@ts-ignore
+    const user = await User.create(userData);
+
+    if (!user) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        `Failed to create user with ${type} authentication`
+      );
+    }
+
+    const accessToken = jwtHelper.createToken(
+      { id: user._id, role: user.role },
+      config.jwt.jwt_secret as Secret
+    );
+
+    return { accessToken };
+  }
 };
 export const AuthService = {
   verifyEmailToDB,
@@ -361,4 +408,5 @@ export const AuthService = {
   resetPasswordToDB,
   resendEmailOTP,
   changePasswordToDB,
+  socialLoginFromDB,
 };

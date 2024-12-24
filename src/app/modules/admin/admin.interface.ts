@@ -9,6 +9,8 @@ export type IAdmin = {
   status?: 'active' | 'delete';
   profile?: string;
   verified?: boolean;
+  appId?: string;
+  provider?: string;
   role?: USER_ROLES.ADMIN;
   authentication?: {
     isResetPassword: boolean;

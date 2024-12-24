@@ -11,7 +11,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
   {
     name: {
       type: String,
-      required: true,
+      required: false,
     },
     address: {
       type: String,
@@ -25,7 +25,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     role: {
       type: String,
       default: USER_ROLES.TEACHER,
-      required: true,
+      required: false,
     },
     skills: {
       type: [String],
@@ -39,11 +39,11 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       type: String,
       enum: ['platform', 'freelancer'],
       default: 'freelancer',
-      required: true,
+      required: false,
     },
     email: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
       lowercase: true,
       match: /.+\@.+\..+/, // Regex for basic email validation
@@ -75,7 +75,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     phone: {
       type: String,
-      required: true,
+      required: false,
     },
 
     earnings: {
@@ -99,7 +99,16 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       type: Boolean,
       default: false,
     },
-
+    appId: {
+      type: String,
+      required: false,
+      unique: true,
+    },
+    provider: {
+      type: String,
+      required: false,
+      enum: ['apple', 'google'],
+    },
     // language: {
     //   type: String,
     //   enum: LANGUAGE,
@@ -176,7 +185,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       select: 0,
       minlength: 8,
     },

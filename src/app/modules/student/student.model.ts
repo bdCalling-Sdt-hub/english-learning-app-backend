@@ -84,6 +84,16 @@ const userSchema = new Schema<IStudent, StudentModel>(
     cardNumber: {
       type: String,
     },
+    appId: {
+      type: String,
+      required: false,
+      unique: true,
+    },
+    provider: {
+      type: String,
+      required: false,
+      enum: ['apple', 'google'],
+    },
     authentication: {
       type: {
         isResetPassword: {
@@ -133,7 +143,9 @@ userSchema.pre('save', async function (next) {
   }
 
   //password hash
+  //@ts-ignore
   this.password = await bcrypt.hash(
+    //@ts-ignore
     this.password,
     Number(config.bcrypt_salt_rounds)
   );

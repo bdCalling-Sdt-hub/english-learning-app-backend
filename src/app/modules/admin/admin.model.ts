@@ -39,6 +39,16 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
       type: String,
       default: USER_ROLES.ADMIN,
     },
+    appId: {
+      type: String,
+      required: false,
+      unique: true,
+    },
+    provider: {
+      type: String,
+      required: false,
+      enum: ['apple', 'google'],
+    },
     status: {
       type: String,
       enum: ['active', 'delete'],
