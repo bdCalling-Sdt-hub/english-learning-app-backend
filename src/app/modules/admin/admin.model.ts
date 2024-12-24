@@ -10,11 +10,11 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
   {
     name: {
       type: String,
-      required: [true, 'name is required'],
+      required: false,
     },
     email: {
       type: String,
-      required: [true, 'email is required'],
+      required: false,
     },
     password: {
       type: String,
@@ -44,7 +44,7 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
       required: false,
       unique: true,
     },
-    provider: {
+    loginType: {
       type: String,
       required: false,
       enum: ['apple', 'google'],

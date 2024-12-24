@@ -44,9 +44,9 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     email: {
       type: String,
       required: false,
+      sparse: true,
       unique: true,
       lowercase: true,
-      match: /.+\@.+\..+/, // Regex for basic email validation
     },
     location: {
       type: String,
@@ -104,7 +104,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       required: false,
       unique: true,
     },
-    provider: {
+    loginType: {
       type: String,
       required: false,
       enum: ['apple', 'google'],

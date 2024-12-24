@@ -13,7 +13,7 @@ export type IStudent = {
   address?: string;
   profile?: string;
   appId?: string;
-  provider?: string;
+  loginType?: string;
   status?: 'active' | 'delete';
   verified?: boolean;
   education?: string;

@@ -10,7 +10,7 @@ export type IAdmin = {
   profile?: string;
   verified?: boolean;
   appId?: string;
-  provider?: string;
+  loginType?: string;
   role?: USER_ROLES.ADMIN;
   authentication?: {
     isResetPassword: boolean;

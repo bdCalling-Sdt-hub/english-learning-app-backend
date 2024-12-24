@@ -359,27 +359,27 @@ const resendEmailOTP = async (email: string) => {
   return { message: 'OTP sent successfully' };
 };
 const socialLoginFromDB = async (payload: any) => {
-  const { appId, role, type } = payload;
+  const { appId, role, loginType } = payload;
   const User: UserModel = getModelAccordingToRole({ role });
   //@ts-ignore
   const isExistUser = await User.findOne({
     appId,
-    provider: type,
+    loginType,
   });
 
   if (isExistUser) {
-    const accessToken = jwtHelper.createToken(
+    const token = jwtHelper.createToken(
       { id: isExistUser._id, role: isExistUser.role },
       config.jwt.jwt_secret as Secret
     );
 
-    return { accessToken };
+    return { token, role, loginType };
   } else {
     const userData = {
-      name: payload.name,
       appId,
       role,
-      provider: type,
+      email: '',
+      loginType,
       verified: true,
       password: crypto.randomBytes(20).toString('hex'),
     };
@@ -389,16 +389,16 @@ const socialLoginFromDB = async (payload: any) => {
     if (!user) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        `Failed to create user with ${type} authentication`
+        `Failed to create user with ${loginType} authentication`
       );
     }
 
-    const accessToken = jwtHelper.createToken(
+    const token = jwtHelper.createToken(
       { id: user._id, role: user.role },
       config.jwt.jwt_secret as Secret
     );
 
-    return { accessToken };
+    return { token, role, loginType };
   }
 };
 export const AuthService = {

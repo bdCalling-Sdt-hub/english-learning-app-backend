@@ -17,7 +17,7 @@ export type ITeacher = {
   skills?: string[];
   password: string;
   appId?: string;
-  provider?: string;
+  loginType?: string;
   profile?: string;
   // language?: LANGUAGE.ENGLISH | LANGUAGE.HEBREW | LANGUAGE.SPANISH;
   country?: string;

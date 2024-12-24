@@ -12,7 +12,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
   {
     name: {
       type: String,
-      required: true,
+      required: false,
     },
     role: {
       type: String,
@@ -21,7 +21,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     },
     email: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
       lowercase: true,
     },
@@ -32,7 +32,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     },
     phone: {
       type: String,
-      required: true,
+      required: false,
     },
     password: {
       type: String,
@@ -89,7 +89,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
       required: false,
       unique: true,
     },
-    provider: {
+    loginType: {
       type: String,
       required: false,
       enum: ['apple', 'google'],
