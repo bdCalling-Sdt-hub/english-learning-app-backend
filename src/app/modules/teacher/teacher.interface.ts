@@ -84,6 +84,5 @@ export interface TeacherStripeAccountData {
 
 export type TeacherModel = {
   isExistTeacherById(id: string): Promise<ITeacher | null>;
-  isExistTeacherByEmail(email: string): Promise<ITeacher | null>;
   isMatchPassword(password: string, hashPassword: string): Promise<boolean>;
 } & Model<ITeacher>;

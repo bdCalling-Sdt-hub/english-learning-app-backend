@@ -42,7 +42,7 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
     appId: {
       type: String,
       required: false,
-      unique: true,
+      unique: false,
     },
     loginType: {
       type: String,

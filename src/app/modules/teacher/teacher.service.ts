@@ -49,6 +49,11 @@ const createTeacherToDB = async (req: any) => {
       );
     }
   }
+
+  const isExist = await Teacher.findOne({ email: req.body.email });
+  if (isExist) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+  }
   const { ...user } = req.body;
   const isExistStudent = await Student.findOne({ email: user.email });
   const isExistAdmin = await Admin.findOne({ email: user.email });
@@ -59,7 +64,7 @@ const createTeacherToDB = async (req: any) => {
   if (isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already exist!');
   }
-  const isExistTeacher = await Teacher.isExistTeacherByEmail(user.email);
+  const isExistTeacher = await Teacher.findOne({ email: user.email });
   if (isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
   }
@@ -236,11 +241,15 @@ const createTeacherStripeAccount = async (
 
   // Save to the DB
   if (account.id && account?.external_accounts?.data.length) {
+    //@ts-ignore
     isExistUser.accountInformation.stripeAccountId = account.id;
+    //@ts-ignore
     isExistUser.accountInformation.bankAccountNumber =
       values.bank_info.account_number;
+    //@ts-ignore
     isExistUser.accountInformation.externalAccountId =
       account.external_accounts.data[0].id;
+    //@ts-ignore
     isExistUser.accountInformation.status = 'active';
     await Teacher.findByIdAndUpdate(user.id, isExistUser);
   }

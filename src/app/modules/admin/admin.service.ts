@@ -97,7 +97,7 @@ const createAppointedTeacherToDB = async (
   if (!isExistAdmin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
   }
-  const isExistTeacher = await Teacher.isExistTeacherByEmail(userData.email);
+  const isExistTeacher = await Teacher.findOne({ email: userData.email });
   if (isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
   }

@@ -45,7 +45,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
       type: String,
       required: false,
       sparse: true,
-      unique: true,
+      unique: false,
       lowercase: true,
     },
     location: {
@@ -102,7 +102,7 @@ const teacherSchema = new Schema<ITeacher, TeacherModel>(
     appId: {
       type: String,
       required: false,
-      unique: true,
+      unique: false,
     },
     loginType: {
       type: String,
@@ -199,11 +199,6 @@ teacherSchema.statics.isExistTeacherById = async (id: string) => {
   return isExist;
 };
 
-teacherSchema.statics.isExistTeacherByEmail = async (email: string) => {
-  const isExist = await Teacher.findOne({ email });
-  return isExist;
-};
-
 //is match password
 teacherSchema.statics.isMatchPassword = async (
   password: string,
@@ -214,12 +209,6 @@ teacherSchema.statics.isMatchPassword = async (
 
 //check Teacher
 teacherSchema.pre('save', async function (next) {
-  //check Teacher
-  const isExist = await Teacher.findOne({ email: this.email });
-  if (isExist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
-  }
-
   //password hash
   this.password = await bcrypt.hash(
     this.password,

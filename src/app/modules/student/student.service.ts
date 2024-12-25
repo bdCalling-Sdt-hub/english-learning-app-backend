@@ -40,6 +40,10 @@ const createStudentToDB = async (
       );
     }
   }
+  const isExist = await Student.findOne({ email: payload.email });
+  if (isExist) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+  }
   const isExistTeacher = await Teacher.findOne({ email: payload.email });
   if (isExistTeacher) {
     throw new ApiError(
@@ -69,6 +73,7 @@ const createStudentToDB = async (
     otp: otp,
     email: createUser.email!,
   };
+  //@ts-ignore
   const createAccountTemplate = emailTemplate.createAccount(values);
   emailHelper.sendEmail(createAccountTemplate);
 

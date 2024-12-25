@@ -378,7 +378,6 @@ const socialLoginFromDB = async (payload: any) => {
     const userData = {
       appId,
       role,
-      email: '',
       loginType,
       verified: true,
       password: crypto.randomBytes(20).toString('hex'),

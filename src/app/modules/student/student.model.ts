@@ -22,7 +22,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     email: {
       type: String,
       required: false,
-      unique: true,
+      unique: false,
       lowercase: true,
     },
     banner: {
@@ -87,7 +87,7 @@ const userSchema = new Schema<IStudent, StudentModel>(
     appId: {
       type: String,
       required: false,
-      unique: true,
+      unique: false,
     },
     loginType: {
       type: String,
@@ -121,11 +121,6 @@ userSchema.statics.isExistStudentById = async (id: string) => {
   return isExist;
 };
 
-userSchema.statics.isExistUserByEmail = async (email: string) => {
-  const isExist = await Student.findOne({ email });
-  return isExist;
-};
-
 //is match password
 userSchema.statics.isMatchPassword = async (
   password: string,
@@ -136,12 +131,6 @@ userSchema.statics.isMatchPassword = async (
 
 //check user
 userSchema.pre('save', async function (next) {
-  //check user
-  const isExist = await Student.findOne({ email: this.email });
-  if (isExist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
-  }
-
   //password hash
   //@ts-ignore
   this.password = await bcrypt.hash(

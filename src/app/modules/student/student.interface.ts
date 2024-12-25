@@ -30,6 +30,5 @@ export type IStudent = {
 
 export type StudentModel = {
   isExistStudentById(id: string): any;
-  isExistUserByEmail(email: string): any;
   isMatchPassword(password: string, hashPassword: string): boolean;
 } & Model<IStudent>;
