@@ -22,7 +22,6 @@ const userSchema = new Schema<IStudent, StudentModel>(
     email: {
       type: String,
       required: false,
-      unique: false,
       lowercase: true,
     },
     banner: {
@@ -121,6 +120,13 @@ userSchema.statics.isExistStudentById = async (id: string) => {
   return isExist;
 };
 
+userSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    sparse: true,
+  }
+);
 //is match password
 userSchema.statics.isMatchPassword = async (
   password: string,
@@ -132,6 +138,7 @@ userSchema.statics.isMatchPassword = async (
 //check user
 userSchema.pre('save', async function (next) {
   //password hash
+  await Student.collection.dropIndex('email_1');
   //@ts-ignore
   this.password = await bcrypt.hash(
     //@ts-ignore

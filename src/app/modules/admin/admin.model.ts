@@ -77,6 +77,13 @@ adminSchema.statics.isMatchPassword = async (
 ): Promise<boolean> => {
   return await bcrypt.compare(password, hashPassword);
 };
+adminSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    sparse: true,
+  }
+);
 adminSchema.pre('save', async function (next) {
   const isExistSuperAdmin = await Admin.find({
     type: AdminTypes.SUPERADMIN,

@@ -198,7 +198,13 @@ teacherSchema.statics.isExistTeacherById = async (id: string) => {
   const isExist = await Teacher.findById(id);
   return isExist;
 };
-
+teacherSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    sparse: true,
+  }
+);
 //is match password
 teacherSchema.statics.isMatchPassword = async (
   password: string,
