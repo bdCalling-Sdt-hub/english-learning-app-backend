@@ -319,7 +319,11 @@ const updateProfileToDB = async (
   }
 
   //unlink file here
-  if (payload.profile && isExistUser.profile?.toString().length > 2) {
+  if (
+    payload.profile &&
+    isExistUser.profile?.toString().length > 2 &&
+    isExistUser.profile !== '/profile/default.png'
+  ) {
     await unlinkFile(isExistUser.profile);
   }
 

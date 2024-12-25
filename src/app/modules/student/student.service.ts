@@ -129,7 +129,11 @@ const updateProfileToDB = async (
   }
   //unlink file here
   //@ts-ignore
-  if (payload.profile && isExistUser.profile?.length > 2) {
+  if (
+    payload.profile &&
+    isExistUser?.profile?.length! > 2 &&
+    isExistUser.profile !== '/profile/default.png'
+  ) {
     //@ts-ignore
     unlinkFile(isExistUser.profile);
   }
