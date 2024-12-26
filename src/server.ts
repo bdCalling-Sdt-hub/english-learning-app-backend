@@ -22,7 +22,10 @@ async function main() {
   try {
     mongoose.connect(config.database_url as string);
     logger.info(colors.green('🚀 Database connected successfully'));
-    const isExistAdmin = await Admin.findOne({ type: AdminTypes.SUPERADMIN });
+    const isExistAdmin = await Admin.findOne({
+      type: AdminTypes.SUPERADMIN,
+      role: USER_ROLES.ADMIN,
+    });
     if (!isExistAdmin) {
       const result = await AdminService.createAdminToDB({
         name: 'SUPERADMIN',
