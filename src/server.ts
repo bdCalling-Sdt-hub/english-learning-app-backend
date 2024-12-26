@@ -7,6 +7,9 @@ import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
 import { Info } from './app/modules/info/info.model';
 import { initCronJobs } from './app/modules/cron/cronService.controller';
+import { AdminService } from './app/modules/admin/admin.service';
+import { AdminTypes, USER_ROLES } from './enums/user';
+import { Admin } from './app/modules/admin/admin.model';
 //uncaught exception
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandleException Detected', error);
@@ -19,7 +22,20 @@ async function main() {
   try {
     mongoose.connect(config.database_url as string);
     logger.info(colors.green('🚀 Database connected successfully'));
-
+    const isExistAdmin = await Admin.findOne({ type: AdminTypes.SUPERADMIN });
+    if (!isExistAdmin) {
+      const result = await AdminService.createAdminToDB({
+        name: 'SUPERADMIN',
+        email: process.env.ADMIN_EMAIL || 'natan@gmail.com',
+        password: process.env.ADMIN_PASSWORD || '',
+        role: USER_ROLES.ADMIN,
+        type: AdminTypes.SUPERADMIN,
+      });
+      if (!result) {
+        console.log('Super Admin not created');
+      }
+      console.log('Super Admin created successfully');
+    }
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port);
 
