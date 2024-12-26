@@ -43,11 +43,18 @@ const updateAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllAdmins = catchAsync(async (req: Request, res: Response) => {
-  const result = await AdminService.getAdminsFromDB();
+  const query = req.query;
+  const result = await AdminService.getAdminsFromDB(query);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Admins retrieved successfully',
+    pagination: {
+      currentPage: Number(query.page) || 1,
+      limit: Number(query.limit) || 10,
+      totalPage: Math.ceil(result.length / (Number(query.limit) || 10)),
+      total: result.length,
+    },
     data: result,
   });
 });
@@ -125,6 +132,15 @@ const makeTeacherUnappointed = catchAsync(
   }
 );
 
+const getWebSiteStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.getWebSiteStatusFromDB();
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Website status retrieved successfully',
+    data: result,
+  });
+});
 export const AdminController = {
   createAdmin,
   createSuperAdmin,
@@ -135,4 +151,5 @@ export const AdminController = {
   createAppointedTeacher,
   makeTeacherAppointed,
   makeTeacherUnappointed,
+  getWebSiteStatus,
 };

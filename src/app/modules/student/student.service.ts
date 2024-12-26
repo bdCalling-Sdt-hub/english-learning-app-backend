@@ -144,10 +144,23 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
-const getAllStudentsFromDB = async (): Promise<IStudent[]> => {
-  const result = await Student.find({ status: { $ne: 'delete' } }).select(
-    '-cardNumber'
-  );
+const getAllStudentsFromDB = async (query: any): Promise<IStudent[]> => {
+  const { page = 1, limit = 10, searchTerm = '' } = query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const searchConditions = searchTerm
+    ? {
+        $or: [
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } },
+        ],
+      }
+    : {};
+
+  const result = await Student.find(searchConditions, { password: 0 })
+    .skip(skip)
+    .limit(Number(limit));
+
   return result;
 };
 

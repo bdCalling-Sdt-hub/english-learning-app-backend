@@ -87,11 +87,18 @@ const updateProfile = catchAsync(
 );
 
 const getAllTeachers = catchAsync(async (req: Request, res: Response) => {
-  const result = await TeacherService.getAllTeachersFromDB();
+  const query = req.query;
+  const result = await TeacherService.getAllTeachersFromDB(query);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Teachers retrieved successfully',
+    pagination: {
+      currentPage: Number(query.page) || 1,
+      limit: Number(query.limit) || 10,
+      totalPage: Math.ceil(result.length / (Number(query.limit) || 10)),
+      total: result.length,
+    },
     data: result,
   });
 });

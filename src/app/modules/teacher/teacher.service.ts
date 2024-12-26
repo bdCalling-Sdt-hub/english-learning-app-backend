@@ -334,8 +334,26 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
-const getAllTeachersFromDB = async (): Promise<Partial<ITeacher>[]> => {
-  const result = await Teacher.find({}, { password: 0 });
+const getAllTeachersFromDB = async (
+  query: any
+): Promise<Partial<ITeacher>[]> => {
+  const { page = 1, limit = 10, searchTerm = '' } = query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const searchConditions = searchTerm
+    ? {
+        $or: [
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } },
+          { language: { $regex: searchTerm, $options: 'i' } },
+        ],
+      }
+    : {};
+
+  const result = await Teacher.find(searchConditions, { password: 0 })
+    .skip(skip)
+    .limit(Number(limit));
+
   return result;
 };
 const getTeacherByIdFromDB = async (

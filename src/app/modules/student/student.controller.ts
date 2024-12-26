@@ -58,11 +58,18 @@ const updateProfile = catchAsync(
 );
 
 const getAllStudents = catchAsync(async (req: Request, res: Response) => {
-  const result = await StudentService.getAllStudentsFromDB();
+  const query = req.query;
+  const result = await StudentService.getAllStudentsFromDB(query);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Students retrieved successfully',
+    pagination: {
+      currentPage: Number(query.page) || 1,
+      limit: Number(query.limit) || 10,
+      totalPage: Math.ceil(result.length / (Number(query.limit) || 10)),
+      total: result.length,
+    },
     data: result,
   });
 });

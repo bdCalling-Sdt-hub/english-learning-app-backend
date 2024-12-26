@@ -11,6 +11,8 @@ import app from '../../../app';
 import { Student } from '../student/student.model';
 import { NotificationService } from '../notifications/notification.service';
 import { Server } from 'socket.io';
+import { Course } from '../course/course.model';
+import { Enrollment } from '../course/enrollment/enrollment.model';
 
 const createAdminToDB = async (
   userData: IAdmin,
@@ -63,12 +65,25 @@ const getAdminByIdFromDB = async (id: string) => {
   }
   return admin;
 };
-const getAdminsFromDB = async () => {
-  const admins = await Admin.find({ type: { $ne: AdminTypes.SUPERADMIN } });
-  if (!admins) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
-  }
-  return admins;
+const getAdminsFromDB = async (query: any) => {
+  const { page = 1, limit = 10, searchTerm = '' } = query;
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const searchConditions = searchTerm
+    ? {
+        $or: [
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } },
+          { language: { $regex: searchTerm, $options: 'i' } },
+        ],
+      }
+    : {};
+
+  const result = await Admin.find(searchConditions, { password: 0 })
+    .skip(skip)
+    .limit(Number(limit));
+
+  return result;
 };
 const deleteAdminFromDB = async (id: string) => {
   const existAdmin = await Admin.findById(id);
@@ -204,6 +219,55 @@ const makeTeacherUnappointedToDB = async (id: string, adminId: string) => {
   return unappointedTeacher;
 };
 
+const getWebSiteStatusFromDB = async () => {
+  const [allStudents, allTeachers, allAdmins, completedCourses] =
+    await Promise.all([
+      Student.find(),
+      Teacher.find(),
+      Admin.find(),
+      Course.find({ status: 'completed' }),
+    ]);
+  const topTeachers = await Enrollment.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'courseID',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $group: {
+        _id: '$course.teacherID',
+        enrollmentCount: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { enrollmentCount: -1 },
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  // Lookup teacher details for each top teacher
+  const topTeachersLookup = await Teacher.populate(topTeachers, {
+    path: '_id',
+    select: 'name email profileImage type verified -_id profile',
+  });
+
+  const finalResult = {
+    students: allStudents.length,
+    teachers: allTeachers.length,
+    admins: allAdmins.length,
+    completedCourses: completedCourses.length,
+    topTeachers: topTeachersLookup,
+  };
+  return finalResult;
+};
+
 export const AdminService = {
   createAdminToDB,
   updateAdminToDB,
@@ -213,4 +277,5 @@ export const AdminService = {
   createAppointedTeacherToDB,
   makeTeacherAppointedToDB,
   makeTeacherUnappointedToDB,
+  getWebSiteStatusFromDB,
 };

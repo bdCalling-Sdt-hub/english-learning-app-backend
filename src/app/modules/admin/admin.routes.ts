@@ -17,6 +17,7 @@ router.patch(
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.updateAdmin
 );
+router.get('/status', AdminController.getWebSiteStatus);
 router.get(
   '/',
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
