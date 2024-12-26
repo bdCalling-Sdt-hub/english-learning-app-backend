@@ -121,6 +121,7 @@ const payTeacherForEnrollment = async (enrollmentId: string) => {
     const transfer = await stripe.transfers.create({
       amount: teacherShare,
       currency: 'usd',
+      //@ts-ignore
       destination: teacher.accountInformation.stripeAccountId!,
       transfer_group: enrollment.transactionId,
     });
@@ -188,6 +189,7 @@ const payTeacherForCourse = async (courseId: string, io: Server) => {
   const transfer = await stripe.transfers.create({
     amount: transferAmount,
     currency: 'usd',
+    //@ts-ignore
     destination: teacher.accountInformation.stripeAccountId!,
     transfer_group: courseId,
   });

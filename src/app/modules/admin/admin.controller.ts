@@ -141,6 +141,28 @@ const getWebSiteStatus = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getAdminProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.getAdminProfile(req.user.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Admin profile retrieved successfully',
+    data: result,
+  });
+});
+const getMonthlyEarning = catchAsync(async (req: Request, res: Response) => {
+  const { year } = req.query;
+  if (!year) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Year is required');
+  }
+  const result = await AdminService.getMonthlyEarning(Number(year));
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Monthly earning retrieved successfully',
+    data: result,
+  });
+});
 export const AdminController = {
   createAdmin,
   createSuperAdmin,
@@ -152,4 +174,6 @@ export const AdminController = {
   makeTeacherAppointed,
   makeTeacherUnappointed,
   getWebSiteStatus,
+  getAdminProfile,
+  getMonthlyEarning,
 };

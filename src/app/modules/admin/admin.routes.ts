@@ -12,12 +12,26 @@ router.post(
   AdminController.createSuperAdmin
 );
 router.post('/', auth(AdminTypes.SUPERADMIN), AdminController.createAdmin);
+router.get(
+  '/profile',
+  auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
+  AdminController.getAdminProfile
+);
 router.patch(
   '/:id',
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.updateAdmin
 );
-router.get('/status', AdminController.getWebSiteStatus);
+router.get(
+  '/status',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.getWebSiteStatus
+);
+router.get(
+  '/earnings',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.getMonthlyEarning
+);
 router.get(
   '/',
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
@@ -28,6 +42,7 @@ router.get(
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.getAdminById
 );
+
 router.delete(
   '/:id',
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),

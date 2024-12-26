@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
   '/',
-  // auth(USER_ROLES.STUDENT),
+  auth(USER_ROLES.STUDENT),
   validateRequest(EnrollmentValidation.createEnrollmentZodSchema),
   EnrollmentController.createEnrollment
 );

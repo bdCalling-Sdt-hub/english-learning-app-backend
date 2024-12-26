@@ -257,17 +257,105 @@ const getWebSiteStatusFromDB = async () => {
     path: '_id',
     select: 'name email profileImage type verified -_id profile',
   });
-
+  const topCourses = await Enrollment.aggregate([
+    {
+      $group: {
+        _id: '$courseID',
+        enrollmentCount: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { enrollmentCount: -1 },
+    },
+    {
+      $limit: 5,
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'courseDetails',
+      },
+    },
+    {
+      $unwind: '$courseDetails',
+    },
+    {
+      $project: {
+        _id: 0,
+        course: '$courseDetails',
+        enrollmentCount: 1,
+      },
+    },
+  ]);
+  const totalCompletedCourses = await Course.find({ status: 'completed' });
   const finalResult = {
     students: allStudents.length,
     teachers: allTeachers.length,
     admins: allAdmins.length,
     completedCourses: completedCourses.length,
     topTeachers: topTeachersLookup,
+    topCourses,
+    totalCompletedCourses,
   };
   return finalResult;
 };
+const getAdminProfile = async (id: string) => {
+  console.log('id', id);
+  const admin = await Admin.findOne({ _id: id });
+  if (!admin) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
+  }
+  return admin;
+};
+const getMonthlyEarning = async (year: number) => {
+  const monthlyEarnings = await Enrollment.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'courseID',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $match: {
+        $expr: {
+          $eq: [{ $year: '$createdAt' }, year],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { month: { $month: '$createdAt' } },
+        totalEarnings: { $sum: '$course.price' },
+      },
+    },
+    {
+      $sort: { '_id.month': 1 },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: '$_id.month',
+        totalEarnings: 1,
+      },
+    },
+  ]);
 
+  const completeMonthlyEarnings = Array.from({ length: 12 }, (_, i) => {
+    const existingMonth = monthlyEarnings.find(m => m.month === i + 1);
+    return {
+      month: i + 1,
+      totalEarnings: existingMonth ? existingMonth.totalEarnings : 0,
+    };
+  });
+  return completeMonthlyEarnings;
+};
 export const AdminService = {
   createAdminToDB,
   updateAdminToDB,
@@ -278,4 +366,6 @@ export const AdminService = {
   makeTeacherAppointedToDB,
   makeTeacherUnappointedToDB,
   getWebSiteStatusFromDB,
+  getAdminProfile,
+  getMonthlyEarning,
 };
