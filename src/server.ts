@@ -27,7 +27,7 @@ async function main() {
       role: USER_ROLES.ADMIN,
     });
     if (!isExistAdmin) {
-      const result = await AdminService.createAdminToDB({
+      const result = await Admin.create({
         name: 'SUPERADMIN',
         email: process.env.ADMIN_EMAIL || 'natan@gmail.com',
         password: process.env.ADMIN_PASSWORD || '',
