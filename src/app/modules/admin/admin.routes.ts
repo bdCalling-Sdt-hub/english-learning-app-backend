@@ -14,7 +14,7 @@ router.post(
 router.post('/', auth(AdminTypes.SUPERADMIN), AdminController.createAdmin);
 router.get(
   '/profile',
-  auth(USER_ROLES.ADMIN, USER_ROLES.STUDENT),
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.getAdminProfile
 );
 router.patch(

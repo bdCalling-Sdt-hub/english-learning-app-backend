@@ -303,7 +303,7 @@ const getWebSiteStatusFromDB = async () => {
 };
 const getAdminProfile = async (id: string) => {
   console.log('id', id);
-  const admin = await Admin.findOne({ _id: id });
+  const admin = await Admin.findOne({ _id: id }, { password: 0 });
   if (!admin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
   }
