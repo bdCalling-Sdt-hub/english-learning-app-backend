@@ -252,6 +252,7 @@ const getWebSiteStatusFromDB = async () => {
       $limit: 10,
     },
   ]);
+  const totalUsers = allStudents.length + allTeachers.length + allAdmins.length;
   // Lookup teacher details for each top teacher
   const topTeachersLookup = await Teacher.populate(topTeachers, {
     path: '_id',
@@ -296,6 +297,7 @@ const getWebSiteStatusFromDB = async () => {
     admins: allAdmins.length,
     completedCourses: completedCourses.length,
     topTeachers: topTeachersLookup,
+    totalUsers,
     topCourses,
     totalCompletedCourses,
   };
