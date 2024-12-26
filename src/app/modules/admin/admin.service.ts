@@ -290,10 +290,20 @@ const getWebSiteStatusFromDB = async () => {
       },
     },
   ]);
+  const allPlatformTeacher = await Teacher.find({
+    type: 'platform',
+  }).countDocuments();
+  const allFreelancerTeacher = await Teacher.find({
+    type: 'freelancer',
+  }).countDocuments();
   const totalCompletedCourses = await Course.find({ status: 'completed' });
   const finalResult = {
     students: allStudents.length,
     teachers: allTeachers.length,
+    teacherCount: {
+      platform: allPlatformTeacher,
+      freelancer: allFreelancerTeacher,
+    },
     admins: allAdmins.length,
     completedCourses: completedCourses.length,
     topTeachers: topTeachersLookup,
