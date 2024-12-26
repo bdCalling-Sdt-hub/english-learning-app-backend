@@ -19,7 +19,7 @@ const enrollmentSchema = new Schema<IEnrollment, EnrollmentModel>(
       required: true,
     },
     teacherID: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: false,
     },
     teacherPaid: {

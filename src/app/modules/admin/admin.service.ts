@@ -297,12 +297,70 @@ const getWebSiteStatusFromDB = async () => {
     type: 'freelancer',
   }).countDocuments();
   const totalCompletedCourses = await Course.find({ status: 'completed' });
+  const totalEnrolledPlatformCourses = await Enrollment.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'courseID',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $match: {
+        'course.type': 'platform',
+      },
+    },
+    {
+      $group: {
+        _id: '$courseID',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $count: 'total',
+    },
+  ]);
+  const totalEnrolledFreelancerCourses = await Enrollment.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'courseID',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $match: {
+        'course.type': 'freelancer',
+      },
+    },
+    {
+      $group: {
+        _id: '$courseID',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $count: 'total',
+    },
+  ]);
   const finalResult = {
     students: allStudents.length,
     teachers: allTeachers.length,
     teacherCount: {
       platform: allPlatformTeacher,
       freelancer: allFreelancerTeacher,
+    },
+    soldCourses: {
+      platform: totalEnrolledPlatformCourses[0].total,
+      freelancer: totalEnrolledFreelancerCourses[0].total,
     },
     admins: allAdmins.length,
     completedCourses: completedCourses.length,
