@@ -163,6 +163,21 @@ const getMonthlyEarning = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMonthlyEnrollmentStatus = catchAsync(
+  async (req: Request, res: Response) => {
+    const { year } = req.query;
+    if (!year) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Year is required');
+    }
+    const result = await AdminService.getMonthlyEnrollmentStatus(Number(year));
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Monthly enrollment status retrieved successfully',
+      data: result,
+    });
+  }
+);
 export const AdminController = {
   createAdmin,
   createSuperAdmin,
@@ -176,4 +191,5 @@ export const AdminController = {
   getWebSiteStatus,
   getAdminProfile,
   getMonthlyEarning,
+  getMonthlyEnrollmentStatus,
 };

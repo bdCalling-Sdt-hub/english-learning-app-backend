@@ -426,6 +426,102 @@ const getMonthlyEarning = async (year: number) => {
   });
   return completeMonthlyEarnings;
 };
+const getMonthlyEnrollmentStatus = async (year: number) => {
+  try {
+    // First aggregate enrollments with course information
+    const enrollmentStats = await Enrollment.aggregate([
+      {
+        // Match enrollments for the specified year
+        $match: {
+          createdAt: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        // Lookup course information
+        $lookup: {
+          from: 'courses',
+          localField: 'courseID',
+          foreignField: '_id',
+          as: 'courseInfo',
+        },
+      },
+      {
+        // Unwind the courseInfo array
+        $unwind: '$courseInfo',
+      },
+      {
+        // Group by month and course type
+        $group: {
+          _id: {
+            month: { $month: '$createdAt' },
+            courseType: '$courseInfo.type',
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        // Format output
+        $project: {
+          _id: 0,
+          month: '$_id.month',
+          courseType: '$_id.courseType',
+          enrollmentCount: '$count',
+        },
+      },
+      {
+        // Sort by month
+        $sort: {
+          month: 1,
+          courseType: 1,
+        },
+      },
+    ]);
+
+    // Create a complete monthly report including months with zero enrollments
+    const completeMonthlyReport = Array.from({ length: 12 }, (_, index) => {
+      const monthNum = index + 1;
+      const platformData = enrollmentStats.find(
+        item => item.month === monthNum && item.courseType === 'platform'
+      );
+      const freelancerData = enrollmentStats.find(
+        item => item.month === monthNum && item.courseType === 'freelancer'
+      );
+
+      return {
+        month: monthNum,
+
+        platform: platformData ? platformData.enrollmentCount : 0,
+        freelancer: freelancerData ? freelancerData.enrollmentCount : 0,
+        total:
+          (platformData?.enrollmentCount || 0) +
+          (freelancerData?.enrollmentCount || 0),
+      };
+    });
+
+    // Calculate totals and statistics
+    const totalStats = completeMonthlyReport.reduce(
+      (acc, month) => {
+        return {
+          platformTotal: acc.platformTotal + month.platform.enrollmentCount,
+          freelancerTotal:
+            acc.freelancerTotal + month.freelancer.enrollmentCount,
+          grandTotal: acc.grandTotal + month.total,
+        };
+      },
+      { platformTotal: 0, freelancerTotal: 0, grandTotal: 0 }
+    );
+
+    return completeMonthlyReport;
+  } catch (error) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Error calculating enrollment statistics by course type'
+    );
+  }
+};
 export const AdminService = {
   createAdminToDB,
   updateAdminToDB,
@@ -438,4 +534,5 @@ export const AdminService = {
   getWebSiteStatusFromDB,
   getAdminProfile,
   getMonthlyEarning,
+  getMonthlyEnrollmentStatus,
 };

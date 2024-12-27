@@ -6,11 +6,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { AdminController } from './admin.controller';
 
 const router = express.Router();
-router.post(
-  '/super-admin',
-  // auth(USER_ROLES.ADMIN),
-  AdminController.createSuperAdmin
-);
+
 router.post('/', auth(AdminTypes.SUPERADMIN), AdminController.createAdmin);
 router.get(
   '/profile',
@@ -26,6 +22,11 @@ router.get(
   '/status',
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.getWebSiteStatus
+);
+router.get(
+  '/enrollments',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  AdminController.getMonthlyEnrollmentStatus
 );
 router.get(
   '/earnings',
