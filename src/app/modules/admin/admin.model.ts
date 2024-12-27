@@ -86,6 +86,7 @@ adminSchema.index(
 );
 adminSchema.pre('save', async function (next) {
   const isExistSuperAdmin = await Admin.find({
+    email: this.email,
     type: AdminTypes.SUPERADMIN,
   });
   if (isExistSuperAdmin.length > 1) {
