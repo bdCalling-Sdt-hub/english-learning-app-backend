@@ -369,6 +369,31 @@ const getWebSiteStatusFromDB = async () => {
       $count: 'total',
     },
   ]);
+  const totalEarning = await Enrollment.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'courseID',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $group: {
+        _id: null,
+        totalEarnings: { $sum: '$course.price' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalEarnings: 1,
+      },
+    },
+  ]).then(result => result[0]?.totalEarnings || 0);
   const finalResult = {
     students: allStudents.length,
     teachers: allTeachers.length,
@@ -384,6 +409,7 @@ const getWebSiteStatusFromDB = async () => {
     completedCourses: completedCourses.length,
     topTeachers: topTeachersLookup,
     totalUsers,
+    totalEarning,
     topCourses,
     totalCompletedCourses,
   };
