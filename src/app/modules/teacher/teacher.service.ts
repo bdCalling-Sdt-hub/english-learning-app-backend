@@ -34,6 +34,11 @@ const stripe = new Stripe(stripeSecretKey, {
 
 const createTeacherToDB = async (req: any) => {
   const email = req.body.email;
+  console.log(req.body);
+  if (!req.body.email) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email should be provided');
+  }
+
   const validDomains = [
     'gmail.com',
     'yahoo.com',
@@ -42,7 +47,7 @@ const createTeacherToDB = async (req: any) => {
     'outlook.com',
   ];
   for (const domain of validDomains) {
-    if (email.toString().includes(domain)) {
+    if (!email.toString().includes(domain)) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Please provide a valid email address'

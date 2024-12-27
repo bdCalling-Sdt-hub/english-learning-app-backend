@@ -7,8 +7,7 @@ import { AdminService } from './admin.service';
 import { Server } from 'socket.io';
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
-  const { ...userData } = req.body;
-  const result = await AdminService.createAdminToDB(userData);
+  const result = await AdminService.createAdminToDB(req.body);
 
   sendResponse(res, {
     success: true,

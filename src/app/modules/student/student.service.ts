@@ -25,6 +25,9 @@ const createStudentToDB = async (
   //set role
   payload.role = USER_ROLES.STUDENT;
   const email = payload.email;
+  if (!payload.email) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email should be provided');
+  }
   const validDomains = [
     'gmail.com',
     'yahoo.com',
@@ -33,7 +36,7 @@ const createStudentToDB = async (
     'outlook.com',
   ];
   for (const domain of validDomains) {
-    if (email?.toString().includes(domain)) {
+    if (!email?.toString().includes(domain)) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Please provide a valid email address'

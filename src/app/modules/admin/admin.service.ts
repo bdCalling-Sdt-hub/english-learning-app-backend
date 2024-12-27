@@ -18,9 +18,18 @@ const createAdminToDB = async (
   userData: IAdmin,
   type: string | undefined = undefined
 ) => {
-  const isExistAdmin = await Admin.findOne({ email: userData.email });
-  const isExistTeacher = await Teacher.findOne({ email: userData.email });
-  const isExistStudent = await Student.findOne({ email: userData.email });
+  console.log(userData);
+
+  if (!userData.email) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email should be provided');
+  }
+
+  const [isExistAdmin, isExistStudent, isExistTeacher] = await Promise.all([
+    Admin.findOne({ email: userData.email }),
+    Student.findOne({ email: userData.email }),
+    Teacher.findOne({ email: userData.email }),
+  ]);
+  console.log(isExistAdmin, isExistStudent, isExistTeacher);
   if (isExistAdmin || isExistTeacher || isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
   }
@@ -108,6 +117,26 @@ const createAppointedTeacherToDB = async (
   adminId: string,
   io: Server
 ) => {
+  console.log(userData);
+  if (!userData.email) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email should be provided');
+  }
+
+  const validDomains = [
+    'gmail.com',
+    'yahoo.com',
+    'hotmail.com',
+    'aol.com',
+    'outlook.com',
+  ];
+  for (const domain of validDomains) {
+    if (!userData.email.toString().includes(domain)) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Please provide a valid email address'
+      );
+    }
+  }
   const isExistAdmin = await Admin.findById(adminId);
   if (!isExistAdmin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
