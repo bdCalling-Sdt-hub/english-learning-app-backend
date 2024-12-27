@@ -174,7 +174,7 @@ const updateCourseToDB = async (
 
 const getAllCoursesFromDB = async (): Promise<Partial<any>[]> => {
   // Get all non-deleted courses
-  const courses = await Course.find({ status: { $ne: 'delete' } });
+  const courses = await Course.find({ status: 'active' });
 
   // Use Promise.all to wait for all teacher lookups to complete
   const finalResult = await Promise.all(
