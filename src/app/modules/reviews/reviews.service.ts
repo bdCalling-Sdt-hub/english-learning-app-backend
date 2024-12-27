@@ -73,9 +73,10 @@ const getTeacherReviewsFromDB = async (id: string) => {
   if (!existTeacher) {
     throw new Error('Student not found');
   }
-  const reviews = await Reviews.find({ teacher: id }).populate(
-    'teacher studentID'
-  );
+  const reviews = await Reviews.find({ teacher: id }).populate({
+    path: 'teacher studentID',
+    select: '-accountInformation',
+  });
   if (!reviews) {
     throw new Error('Reviews not found');
   }
