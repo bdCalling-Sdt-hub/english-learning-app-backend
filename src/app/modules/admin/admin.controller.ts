@@ -6,18 +6,6 @@ import ApiError from '../../../errors/ApiError';
 import { AdminService } from './admin.service';
 import { Server } from 'socket.io';
 
-const createSuperAdmin = catchAsync(async (req: Request, res: Response) => {
-  const { ...userData } = req.body;
-  const result = await AdminService.createAdminToDB(userData, 'SUPERADMIN');
-
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Super admin created successfully',
-    data: '',
-  });
-});
-
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
   const result = await AdminService.createAdminToDB(userData);
@@ -180,7 +168,6 @@ const getMonthlyEnrollmentStatus = catchAsync(
 );
 export const AdminController = {
   createAdmin,
-  createSuperAdmin,
   updateAdmin,
   getAllAdmins,
   getAdminById,
