@@ -188,11 +188,17 @@ const getAllCoursesFromDB = async (): Promise<Partial<any>[]> => {
       const totalLectures = await Lecture.find({
         courseID: course._id,
       });
+      const ratingOfCourse = await Reviews.find({ courseID: course._id });
+      const allRating = ratingOfCourse.reduce(
+        (total, review) => total + review.star,
+        0
+      );
       return {
         ...courseObj,
         startDate: courseObj.startDate,
         teacherName: teacher?.name,
         totalLectures: course?.lectures?.length,
+        rating: allRating / ratingOfCourse.length,
       };
     })
   );
