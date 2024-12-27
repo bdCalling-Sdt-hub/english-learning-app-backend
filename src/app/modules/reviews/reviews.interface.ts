@@ -5,7 +5,7 @@ export type IReviews = {
   description: string;
   courseID: string;
   teacher: ObjectId;
-  studentID: string;
+  studentID: ObjectId;
 };
 
 export type ReviewsModel = Model<IReviews>;

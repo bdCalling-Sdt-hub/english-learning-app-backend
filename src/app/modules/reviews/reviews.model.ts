@@ -26,7 +26,8 @@ const reviewSchema = new Schema<IReviews, ReviewsModel>(
       required: [true, 'teacher is required'],
     },
     studentID: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Student',
       required: [true, 'studentID is required'],
     },
   },
@@ -43,7 +44,7 @@ reviewSchema.pre('save', async function (next) {
   if (!isExistStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Student not found!');
   }
-  if (isExistCourse.enrollmentsID.includes(this.studentID)) {
+  if (isExistCourse.enrollmentsID.includes(this.studentID.toString())) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
       "You didn't enroll in this course!"

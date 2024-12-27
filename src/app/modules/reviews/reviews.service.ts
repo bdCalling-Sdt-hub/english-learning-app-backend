@@ -1,5 +1,6 @@
 import { Course } from '../course/course.model';
 import { Student } from '../student/student.model';
+import { Teacher } from '../teacher/teacher.model';
 import { Reviews } from './reviews.model';
 
 const createReviewsToDB = async (data: any) => {
@@ -64,9 +65,28 @@ const getStudentReviewsFromDB = async (id: string) => {
   return reviews;
 };
 
+const getTeacherReviewsFromDB = async (id: string) => {
+  const existTeacher = await Teacher.findOne({
+    _id: id,
+    status: { $ne: 'delete' },
+  });
+  if (!existTeacher) {
+    throw new Error('Student not found');
+  }
+  const reviews = await Reviews.find({ teacher: id }).populate(
+    'teacher studentID'
+  );
+  if (!reviews) {
+    throw new Error('Reviews not found');
+  }
+
+  return reviews;
+};
+
 export const reviewsService = {
   createReviewsToDB,
   getAllReviewsFromDB,
   getSingleReviewFromDB,
   getStudentReviewsFromDB,
+  getTeacherReviewsFromDB,
 };

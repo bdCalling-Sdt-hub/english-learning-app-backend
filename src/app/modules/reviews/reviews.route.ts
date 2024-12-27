@@ -16,6 +16,7 @@ router
   )
   .get('/courses/:id', ReviewsController.getAllReviews)
   .get('/:id', ReviewsController.getSingleReview)
-  .get('/students/:id', ReviewsController.getStudentReviews);
+  .get('/students/:id', ReviewsController.getStudentReviews)
+  .get('/teachers/:id', ReviewsController.getTeacherReviews);
 
 export const ReviewsRoutes = router;
