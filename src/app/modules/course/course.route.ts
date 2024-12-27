@@ -11,7 +11,7 @@ const router = express.Router();
 router
   .post(
     '',
-    auth(USER_ROLES.TEACHER),
+    auth(USER_ROLES.TEACHER, USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
     fileUploadHandler(),
     CourseController.createCourse
   )

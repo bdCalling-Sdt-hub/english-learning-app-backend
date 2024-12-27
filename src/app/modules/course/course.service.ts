@@ -22,6 +22,7 @@ import { Student } from '../student/student.model';
 import { Reviews } from '../reviews/reviews.model';
 import { Types } from 'mongoose';
 import dayjs from 'dayjs';
+import { Admin } from '../admin/admin.model';
 
 // with stripe
 const stripe = new Stripe(config.stripe_secret_key!, {
@@ -35,7 +36,10 @@ const createCourseToDB = async (
 ): Promise<Partial<ICourse>> => {
   // Validate the teacher's existence
   data.teacherID = id;
-  const isExistTeacher: any = await Teacher.findOne({ _id: data.teacherID });
+  let isExistTeacher: any = await Teacher.findOne({ _id: data.teacherID });
+  if (!isExistTeacher) {
+    isExistTeacher = await Admin.findOne({ _id: data.teacherID });
+  }
 
   // @ts-ignore
   const isTeacherDeleted = isExistTeacher?.status === status.delete;
