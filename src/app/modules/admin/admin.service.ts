@@ -117,49 +117,38 @@ const createAppointedTeacherToDB = async (
   adminId: string,
   io: Server
 ) => {
-  console.log(userData);
   if (!userData.email) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email should be provided');
   }
 
-  const validDomains = [
-    'gmail.com',
-    'yahoo.com',
-    'hotmail.com',
-    'aol.com',
-    'outlook.com',
-  ];
-  for (const domain of validDomains) {
-    if (!userData.email.toString().includes(domain)) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Please provide a valid email address'
-      );
-    }
-  }
   const isExistAdmin = await Admin.findById(adminId);
   if (!isExistAdmin) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin not found!');
   }
-  const isExistTeacher = await Teacher.findOne({ email: userData.email });
-  if (isExistTeacher) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
+
+  // Combine email existence checks
+  const [existingTeacher, existingStudent] = await Promise.all([
+    Teacher.findOne({ email: userData.email }),
+    Student.findOne({ email: userData.email }),
+  ]);
+
+  if (existingTeacher || existingStudent) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists!');
   }
-  const isExistStudent = await Student.findOne({ email: userData.email });
-  if (isExistTeacher || isExistStudent) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
-  }
+
   const data = {
     ...userData,
     appointedBy: adminId,
     type: 'platform',
     verified: true,
   };
+
   const createdTeacher = await Teacher.create(data);
   if (!createdTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
   }
-  const studentMessage = `${createdTeacher.name} have became an appointed teacher.`;
+
+  const studentMessage = `${createdTeacher.name} has become an appointed teacher.`;
   const notificationSentStudent =
     await NotificationService.sendNotificationToAllUsersOfARole(
       USER_ROLES.STUDENT,
@@ -175,9 +164,9 @@ const createAppointedTeacherToDB = async (
   if (!notificationSentStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
   }
+
   return createdTeacher;
 };
-
 const makeTeacherAppointedToDB = async (
   id: string,
   adminId: string,

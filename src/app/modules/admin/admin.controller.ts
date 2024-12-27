@@ -71,7 +71,7 @@ const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
 
 const createAppointedTeacher = catchAsync(
   async (req: Request, res: Response) => {
-    const adminId = req.params.adminId;
+    const adminId = req.user.id;
     const { ...userData } = req.body;
     const io: Server = req.app.get('io');
     const result = await AdminService.createAppointedTeacherToDB(

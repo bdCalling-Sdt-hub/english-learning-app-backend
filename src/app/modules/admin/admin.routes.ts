@@ -50,7 +50,7 @@ router.delete(
   AdminController.deleteAdmin
 );
 router.post(
-  '/:adminId/create-appointed-teacher',
+  '/create-appointed-teacher',
   auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
   AdminController.createAppointedTeacher
 );

@@ -35,13 +35,12 @@ const createStudentToDB = async (
     'aol.com',
     'outlook.com',
   ];
-  for (const domain of validDomains) {
-    if (!email?.toString().includes(domain)) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Please provide a valid email address'
-      );
-    }
+  const emailDomain = email?.split('@')[1];
+  if (!validDomains.includes(emailDomain as string)) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Please provide a valid email address'
+    );
   }
   const isExist = await Student.findOne({ email: payload.email });
   if (isExist) {

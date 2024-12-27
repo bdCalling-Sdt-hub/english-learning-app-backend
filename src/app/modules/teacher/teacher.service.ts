@@ -46,13 +46,12 @@ const createTeacherToDB = async (req: any) => {
     'aol.com',
     'outlook.com',
   ];
-  for (const domain of validDomains) {
-    if (!email.toString().includes(domain)) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Please provide a valid email address'
-      );
-    }
+  const emailDomain = email.split('@')[1];
+  if (!validDomains.includes(emailDomain)) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Please provide a valid email address'
+    );
   }
 
   const isExist = await Teacher.findOne({ email: req.body.email });
@@ -342,9 +341,7 @@ const updateProfileToDB = async (
 const getAllTeachersFromDB = async (
   query: any
 ): Promise<Partial<ITeacher>[]> => {
-  const { page = 1, limit = 10, searchTerm = '' } = query;
-  const skip = (Number(page) - 1) * Number(limit);
-
+  const searchTerm = query.searchTerm || '';
   const searchConditions = searchTerm
     ? {
         $or: [
@@ -354,11 +351,13 @@ const getAllTeachersFromDB = async (
         ],
       }
     : {};
-
+  let skip = 0;
+  if (query.page && query.limit) {
+    skip = (Number(query.page) - 1) * Number(query.limit);
+  }
   const result = await Teacher.find(searchConditions, { password: 0 })
     .skip(skip)
-    .limit(Number(limit));
-
+    .limit(Number(query.limit));
   return result;
 };
 const getTeacherByIdFromDB = async (
