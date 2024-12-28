@@ -1,6 +1,5 @@
 node_modules
 .env
-uploads/
 /winston
 testing-frontend-react
 /dist
