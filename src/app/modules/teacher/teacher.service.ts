@@ -285,7 +285,8 @@ const getTeacherProfileFromDB = async (
   }
   const finalResult = {
     isPaymentSetup,
-    ...isExistTeacher,
+    //@ts-ignore
+    ...isExistTeacher._doc,
   };
   return finalResult;
 };
