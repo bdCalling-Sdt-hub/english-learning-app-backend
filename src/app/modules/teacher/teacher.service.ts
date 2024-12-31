@@ -279,7 +279,14 @@ const getTeacherProfileFromDB = async (
   if (!isExistTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
   }
-
+  let isPaymentSetup = false;
+  if (isExistTeacher.accountInformation?.stripeAccountId !== null) {
+    isPaymentSetup = true;
+  }
+  const finalResult = {
+    isPaymentSetup,
+    ...isExistTeacher,
+  };
   return isExistTeacher;
 };
 
