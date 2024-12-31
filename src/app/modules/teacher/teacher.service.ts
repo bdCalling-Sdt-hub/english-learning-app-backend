@@ -287,7 +287,7 @@ const getTeacherProfileFromDB = async (
     isPaymentSetup,
     ...isExistTeacher,
   };
-  return isExistTeacher;
+  return finalResult;
 };
 
 const updateProfileToDB = async (
