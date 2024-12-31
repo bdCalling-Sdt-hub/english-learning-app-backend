@@ -400,6 +400,7 @@ const deleteTeacherFromDB = async (id: string): Promise<Partial<any>> => {
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Couldn't delete teacher!");
   }
+  await Course.deleteMany({ teacherID: id });
   return { message: 'Teacher deleted successfully' };
 };
 
