@@ -53,26 +53,27 @@ const createTeacherToDB = async (req: any) => {
       'Please provide a valid email address'
     );
   }
-
-  const isExist = await Teacher.findOne({ email: req.body.email });
-  if (isExist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
-  }
   const { ...user } = req.body;
-  const isExistStudent = await Student.findOne({ email: user.email });
-  const isExistAdmin = await Admin.findOne({ email: user.email });
 
-  if (isExistAdmin) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin already exist!');
-  }
-  if (isExistStudent) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already exist!');
-  }
-  const isExistTeacher = await Teacher.findOne({ email: user.email });
-  if (isExistTeacher) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
-  }
+  if (email.includes('@')) {
+    const isExist = await Teacher.findOne({ email: req.body.email });
+    if (isExist) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+    }
+    const isExistStudent = await Student.findOne({ email: user.email });
+    const isExistAdmin = await Admin.findOne({ email: user.email });
 
+    if (isExistAdmin) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Admin already exist!');
+    }
+    if (isExistStudent) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already exist!');
+    }
+    const isExistTeacher = await Teacher.findOne({ email: user.email });
+    if (isExistTeacher) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Teacher already exist!');
+    }
+  }
   const createdTeacher = await Teacher.create(user);
   if (!createdTeacher) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Something went wrong!');
