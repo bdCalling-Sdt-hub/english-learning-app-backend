@@ -139,6 +139,9 @@ const updateProfileToDB = async (
     //@ts-ignore
     unlinkFile(isExistUser.profile);
   }
+  if (!payload.email?.includes('@') || isExistUser.email === payload.email) {
+    delete payload.email;
+  }
   const updateDoc = await Student.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   });
