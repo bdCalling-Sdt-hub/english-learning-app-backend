@@ -1,5 +1,5 @@
 import express from 'express';
-import { USER_ROLES } from '../../../enums/user';
+import { AdminTypes, USER_ROLES } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import validateRequest from '../../middlewares/validateRequest';
@@ -23,7 +23,11 @@ router
     fileUploadHandler(),
     StudentController.updateProfile
   )
-  .delete('/', auth(USER_ROLES.STUDENT), StudentController.deleteStudent);
+  .delete(
+    '/',
+    auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+    StudentController.deleteStudent
+  );
 router.post('/banner/select', StudentController.selectBannerByID);
 
 router
