@@ -1,5 +1,5 @@
 import express from 'express';
-import { USER_ROLES } from '../../../enums/user';
+import { AdminTypes, USER_ROLES } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import validateRequest from '../../middlewares/validateRequest';
@@ -35,7 +35,11 @@ router
     fileUploadHandler(),
     TeacherController.updateProfile
   )
-  .delete('/:id', auth(USER_ROLES.ADMIN), TeacherController.deleteTeacher)
+  .delete(
+    '/:id',
+    auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+    TeacherController.deleteTeacher
+  )
   .route('/')
   .post(
     validateRequest(TeacherValidation.createTeacherZodSchema),

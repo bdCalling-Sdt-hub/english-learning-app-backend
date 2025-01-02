@@ -365,6 +365,7 @@ const getAllTeachersFromDB = async (
     skip = (Number(query.page) - 1) * Number(query.limit);
   }
   const result = await Teacher.find(searchConditions, { password: 0 })
+    .select('-accountInformation -authentication')
     .skip(skip)
     .limit(Number(query.limit));
   return result;
@@ -372,7 +373,9 @@ const getAllTeachersFromDB = async (
 const getTeacherByIdFromDB = async (
   id: string
 ): Promise<Partial<ITeacher | null>> => {
-  const result = await Teacher.findOne({ _id: id }, { password: 0 });
+  const result = await Teacher.findOne({ _id: id }, { password: 0 }).select(
+    '-accountInformation -authentication'
+  );
   if (!result)
     throw new ApiError(StatusCodes.BAD_REQUEST, "Teacher doesn't exist!");
   const courses = await Course.find({ teacherID: id });
@@ -423,7 +426,9 @@ const getTeachersByLanguageFromDB = async (language: string) => {
       'Language can only be either ENGLISH, HEBREW or SPANISH!'
     );
   }
-  const result = await Teacher.find({ language });
+  const result = await Teacher.find({ language }).select(
+    '-accountInformation -authentication'
+  );
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Teachers not found!');
   }
