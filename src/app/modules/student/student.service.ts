@@ -185,10 +185,8 @@ const deleteStudentFromDB = async (id: string) => {
   if (!existStudent) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Student doesn't exist!");
   }
-  if (existStudent.status === 'delete') {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Student already deleted!');
-  }
-  await Student.findOneAndUpdate({ _id: id }, { status: 'delete' });
+
+  await Student.findByIdAndUpdate(id);
 
   return { message: 'Student deleted successfully' };
 };

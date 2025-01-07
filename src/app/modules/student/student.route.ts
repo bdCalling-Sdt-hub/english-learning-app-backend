@@ -24,6 +24,11 @@ router
     StudentController.updateProfile
   )
   .delete(
+    '/',
+    auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+    StudentController.deleteStudentApp
+  )
+  .delete(
     '/:id',
     auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
     StudentController.deleteStudent
