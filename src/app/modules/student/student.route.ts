@@ -27,12 +27,12 @@ router
     '/',
     auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
     StudentController.deleteStudentApp
-  )
-  .delete(
-    '/:id',
-    auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
-    StudentController.deleteStudent
   );
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
+  StudentController.deleteStudent
+);
 router.post('/banner/select', StudentController.selectBannerByID);
 
 router
