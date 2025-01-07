@@ -24,7 +24,7 @@ router
     StudentController.updateProfile
   )
   .delete(
-    '/',
+    '/:id',
     auth(USER_ROLES.ADMIN, AdminTypes.SUPERADMIN),
     StudentController.deleteStudent
   );
