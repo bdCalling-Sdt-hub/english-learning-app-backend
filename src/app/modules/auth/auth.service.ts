@@ -373,7 +373,13 @@ const socialLoginFromDB = async (payload: any) => {
       config.jwt.jwt_secret as Secret
     );
 
-    return { token, role, loginType };
+    return {
+      token,
+      role,
+      loginType,
+
+      ...(role === USER_ROLES.TEACHER ? { type: 'freelancer' } : {}),
+    };
   } else {
     const userData = {
       appId,
