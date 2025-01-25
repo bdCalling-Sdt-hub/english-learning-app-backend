@@ -9,7 +9,6 @@ import generateOTP from '../../../util/generateOTP';
 import { IStudent } from './student.interface';
 import { Student } from './student.model';
 import { Teacher } from '../teacher/teacher.model';
-import sendResponse from '../../../shared/sendResponse';
 import { isStudentDeleted } from '../../../util/isDeleted';
 import { Admin } from '../admin/admin.model';
 import { Course } from '../course/course.model';
@@ -119,6 +118,8 @@ const getStudentProfileFromDB = async (
     name: isExistUser.name || '',
     email: isExistUser.email || '',
     phone: isExistUser.phone || '',
+    appId: isExistUser.appId || '',
+    loginType: isExistUser.loginType || '',
   };
 };
 
