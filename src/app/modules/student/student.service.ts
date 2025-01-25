@@ -116,9 +116,9 @@ const getStudentProfileFromDB = async (
 
   return {
     ...isExistUser,
-    name: isExistUser.name,
-    email: isExistUser.email,
-    phone: isExistUser.phone,
+    name: isExistUser.name || '',
+    email: isExistUser.email || '',
+    phone: isExistUser.phone || '',
   };
 };
 
