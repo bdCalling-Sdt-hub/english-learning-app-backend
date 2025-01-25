@@ -287,6 +287,7 @@ const getTeacherProfileFromDB = async (
     isPaymentSetup,
     //@ts-ignore
     ...isExistTeacher._doc,
+    banner: isExistTeacher.banner || '/banners/default.png',
     name: isExistTeacher.name || '',
     email: isExistTeacher.email || '',
     phone: isExistTeacher.phone || '',
