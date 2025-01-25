@@ -71,7 +71,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
     // @ts-ignore
     return { createToken, role: existUser?.type?.toUpperCase() };
   }
-  return { createToken, role };
+  return { createToken, role, loginType: '' };
 };
 
 // forget password
@@ -374,9 +374,8 @@ const socialLoginFromDB = async (payload: any) => {
     );
 
     return {
-      token,
+      createToken: token,
       loginType,
-
       ...(role === USER_ROLES.TEACHER ? { role: 'FREELANCER' } : { role }),
     };
   } else {
@@ -403,7 +402,7 @@ const socialLoginFromDB = async (payload: any) => {
     );
 
     return {
-      token,
+      createToken: token,
       loginType,
       ...(role === USER_ROLES.TEACHER ? { role: 'FREELANCER' } : { role }),
     };
