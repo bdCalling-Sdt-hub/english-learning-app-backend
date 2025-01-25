@@ -287,6 +287,9 @@ const getTeacherProfileFromDB = async (
     isPaymentSetup,
     //@ts-ignore
     ...isExistTeacher._doc,
+    name: isExistTeacher.name,
+    email: isExistTeacher.email,
+    phone: isExistTeacher.phone,
   };
   return finalResult;
 };

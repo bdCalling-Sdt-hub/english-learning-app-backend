@@ -114,7 +114,12 @@ const getStudentProfileFromDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
-  return isExistUser;
+  return {
+    ...isExistUser,
+    name: isExistUser.name,
+    email: isExistUser.email,
+    phone: isExistUser.phone,
+  };
 };
 
 const updateProfileToDB = async (
