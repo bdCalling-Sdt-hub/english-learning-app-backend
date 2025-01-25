@@ -377,7 +377,7 @@ const socialLoginFromDB = async (payload: any) => {
       token,
       loginType,
 
-      ...(role === USER_ROLES.TEACHER ? { role: 'freelancer' } : { role }),
+      ...(role === USER_ROLES.TEACHER ? { role: 'FREELANCER' } : { role }),
     };
   } else {
     const userData = {
@@ -405,7 +405,7 @@ const socialLoginFromDB = async (payload: any) => {
     return {
       token,
       loginType,
-      ...(role === USER_ROLES.TEACHER ? { role: 'freelancer' } : { role }),
+      ...(role === USER_ROLES.TEACHER ? { role: 'FREELANCER' } : { role }),
     };
   }
 };
