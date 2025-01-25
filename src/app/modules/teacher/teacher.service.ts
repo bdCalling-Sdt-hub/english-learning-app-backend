@@ -290,6 +290,8 @@ const getTeacherProfileFromDB = async (
     name: isExistTeacher.name || '',
     email: isExistTeacher.email || '',
     phone: isExistTeacher.phone || '',
+    appId: isExistTeacher.appId || '',
+    loginType: isExistTeacher.loginType || '',
   };
   return finalResult;
 };
